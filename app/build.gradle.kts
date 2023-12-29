@@ -2,6 +2,10 @@ plugins {
     id("com.android.application")
 }
 
+dependencies {
+    implementation("com.journeyapps:zxing-android-embedded:4.1.0")
+}
+
 android {
     namespace = "io.skyvoli.goodbooks"
     compileSdk = 34
