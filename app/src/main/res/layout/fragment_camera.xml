@@ -4,12 +4,9 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.gallery.GalleryFragment">
+        tools:context=".ui.camera.CameraFragment">
 
     <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
@@ -38,7 +35,7 @@
                 android:layout_margin="10dp"
                 android:backgroundTint="#0F9D58"
                 android:layout_gravity="center"
-                android:text="Scan"/>
+                android:text="@string/scan"/>
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
