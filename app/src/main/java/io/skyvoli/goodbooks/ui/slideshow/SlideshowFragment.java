@@ -4,11 +4,17 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import java.util.Objects;
 
 import io.skyvoli.goodbooks.databinding.FragmentSlideshowBinding;
 
@@ -24,8 +30,19 @@ public class SlideshowFragment extends Fragment {
         binding = FragmentSlideshowBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textSlideshow;
-        slideshowViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        //TODO keine statische Liste
+        String[] eintrag = {
+                "Eintrag 1",
+                "Eintrag 2",
+                "Eintrag 3",
+                "Eintrag 4",
+                "Eintrag 5",
+                "Eintrag 6",
+        };
+        final ListView listView = binding.books;
+        ListAdapter adapter = new ArrayAdapter<String>(requireActivity(), android.R.layout.simple_list_item_1, eintrag);
+        listView.setAdapter(adapter);
+
         return root;
     }
 
