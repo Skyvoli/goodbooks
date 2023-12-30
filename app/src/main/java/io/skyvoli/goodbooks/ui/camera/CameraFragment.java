@@ -57,7 +57,10 @@ public class CameraFragment extends Fragment {
                 cameraViewModel.setText1(result.getContents());
                 cameraViewModel.setText2(result.getFormatName());
                 GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
-                globalViewModel.addBook(result.getContents());
+
+                if (!globalViewModel.addBook(result.getContents())) {
+                    Toast.makeText(getContext(), "Duplicate", Toast.LENGTH_LONG).show();
+                };
 
             }
         }
