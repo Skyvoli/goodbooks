@@ -19,6 +19,7 @@ import com.google.zxing.integration.android.IntentResult;
 
 import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.listener.ScanListener;
+import io.skyvoli.goodbooks.ui.GlobalViewModel;
 
 public class CameraFragment extends Fragment {
 
@@ -26,7 +27,7 @@ public class CameraFragment extends Fragment {
     CameraViewModel cameraViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-       cameraViewModel = new ViewModelProvider(this).get(CameraViewModel.class);
+        cameraViewModel = new ViewModelProvider(this).get(CameraViewModel.class);
 
         binding = FragmentCameraBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -55,6 +56,9 @@ public class CameraFragment extends Fragment {
                 // the content and format of scan message
                 cameraViewModel.setText1(result.getContents());
                 cameraViewModel.setText2(result.getFormatName());
+                GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
+                globalViewModel.addBook(result.getContents());
+
             }
         }
     }
