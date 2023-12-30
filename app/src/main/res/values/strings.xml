@@ -9,6 +9,6 @@
 
     <string name="menu_home">Home</string>
     <string name="menu_camera">Camera</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_books">Books</string>
     <string name="scan">Scan</string>
 </resources>

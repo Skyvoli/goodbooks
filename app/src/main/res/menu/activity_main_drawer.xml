@@ -13,8 +13,8 @@
                 android:icon="@drawable/ic_menu_camera"
                 android:title="@string/menu_camera" />
         <item
-                android:id="@+id/nav_slideshow"
-                android:icon="@drawable/ic_menu_slideshow"
-                android:title="@string/menu_slideshow" />
+                android:id="@+id/nav_books"
+                android:icon="@drawable/ic_menu_books"
+                android:title="@string/menu_books" />
     </group>
 </menu>

@@ -18,8 +18,8 @@
             tools:layout="@layout/fragment_camera" />
 
     <fragment
-            android:id="@+id/nav_slideshow"
-            android:name="io.skyvoli.goodbooks.ui.slideshow.SlideshowFragment"
-            android:label="@string/menu_slideshow"
-            tools:layout="@layout/fragment_slideshow" />
+            android:id="@+id/nav_books"
+            android:name="io.skyvoli.goodbooks.ui.books.BooksFragment"
+            android:label="@string/menu_books"
+            tools:layout="@layout/fragment_books" />
 </navigation>
