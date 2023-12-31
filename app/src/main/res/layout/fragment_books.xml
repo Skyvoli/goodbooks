@@ -6,7 +6,7 @@
         android:layout_height="match_parent"
         tools:context=".ui.books.BooksFragment">
 
-    <ListView
+    <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/books"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

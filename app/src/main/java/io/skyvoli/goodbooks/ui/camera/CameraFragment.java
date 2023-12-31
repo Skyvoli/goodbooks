@@ -19,6 +19,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
+import io.skyvoli.goodbooks.dto.Book;
 import io.skyvoli.goodbooks.helper.InformationDialog;
 import io.skyvoli.goodbooks.helper.NoticeDialogListener;
 import io.skyvoli.goodbooks.helper.PermissionDialog;
@@ -79,7 +80,8 @@ public class CameraFragment extends Fragment {
         return new NoticeDialogListener() {
             @Override
             public void onDialogPositiveClick(DialogFragment dialog) {
-                globalViewModel.addBook(result.getContents());
+                //TODO title auflösen
+                globalViewModel.addBook(new Book("My book", result.getContents()));
             }
 
             @Override

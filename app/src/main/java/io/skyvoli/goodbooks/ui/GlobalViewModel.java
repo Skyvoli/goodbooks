@@ -8,9 +8,11 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import io.skyvoli.goodbooks.dto.Book;
+
 public class GlobalViewModel extends ViewModel {
 
-    private final MutableLiveData<Set<String>> books;
+    private final MutableLiveData<Set<Book>> books;
 
     public GlobalViewModel() {
         books = new MutableLiveData<>();
@@ -18,15 +20,15 @@ public class GlobalViewModel extends ViewModel {
         books.setValue(new HashSet<>());
     }
 
-    public LiveData<Set<String>> getBooks() {
+    public LiveData<Set<Book>> getBooks() {
         return books;
     }
 
-    public void addBook(String text) {
-        Objects.requireNonNull(books.getValue()).add(text);
+    public void addBook(Book book) {
+        Objects.requireNonNull(books.getValue()).add(book);
     }
 
     public boolean hasBook(String text) {
-        return Objects.requireNonNull(books.getValue()).contains(text);
+        return Objects.requireNonNull(books.getValue()).contains(new Book("", text));
     }
 }
