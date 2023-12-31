@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -18,7 +19,10 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
-import io.skyvoli.goodbooks.listener.ScanListener;
+import io.skyvoli.goodbooks.helper.InformationDialog;
+import io.skyvoli.goodbooks.helper.NoticeDialogListener;
+import io.skyvoli.goodbooks.helper.PermissionDialog;
+import io.skyvoli.goodbooks.helper.ScanListener;
 import io.skyvoli.goodbooks.ui.GlobalViewModel;
 
 public class CameraFragment extends Fragment {
@@ -50,20 +54,39 @@ public class CameraFragment extends Fragment {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if(result != null) {
             if(result.getContents() == null) {
-                Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "Scan cancelled", Toast.LENGTH_LONG).show();
             } else {
-                // if the intentResult is not null we'll set
-                // the content and format of scan message
                 cameraViewModel.setText1(result.getContents());
                 cameraViewModel.setText2(result.getFormatName());
+
                 GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
 
-                if (!globalViewModel.addBook(result.getContents())) {
-                    Toast.makeText(getContext(), "Duplicate", Toast.LENGTH_LONG).show();
-                };
+                if (globalViewModel.hasBook(result.getContents())) {
+                    InformationDialog informationDialog = new InformationDialog("Duplikat", "Dieses Buch ist bereits vorhanden");
+                    informationDialog.show(getParentFragmentManager(), "Duplikat");
+                    return;
+                }
 
+                PermissionDialog permissionDialog = new PermissionDialog("Buch erkannt",
+                        "Soll das Buch mit ISBN " + result.getContents() + " hinzugefügt werden?",
+                        addBookListener(globalViewModel, result));
+                permissionDialog.show(getParentFragmentManager(), "Buch erkannt");
             }
         }
+    }
+
+    private NoticeDialogListener addBookListener(GlobalViewModel globalViewModel, IntentResult result) {
+        return new NoticeDialogListener() {
+            @Override
+            public void onDialogPositiveClick(DialogFragment dialog) {
+                globalViewModel.addBook(result.getContents());
+            }
+
+            @Override
+            public void onDialogNegativeClick(DialogFragment dialog) {
+                Toast.makeText(getContext(), "Nicht hinzugefügt", Toast.LENGTH_LONG).show();
+            }
+        };
     }
 
     @Override

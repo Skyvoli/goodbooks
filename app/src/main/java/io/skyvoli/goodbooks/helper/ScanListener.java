@@ -1,17 +1,7 @@
-package io.skyvoli.goodbooks.listener;
+package io.skyvoli.goodbooks.helper;
 
-import static android.app.Activity.RESULT_CANCELED;
-import static android.app.Activity.RESULT_OK;
-
-import static androidx.core.app.ActivityCompat.startActivityForResult;
-
-import android.app.Activity;
-import android.content.Intent;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.zxing.integration.android.IntentIntegrator;

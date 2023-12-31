@@ -24,7 +24,11 @@ public class GlobalViewModel extends ViewModel {
         return books;
     }
 
-    public boolean addBook(String text) {
-        return Objects.requireNonNull(books.getValue()).add(text);
+    public void addBook(String text) {
+        Objects.requireNonNull(books.getValue()).add(text);
+    }
+
+    public boolean hasBook(String text) {
+        return Objects.requireNonNull(books.getValue()).contains(text);
     }
 }
