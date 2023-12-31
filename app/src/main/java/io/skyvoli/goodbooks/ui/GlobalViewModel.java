@@ -4,9 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -17,7 +15,7 @@ public class GlobalViewModel extends ViewModel {
     public GlobalViewModel() {
         books = new MutableLiveData<>();
 
-        books.setValue(new HashSet<String>());
+        books.setValue(new HashSet<>());
     }
 
     public LiveData<Set<String>> getBooks() {
