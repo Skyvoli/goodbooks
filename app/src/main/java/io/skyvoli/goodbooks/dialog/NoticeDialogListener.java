@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.helper;
+package io.skyvoli.goodbooks.dialog;
 
 import androidx.fragment.app.DialogFragment;
 

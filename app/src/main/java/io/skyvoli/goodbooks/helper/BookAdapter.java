@@ -22,7 +22,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         this.books = books;
     }
 
-
     @NonNull
     @Override
     public BookViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -51,15 +50,15 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         super.onAttachedToRecyclerView(recyclerView);
     }
 
-    public static class BookViewHolder extends RecyclerView.ViewHolder{
+    public static class BookViewHolder extends RecyclerView.ViewHolder {
 
         protected TextView title;
         protected TextView isbn;
 
         public BookViewHolder(View itemView) {
             super(itemView);
-            title = (TextView) itemView.findViewById(R.id.bookTitle);
-            isbn = (TextView) itemView.findViewById(R.id.isbn);
+            title = itemView.findViewById(R.id.bookTitle);
+            isbn = itemView.findViewById(R.id.isbn);
         }
     }
 }

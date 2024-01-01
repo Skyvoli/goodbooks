@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.helper;
+package io.skyvoli.goodbooks.dialog;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

@@ -20,9 +20,9 @@ import com.google.zxing.integration.android.IntentResult;
 
 import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dto.Book;
-import io.skyvoli.goodbooks.helper.InformationDialog;
-import io.skyvoli.goodbooks.helper.NoticeDialogListener;
-import io.skyvoli.goodbooks.helper.PermissionDialog;
+import io.skyvoli.goodbooks.dialog.InformationDialog;
+import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
+import io.skyvoli.goodbooks.dialog.PermissionDialog;
 import io.skyvoli.goodbooks.helper.ScanListener;
 import io.skyvoli.goodbooks.ui.GlobalViewModel;
 
