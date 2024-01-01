@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     implementation("com.journeyapps:zxing-android-embedded:4.1.0")
+    implementation("org.jsoup:jsoup:1.17.2")
 }
 
 android {

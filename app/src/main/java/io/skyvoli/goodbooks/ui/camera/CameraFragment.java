@@ -23,6 +23,7 @@ import io.skyvoli.goodbooks.dto.Book;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
 import io.skyvoli.goodbooks.dialog.PermissionDialog;
+import io.skyvoli.goodbooks.helper.BookResolver;
 import io.skyvoli.goodbooks.helper.ScanListener;
 import io.skyvoli.goodbooks.ui.GlobalViewModel;
 
@@ -80,8 +81,8 @@ public class CameraFragment extends Fragment {
         return new NoticeDialogListener() {
             @Override
             public void onDialogPositiveClick(DialogFragment dialog) {
-                //TODO title auflösen
-                globalViewModel.addBook(new Book("My book", result.getContents()));
+                BookResolver bookResolver = new BookResolver();
+                globalViewModel.addBook(bookResolver.resolveBook(result.getContents(), getActivity()));
             }
 
             @Override
