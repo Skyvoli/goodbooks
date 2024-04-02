@@ -1,7 +1,5 @@
 package io.skyvoli.goodbooks.helper;
 
-import android.content.Context;
-
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -10,9 +8,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import io.skyvoli.goodbooks.dto.Book;
+import io.skyvoli.goodbooks.model.Book;
+import io.skyvoli.goodbooks.web.HttpRequest;
 
 public class BookResolver {
 
@@ -22,12 +22,21 @@ public class BookResolver {
     private static final String MAXIMUM_RECORDS = "&maximumRecords=";
     private static final String RECORD_SCHEMA = "&recordSchema=oai_dc";
 
-    public Book resolveBook(String isbn, Context context) {
+    public Book resolveBook(String isbn) {
         String url = this.buildUrl(isbn);
-        Document document = new HttpRequest().invoke(url);
-        List<Book> books = this.serializeXml(document, isbn);
-        //TODO better + if books empty
-        return new Book(books.get(0).getName(), isbn);
+        Optional<Document> document = new HttpRequest().invoke(url);
+
+        if (!document.isPresent()) {
+            return new Book("Buchtitel", isbn, false);
+        }
+
+        List<Book> books = this.serializeXml(document.get(), isbn);
+        if (books.size() == 0) {
+            return new Book("Buchtitel", isbn, false);
+        }
+
+        //TODO better
+        return new Book(books.get(0).getName(), isbn, true);
     }
 
     private String buildUrl(String isbn) {
@@ -54,7 +63,7 @@ public class BookResolver {
                 }
             }
 
-            books.add(new Book(mappedData.get("dc:title"), isbn));
+            books.add(new Book(mappedData.get("dc:title"), isbn, true));
         }
         return books;
     }

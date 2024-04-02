@@ -7,19 +7,19 @@
     <!--Fügt Fragment zur Navigation hinzu ==> Button löst Wechsel zum Fragment aus -->
     <fragment
             android:id="@+id/nav_home"
-            android:name="io.skyvoli.goodbooks.ui.home.HomeFragment"
+            android:name="io.skyvoli.goodbooks.ui.fragments.home.HomeFragment"
             android:label="@string/menu_home"
             tools:layout="@layout/fragment_home" />
 
     <fragment
             android:id="@+id/nav_camera"
-            android:name="io.skyvoli.goodbooks.ui.camera.CameraFragment"
+            android:name="io.skyvoli.goodbooks.ui.fragments.camera.CameraFragment"
             android:label="@string/menu_camera"
             tools:layout="@layout/fragment_camera" />
 
     <fragment
             android:id="@+id/nav_books"
-            android:name="io.skyvoli.goodbooks.ui.books.BooksFragment"
+            android:name="io.skyvoli.goodbooks.ui.fragments.books.BooksFragment"
             android:label="@string/menu_books"
             tools:layout="@layout/fragment_books" />
 </navigation>

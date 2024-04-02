@@ -1,9 +1,10 @@
-package io.skyvoli.goodbooks.helper;
+package io.skyvoli.goodbooks.web;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,11 +14,11 @@ import java.util.concurrent.TimeoutException;
 
 public class HttpRequest {
 
-    public Document invoke(String url) {
+    public Optional<Document> invoke(String url) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<Document> future = executorService.submit(() -> this.fetchDocument(url));
+        Future<Optional<Document>> future = executorService.submit(() -> this.fetchDocument(url));
 
-        Document document = null;
+        Optional<Document> document = Optional.empty();
         try {
             document = future.get(10, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
@@ -27,17 +28,17 @@ public class HttpRequest {
         return document;
     }
 
-    private Document fetchDocument(String url) {
-        Document doc = null;
+    private Optional<Document> fetchDocument(String url) {
+        Document doc;
         try {
             doc = Jsoup.connect(url)
                     .maxBodySize(0)
                     .get();
         } catch (IOException e) {
             //logger.error("Couldn't fetch document");
-            e.printStackTrace();
+            return Optional.empty();
         }
-        return doc;
+        return Optional.ofNullable(doc);
     }
 
 }

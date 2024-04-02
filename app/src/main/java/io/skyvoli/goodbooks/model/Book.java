@@ -1,14 +1,16 @@
-package io.skyvoli.goodbooks.dto;
+package io.skyvoli.goodbooks.model;
 
 import java.util.Objects;
 
 public class Book {
     private final String name;
     private final String isbn;
+    private boolean resolved;
 
-    public Book(String name, String isbn) {
+    public Book(String name, String isbn, boolean resolved) {
         this.name = name;
         this.isbn = isbn;
+        this.resolved = resolved;
     }
 
     public String getName() {
@@ -17,6 +19,14 @@ public class Book {
 
     public String getIsbn() {
         return isbn;
+    }
+
+    public boolean isResolved() {
+        return resolved;
+    }
+
+    public void setResolved(boolean resolved) {
+        this.resolved = resolved;
     }
 
     @Override

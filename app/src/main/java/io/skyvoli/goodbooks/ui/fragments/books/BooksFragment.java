@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.ui.books;
+package io.skyvoli.goodbooks.ui.fragments.books;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
-import io.skyvoli.goodbooks.helper.BookAdapter;
-import io.skyvoli.goodbooks.ui.GlobalViewModel;
+import io.skyvoli.goodbooks.ui.adapter.BookAdapter;
+import io.skyvoli.goodbooks.model.GlobalViewModel;
 
 public class BooksFragment extends Fragment {
 

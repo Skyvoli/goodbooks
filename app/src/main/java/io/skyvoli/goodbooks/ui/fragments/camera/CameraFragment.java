@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.ui.camera;
+package io.skyvoli.goodbooks.ui.fragments.camera;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,13 +19,12 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
-import io.skyvoli.goodbooks.dto.Book;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
 import io.skyvoli.goodbooks.dialog.PermissionDialog;
 import io.skyvoli.goodbooks.helper.BookResolver;
 import io.skyvoli.goodbooks.helper.ScanListener;
-import io.skyvoli.goodbooks.ui.GlobalViewModel;
+import io.skyvoli.goodbooks.model.GlobalViewModel;
 
 public class CameraFragment extends Fragment {
 
@@ -82,7 +81,7 @@ public class CameraFragment extends Fragment {
             @Override
             public void onDialogPositiveClick(DialogFragment dialog) {
                 BookResolver bookResolver = new BookResolver();
-                globalViewModel.addBook(bookResolver.resolveBook(result.getContents(), getActivity()));
+                globalViewModel.addBook(bookResolver.resolveBook(result.getContents()));
             }
 
             @Override

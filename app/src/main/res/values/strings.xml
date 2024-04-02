@@ -11,4 +11,7 @@
     <string name="menu_camera">Camera</string>
     <string name="menu_books">Books</string>
     <string name="scan">Scan</string>
+    <string name="isbn">ISBN</string>
+    <string name="author">Author</string>
+    <string name="book_title">Book Title</string>
 </resources>

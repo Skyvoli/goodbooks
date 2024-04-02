@@ -16,9 +16,6 @@ public class ScanListener implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        // we need to create the object
-        // of IntentIntegrator class
-        // which is the class of QR library
         IntentIntegrator intentIntegrator = IntentIntegrator.forSupportFragment(fragment);
         intentIntegrator.setPrompt("Scan a barcode");
         intentIntegrator.setOrientationLocked(false);

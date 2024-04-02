@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.ui.home;
+package io.skyvoli.goodbooks.ui.fragments.home;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

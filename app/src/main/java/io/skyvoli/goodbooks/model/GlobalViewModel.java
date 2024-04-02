@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.ui;
+package io.skyvoli.goodbooks.model;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -8,15 +8,12 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import io.skyvoli.goodbooks.dto.Book;
-
 public class GlobalViewModel extends ViewModel {
 
     private final MutableLiveData<Set<Book>> books;
 
     public GlobalViewModel() {
         books = new MutableLiveData<>();
-
         books.setValue(new HashSet<>());
     }
 
@@ -28,7 +25,7 @@ public class GlobalViewModel extends ViewModel {
         Objects.requireNonNull(books.getValue()).add(book);
     }
 
-    public boolean hasBook(String text) {
-        return Objects.requireNonNull(books.getValue()).contains(new Book("", text));
+    public boolean hasBook(String isbn) {
+        return Objects.requireNonNull(books.getValue()).contains(new Book("", isbn, true));
     }
 }

@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.ui.camera;
+package io.skyvoli.goodbooks.ui.fragments.camera;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
