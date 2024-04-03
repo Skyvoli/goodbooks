@@ -4,7 +4,6 @@
         android:layout_width="match_parent"
         android:layout_height="105dp">
 
-
     <TextView
             android:layout_width="200dp"
             android:id="@+id/bookTitle"
@@ -17,7 +16,7 @@
             android:layout_height="wrap_content"/>
 
     <TextView
-            android:id="@+id/isbn"
+            android:id="@+id/isbnLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/bookTitle"
@@ -25,11 +24,24 @@
             android:layout_marginEnd="20dp"
             android:layout_marginStart="30dp"
             android:gravity="center"
-            android:text="@string/isbn"
+            android:text="@string/isbnLabel"
             android:textSize="16sp"/>
 
     <TextView
-            android:id="@+id/author"
+            android:id="@+id/isbn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/isbnLabel"
+            android:layout_below="@+id/bookTitle"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="10dp"
+            android:gravity="center"
+            android:text="@string/isbnFill"
+            android:textSize="16sp"/>
+
+    <TextView
+            android:id="@+id/authorLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/isbn"
@@ -37,7 +49,20 @@
             android:layout_marginTop="5dp"
             android:layout_marginStart="30dp"
             android:gravity="center"
-            android:text="@string/author"
+            android:text="@string/authorLabel"
+            android:textSize="16sp"/>
+
+    <TextView
+            android:id="@+id/author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/isbn"
+            android:layout_toEndOf="@+id/isbnLabel"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="10dp"
+            android:gravity="center"
+            android:text="@string/authorFill"
             android:textSize="16sp"/>
 
 

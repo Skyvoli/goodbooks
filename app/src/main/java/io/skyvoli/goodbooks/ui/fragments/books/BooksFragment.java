@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
+import io.skyvoli.goodbooks.model.BookViewHolder;
 import io.skyvoli.goodbooks.ui.adapter.BookAdapter;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 
@@ -32,7 +33,7 @@ public class BooksFragment extends Fragment {
         final RecyclerView recyclerView = binding.books;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        RecyclerView.Adapter<BookAdapter.BookViewHolder> adapter =
+        RecyclerView.Adapter<BookViewHolder> adapter =
                 new BookAdapter(new ArrayList<>(Objects.requireNonNull(globalViewModel.getBooks().getValue())));
         recyclerView.setAdapter(adapter);
 

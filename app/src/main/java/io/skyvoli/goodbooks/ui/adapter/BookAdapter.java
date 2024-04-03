@@ -14,9 +14,9 @@ import java.util.ArrayList;
 
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.model.Book;
-import io.skyvoli.goodbooks.ui.formatter.BulletItemFormatter;
+import io.skyvoli.goodbooks.model.BookViewHolder;
 
-public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder> {
+public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 
     private final ArrayList<Book> books;
 
@@ -36,11 +36,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     @Override
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
 
-        holder.title.setText(books.get(position).getName());
+        holder.setTitle(books.get(position).getName());
 
-        BulletItemFormatter converter = new BulletItemFormatter(Color.CYAN);
-        holder.isbn.setText(converter.convertString(books.get(position).getIsbn()));
-        holder.author.setText(converter.convertString("Autor"));
+        holder.setIsbn(books.get(position).getIsbn());
+        holder.setAuthor("Autor");
     }
 
     @Override
@@ -51,19 +50,5 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
-    }
-
-    public static class BookViewHolder extends RecyclerView.ViewHolder {
-
-        protected TextView title;
-        protected TextView isbn;
-        protected TextView author;
-
-        public BookViewHolder(View itemView) {
-            super(itemView);
-            title = itemView.findViewById(R.id.bookTitle);
-            isbn = itemView.findViewById(R.id.isbn);
-            author = itemView.findViewById(R.id.author);
-        }
     }
 }

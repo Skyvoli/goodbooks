@@ -62,6 +62,12 @@ public class CameraFragment extends Fragment {
 
                 GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
 
+                if(!isbnIsBook()) {
+                    InformationDialog informationDialog = new InformationDialog("418", "Ich bin kein Buch.");
+                    informationDialog.show(getParentFragmentManager(), "418");
+                    return;
+                }
+
                 if (globalViewModel.hasBook(result.getContents())) {
                     InformationDialog informationDialog = new InformationDialog("Duplikat", "Dieses Buch ist bereits vorhanden");
                     informationDialog.show(getParentFragmentManager(), "Duplikat");
@@ -74,6 +80,11 @@ public class CameraFragment extends Fragment {
                 permissionDialog.show(getParentFragmentManager(), "Buch erkannt");
             }
         }
+    }
+
+    private boolean isbnIsBook() {
+        //TODO check
+        return true;
     }
 
     private NoticeDialogListener addBookListener(GlobalViewModel globalViewModel, IntentResult result) {
