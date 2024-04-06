@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:backgroundTint="#0F9D58"
+                android:backgroundTint="?attr/colorSecondary"
                 android:layout_gravity="center"
                 android:text="@string/scan"/>
 

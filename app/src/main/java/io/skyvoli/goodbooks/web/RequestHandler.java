@@ -27,10 +27,7 @@ public class RequestHandler {
         Optional<Document> document = Optional.empty();
         try {
             document = future.get(10, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            //TODO better
-            return Optional.empty();
-        }
+        } catch (InterruptedException | ExecutionException | TimeoutException ignored) {}
         return document;
     }
 
