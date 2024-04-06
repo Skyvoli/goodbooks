@@ -12,23 +12,29 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class HttpRequest {
+public class RequestHandler {
 
-    public Optional<Document> invoke(String url) {
+    private final String url;
+
+    public RequestHandler(String url) {
+        this.url = url;
+    }
+
+    public Optional<Document> invoke() {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<Optional<Document>> future = executorService.submit(() -> this.fetchDocument(url));
+        Future<Optional<Document>> future = executorService.submit(this::fetchDocument);
 
         Optional<Document> document = Optional.empty();
         try {
             document = future.get(10, TimeUnit.SECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             //TODO better
-            e.printStackTrace();
+            return Optional.empty();
         }
         return document;
     }
 
-    private Optional<Document> fetchDocument(String url) {
+    private Optional<Document> fetchDocument() {
         Document doc;
         try {
             doc = Jsoup.connect(url)

@@ -16,4 +16,5 @@
     <string name="book_title">Book Title</string>
     <string name="isbnFill">isbn</string>
     <string name="authorFill">autor</string>
+    <string name="bookCover">bookCover</string>
 </resources>

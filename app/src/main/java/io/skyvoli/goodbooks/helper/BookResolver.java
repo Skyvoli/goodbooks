@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.skyvoli.goodbooks.model.Book;
-import io.skyvoli.goodbooks.web.HttpRequest;
+import io.skyvoli.goodbooks.web.RequestHandler;
 
 public class BookResolver {
 
@@ -24,7 +24,7 @@ public class BookResolver {
 
     public Book resolveBook(String isbn) {
         String url = this.buildUrl(isbn);
-        Optional<Document> document = new HttpRequest().invoke(url);
+        Optional<Document> document = new RequestHandler(url).invoke();
 
         if (!document.isPresent()) {
             return new Book("Buchtitel", isbn, false);
