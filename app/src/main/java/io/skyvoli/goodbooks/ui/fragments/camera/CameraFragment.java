@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -53,8 +52,8 @@ public class CameraFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if(result != null) {
-            if(result.getContents() == null) {
+        if (result != null) {
+            if (result.getContents() == null) {
                 Toast.makeText(getContext(), "Scan cancelled", Toast.LENGTH_LONG).show();
             } else {
                 cameraViewModel.setText1(result.getContents());
@@ -62,7 +61,7 @@ public class CameraFragment extends Fragment {
 
                 GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
 
-                if(!isbnIsBook()) {
+                if (!isbnIsBook()) {
                     InformationDialog informationDialog = new InformationDialog("418", "Ich bin kein Buch.");
                     informationDialog.show(getParentFragmentManager(), "418");
                     return;
@@ -90,13 +89,13 @@ public class CameraFragment extends Fragment {
     private NoticeDialogListener addBookListener(GlobalViewModel globalViewModel, IntentResult result) {
         return new NoticeDialogListener() {
             @Override
-            public void onDialogPositiveClick(DialogFragment dialog) {
+            public void onDialogPositiveClick() {
                 BookResolver bookResolver = new BookResolver();
                 globalViewModel.addBook(bookResolver.resolveBook(result.getContents()));
             }
 
             @Override
-            public void onDialogNegativeClick(DialogFragment dialog) {
+            public void onDialogNegativeClick() {
                 Toast.makeText(getContext(), "Nicht hinzugefügt", Toast.LENGTH_LONG).show();
             }
         };

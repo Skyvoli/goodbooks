@@ -27,12 +27,8 @@ public class PermissionDialog extends AppCompatDialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("Yes", (dialog, which) -> {
-                    listener.onDialogPositiveClick(this);
-                })
-                .setNegativeButton("No", (dialog, which) -> {
-                    listener.onDialogNegativeClick(this);
-                });
+                .setPositiveButton("Yes", (dialog, which) -> listener.onDialogPositiveClick())
+                .setNegativeButton("No", (dialog, which) -> listener.onDialogNegativeClick());
         Dialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
         return dialog;
