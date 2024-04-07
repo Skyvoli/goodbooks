@@ -27,7 +27,8 @@ public class RequestHandler {
         Optional<Document> document = Optional.empty();
         try {
             document = future.get(10, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException ignored) {}
+        } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
+        }
         return document;
     }
 
@@ -38,7 +39,6 @@ public class RequestHandler {
                     .maxBodySize(0)
                     .get();
         } catch (IOException e) {
-            //logger.error("Couldn't fetch document");
             return Optional.empty();
         }
         return Optional.ofNullable(doc);

@@ -17,13 +17,14 @@ import java.util.Objects;
 
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
 import io.skyvoli.goodbooks.model.BookViewHolder;
-import io.skyvoli.goodbooks.ui.adapter.BookAdapter;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
+import io.skyvoli.goodbooks.ui.adapter.BookAdapter;
 
 public class BooksFragment extends Fragment {
 
     private FragmentBooksBinding binding;
 
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
 

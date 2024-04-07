@@ -30,6 +30,7 @@ public class CameraFragment extends Fragment {
     private FragmentCameraBinding binding;
     CameraViewModel cameraViewModel;
 
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         cameraViewModel = new ViewModelProvider(this).get(CameraViewModel.class);
 

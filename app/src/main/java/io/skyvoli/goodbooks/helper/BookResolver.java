@@ -31,7 +31,7 @@ public class BookResolver {
         }
 
         List<Book> books = this.serializeXml(document.get(), isbn);
-        if (books.size() == 0) {
+        if (books.isEmpty()) {
             return new Book("Buchtitel", isbn, false);
         }
 
@@ -42,6 +42,7 @@ public class BookResolver {
     private String buildUrl(String isbn) {
         return BASE_URL + OPERATION + QUERY + isbn + MAXIMUM_RECORDS + 5 + RECORD_SCHEMA;
     }
+
     private List<Book> serializeXml(Document document, String isbn) {
 
         List<Elements> booksData = document.getElementsByTag("dc")
@@ -55,7 +56,7 @@ public class BookResolver {
         for (Elements bookData : booksData) {
             Map<String, String> mappedData = new HashMap<>();
 
-            for (Element data: bookData) {
+            for (Element data : bookData) {
                 if (mappedData.containsKey(data.tagName())) {
                     mappedData.put(data.tagName() + data.attributes(), mappedData.get(data.tagName()) + " + " + data.text());
                 } else {

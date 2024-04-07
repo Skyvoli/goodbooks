@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.model.Book;
@@ -16,9 +16,9 @@ import io.skyvoli.goodbooks.model.BookViewHolder;
 
 public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 
-    private final ArrayList<Book> books;
+    private final List<Book> books;
 
-    public BookAdapter(ArrayList<Book> books) {
+    public BookAdapter(List<Book> books) {
         this.books = books;
     }
 
@@ -43,10 +43,5 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     @Override
     public int getItemCount() {
         return books.size();
-    }
-
-    @Override
-    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
     }
 }
