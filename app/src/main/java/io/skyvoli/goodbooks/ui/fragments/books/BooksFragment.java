@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -31,11 +32,16 @@ public class BooksFragment extends Fragment {
 
 
         final RecyclerView recyclerView = binding.books;
+        final TextView placeholder = binding.placeholder;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         RecyclerView.Adapter<BookViewHolder> adapter =
                 new BookAdapter(new ArrayList<>(Objects.requireNonNull(globalViewModel.getBooks().getValue())));
         recyclerView.setAdapter(adapter);
+
+        if (!globalViewModel.getBooks().getValue().isEmpty()) {
+            placeholder.setVisibility(View.GONE);
+        }
 
         return root;
     }

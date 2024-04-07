@@ -11,10 +11,11 @@
     <string name="menu_camera">Camera</string>
     <string name="menu_books">Books</string>
     <string name="scan">Scan</string>
-    <string name="isbnLabel">ISBN:</string>
-    <string name="authorLabel">Autor:</string>
+    <string name="isbn_label">ISBN:</string>
+    <string name="author_label">Autor:</string>
     <string name="book_title">Book Title</string>
-    <string name="isbnFill">isbn</string>
-    <string name="authorFill">autor</string>
+    <string name="isbn_placeholder">isbn</string>
+    <string name="author_placeholder">autor</string>
     <string name="bookCover">bookCover</string>
+    <string name="books_placeholder">Keine Bücher vorhanden</string>
 </resources>

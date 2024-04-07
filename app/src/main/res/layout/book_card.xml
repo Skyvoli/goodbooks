@@ -25,7 +25,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginStart="30dp"
             android:gravity="center"
-            android:text="@string/isbnLabel"
+            android:text="@string/isbn_label"
             android:textSize="16sp"/>
 
     <TextView
@@ -38,7 +38,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
             android:gravity="center"
-            android:text="@string/isbnFill"
+            android:text="@string/isbn_placeholder"
             android:textSize="16sp"/>
 
     <TextView
@@ -50,7 +50,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginStart="30dp"
             android:gravity="center"
-            android:text="@string/authorLabel"
+            android:text="@string/author_label"
             android:textSize="16sp"/>
 
     <TextView
@@ -63,7 +63,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginStart="20dp"
             android:gravity="center"
-            android:text="@string/authorFill"
+            android:text="@string/author_placeholder"
             android:textSize="16sp"/>
 
     <ImageView
