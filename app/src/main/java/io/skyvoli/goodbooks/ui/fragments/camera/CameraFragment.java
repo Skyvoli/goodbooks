@@ -57,12 +57,13 @@ public class CameraFragment extends Fragment {
             if (result.getContents() == null) {
                 Toast.makeText(getContext(), "Scan cancelled", Toast.LENGTH_LONG).show();
             } else {
-                cameraViewModel.setText1(result.getContents());
+                String isbn = result.getContents();
+                cameraViewModel.setText1(isbn);
                 cameraViewModel.setText2(result.getFormatName());
 
                 GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
 
-                if (!isbnIsBook()) {
+                if (!isbnIsBook(isbn)) {
                     InformationDialog informationDialog = new InformationDialog("418", "Ich bin kein Buch.");
                     informationDialog.show(getParentFragmentManager(), "418");
                     return;
@@ -82,9 +83,10 @@ public class CameraFragment extends Fragment {
         }
     }
 
-    private boolean isbnIsBook() {
-        //TODO check
-        return true;
+    private boolean isbnIsBook(String isbn) {
+        //TODO Test
+        String prefix = isbn.substring(0, 3);
+        return isbn.toCharArray().length == 13 && prefix.equals("978");
     }
 
     private NoticeDialogListener addBookListener(GlobalViewModel globalViewModel, IntentResult result) {
