@@ -2,25 +2,25 @@ package io.skyvoli.goodbooks.helper;
 
 import android.view.View;
 
-import androidx.fragment.app.Fragment;
+import androidx.activity.result.ActivityResultLauncher;
 
-import com.google.zxing.integration.android.IntentIntegrator;
+import com.journeyapps.barcodescanner.ScanOptions;
 
 public class ScanListener implements View.OnClickListener {
 
-    private final Fragment fragment;
+    private final ActivityResultLauncher<ScanOptions> barcodeLauncher;
 
-    public ScanListener(Fragment fragment) {
-        this.fragment = fragment;
+    public ScanListener(ActivityResultLauncher<ScanOptions> barcodeLauncher) {
+        this.barcodeLauncher = barcodeLauncher;
     }
 
     @Override
     public void onClick(View v) {
-        IntentIntegrator intentIntegrator = IntentIntegrator.forSupportFragment(fragment);
-        intentIntegrator.setPrompt("Scan a barcode");
-        intentIntegrator.setOrientationLocked(false);
-        intentIntegrator.setDesiredBarcodeFormats(IntentIntegrator.EAN_13);
-        intentIntegrator.setBeepEnabled(true);
-        intentIntegrator.initiateScan();
+        ScanOptions scanOptions = new ScanOptions();
+        scanOptions.setPrompt("Scan a barcode");
+        scanOptions.setOrientationLocked(false);
+        scanOptions.setDesiredBarcodeFormats(ScanOptions.EAN_13);
+        scanOptions.setBeepEnabled(true);
+        barcodeLauncher.launch(scanOptions);
     }
 }
