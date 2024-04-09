@@ -18,4 +18,5 @@
     <string name="author_placeholder">autor</string>
     <string name="bookCover">bookCover</string>
     <string name="books_placeholder">Keine Bücher vorhanden</string>
+    <string name="deleteBtn">Lösche Bücher</string>
 </resources>
