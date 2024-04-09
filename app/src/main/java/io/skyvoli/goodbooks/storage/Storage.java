@@ -8,8 +8,10 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
+
+import io.skyvoli.goodbooks.model.Book;
 
 public class Storage {
 
@@ -49,7 +51,7 @@ public class Storage {
         }
     }
 
-    private void clearStorage() {
+    public void clearStorage() {
         File[] files = directory.listFiles();
         if (files == null) {
             return;
@@ -63,10 +65,10 @@ public class Storage {
         }
     }
 
-    public Set<?> getSet(String filename, Class<?> elementClass) {
+    public Set<Book> getBooks(String filename) {
         File file = new File(directory.getAbsolutePath() + File.separator + filename);
         ObjectMapper mapper = new ObjectMapper();
-        CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(Set.class, elementClass);
+        CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(Set.class, Book.class);
 
         try {
             return mapper.readValue(file, collectionType);
@@ -74,6 +76,6 @@ public class Storage {
             Log.e(logTag, "Couldn't read file");
             e.printStackTrace();
         }
-        return Collections.emptySet();
+        return new HashSet<>();
     }
 }

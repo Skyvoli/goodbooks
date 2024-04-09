@@ -15,7 +15,6 @@ public class GlobalViewModel extends ViewModel {
     public GlobalViewModel() {
         books = new MutableLiveData<>();
         books.setValue(new HashSet<>());
-        //TODO Load from file
     }
 
     public LiveData<Set<Book>> getBooks() {
@@ -23,7 +22,13 @@ public class GlobalViewModel extends ViewModel {
     }
 
     public void addBook(Book book) {
-        Objects.requireNonNull(books.getValue()).add(book);
+
+        Set<Book> test = Objects.requireNonNull(books.getValue());
+        test.add(book);
+    }
+
+    public void setBooks(Set<Book> books) {
+        this.books.setValue(books);
     }
 
     public boolean hasBook(String isbn) {
