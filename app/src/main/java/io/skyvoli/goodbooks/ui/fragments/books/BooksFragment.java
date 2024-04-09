@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
-import io.skyvoli.goodbooks.model.BookViewHolder;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
+import io.skyvoli.goodbooks.ui.BookViewHolder;
 import io.skyvoli.goodbooks.ui.adapter.BookAdapter;
 
 public class BooksFragment extends Fragment {

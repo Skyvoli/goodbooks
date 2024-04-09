@@ -12,7 +12,7 @@ import java.util.List;
 
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.model.Book;
-import io.skyvoli.goodbooks.model.BookViewHolder;
+import io.skyvoli.goodbooks.ui.BookViewHolder;
 
 public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 
@@ -33,10 +33,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
-
-        holder.setTitle(books.get(position).getName());
-
-        holder.setIsbn(books.get(position).getIsbn());
+        Book book = books.get(position);
+        holder.setTitle(book.getName());
+        holder.setIsbn(book.getIsbn());
         holder.setAuthor("Autor");
     }
 

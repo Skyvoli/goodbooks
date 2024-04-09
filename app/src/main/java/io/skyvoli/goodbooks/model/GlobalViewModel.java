@@ -15,6 +15,7 @@ public class GlobalViewModel extends ViewModel {
     public GlobalViewModel() {
         books = new MutableLiveData<>();
         books.setValue(new HashSet<>());
+        //TODO Load from file
     }
 
     public LiveData<Set<Book>> getBooks() {

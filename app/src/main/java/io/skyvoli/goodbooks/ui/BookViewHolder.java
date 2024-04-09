@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.model;
+package io.skyvoli.goodbooks.ui;
 
 import android.view.View;
 import android.widget.TextView;
@@ -32,4 +32,3 @@ public class BookViewHolder extends RecyclerView.ViewHolder {
         this.author.setText(author);
     }
 }
-
