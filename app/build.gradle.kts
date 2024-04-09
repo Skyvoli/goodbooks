@@ -2,9 +2,31 @@ plugins {
     id("com.android.application")
 }
 
+val zxingVersion = "4.3.0"
+val jsoupVersion = "1.17.2"
+val fasterxml = "2.17.0"
+val appCompatVersion = "1.6.1"
+val materialVersion = "1.11.0"
+val constraintVersion = "2.1.4"
+val lifecycleVersion = "2.7.0"
+val navigationVersion = "2.7.7"
+val junitVersion = "4.13.2"
+
 dependencies {
-    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-    implementation("org.jsoup:jsoup:1.17.2")
+    implementation("com.journeyapps:zxing-android-embedded:$zxingVersion")
+    implementation("org.jsoup:jsoup:$jsoupVersion")
+    implementation("com.fasterxml.jackson.core:jackson-core:$fasterxml")
+    implementation("com.fasterxml.jackson.core:jackson-databind:$fasterxml")
+    implementation("androidx.appcompat:appcompat:$appCompatVersion")
+    implementation("com.google.android.material:material:$materialVersion")
+    implementation("androidx.constraintlayout:constraintlayout:$constraintVersion")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+    implementation("androidx.navigation:navigation-fragment:$navigationVersion")
+    implementation("androidx.navigation:navigation-ui:$navigationVersion")
+    testImplementation("junit:junit:$junitVersion")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
 
 android {
@@ -37,18 +59,4 @@ android {
     buildFeatures {
         viewBinding = true
     }
-}
-
-dependencies {
-
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
-    implementation("androidx.navigation:navigation-fragment:2.7.7")
-    implementation("androidx.navigation:navigation-ui:2.7.7")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
