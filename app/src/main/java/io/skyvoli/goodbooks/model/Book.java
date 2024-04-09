@@ -1,5 +1,8 @@
 package io.skyvoli.goodbooks.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 public class Book {
@@ -7,7 +10,8 @@ public class Book {
     private final String isbn;
     private boolean resolved;
 
-    public Book(String name, String isbn, boolean resolved) {
+    @JsonCreator
+    public Book(@JsonProperty("name") String name, @JsonProperty("isbn") String isbn, @JsonProperty("resolved") boolean resolved) {
         this.name = name;
         this.isbn = isbn;
         this.resolved = resolved;

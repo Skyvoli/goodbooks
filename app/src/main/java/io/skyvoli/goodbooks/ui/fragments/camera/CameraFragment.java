@@ -25,13 +25,16 @@ import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
 import io.skyvoli.goodbooks.dialog.PermissionDialog;
 import io.skyvoli.goodbooks.helper.BookResolver;
-import io.skyvoli.goodbooks.helper.ScanListener;
+import io.skyvoli.goodbooks.listener.ScanListener;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
+import io.skyvoli.goodbooks.storage.Storage;
 
 public class CameraFragment extends Fragment {
 
     private FragmentCameraBinding binding;
     private CameraViewModel cameraViewModel;
+
+    private final String logTag = this.getClass().getSimpleName();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -57,30 +60,22 @@ public class CameraFragment extends Fragment {
 
     private void onScanResult(ScanIntentResult result) {
         if (result.getContents() == null) {
-            Intent originalIntent = result.getOriginalIntent();
-            if (originalIntent == null) {
-                Log.d(this.getClass().getSimpleName(), "Cancelled scan");
-                Toast.makeText(getActivity(), "Scan cancelled", Toast.LENGTH_LONG).show();
-            } else if (originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
-                Log.d("", "Cancelled scan due to missing camera permission");
-                Toast.makeText(getActivity(), "Cancelled due to missing camera permission", Toast.LENGTH_LONG).show();
-            }
+            handleCanceledScan(result);
             return;
         }
 
-
         String isbn = result.getContents();
-        Log.i("", "Scanned " + isbn);
+        Log.i(logTag, "Scanned " + isbn);
         cameraViewModel.setText1(isbn);
         cameraViewModel.setText2(result.getFormatName());
-
-        GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
 
         if (!isbnIsBook(isbn)) {
             InformationDialog informationDialog = new InformationDialog("418", "Ich bin kein Buch.");
             informationDialog.show(getParentFragmentManager(), "418");
             return;
         }
+
+        GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
 
         if (globalViewModel.hasBook(isbn)) {
             InformationDialog informationDialog = new InformationDialog("Duplikat", "Dieses Buch ist bereits vorhanden");
@@ -94,6 +89,18 @@ public class CameraFragment extends Fragment {
         permissionDialog.show(getParentFragmentManager(), "Buch erkannt");
     }
 
+    private void handleCanceledScan(ScanIntentResult result) {
+        Intent originalIntent = result.getOriginalIntent();
+        if (originalIntent == null) {
+            Log.d(logTag, "Cancelled scan");
+            Toast.makeText(getActivity(), "Scan abgebrochen", Toast.LENGTH_LONG).show();
+        } else if (originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
+            Log.d(logTag, "Cancelled scan due to missing camera permission");
+            Toast.makeText(getActivity(), "Erlaubnis zur Nutzung der Kamera nicht gegeben", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
     private boolean isbnIsBook(String isbn) {
         String prefix = isbn.substring(0, 3);
         return isbn.toCharArray().length == 13 && (prefix.equals("978") || prefix.equals("979"));
@@ -105,6 +112,8 @@ public class CameraFragment extends Fragment {
             public void onDialogPositiveClick() {
                 BookResolver bookResolver = new BookResolver();
                 globalViewModel.addBook(bookResolver.resolveBook(isbn));
+                Storage storage = new Storage(requireContext().getFilesDir());
+                storage.saveObject("books.json", globalViewModel.getBooks().getValue());
             }
 
             @Override
