@@ -8,12 +8,14 @@ import java.util.Objects;
 public class Book {
     private final String name;
     private final String isbn;
+    private final String author;
     private boolean resolved;
 
     @JsonCreator
-    public Book(@JsonProperty("name") String name, @JsonProperty("isbn") String isbn, @JsonProperty("resolved") boolean resolved) {
+    public Book(@JsonProperty("name") String name, @JsonProperty("isbn") String isbn, @JsonProperty("author") String author, @JsonProperty("resolved") boolean resolved) {
         this.name = name;
         this.isbn = isbn;
+        this.author = author;
         this.resolved = resolved;
     }
 
@@ -23,6 +25,10 @@ public class Book {
 
     public String getIsbn() {
         return isbn;
+    }
+
+    public String getAuthor() {
+        return author;
     }
 
     public boolean isResolved() {

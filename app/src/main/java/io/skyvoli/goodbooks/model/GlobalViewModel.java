@@ -22,9 +22,7 @@ public class GlobalViewModel extends ViewModel {
     }
 
     public void addBook(Book book) {
-
-        Set<Book> test = Objects.requireNonNull(books.getValue());
-        test.add(book);
+        Objects.requireNonNull(books.getValue()).add(book);
     }
 
     public void setBooks(Set<Book> books) {
@@ -32,6 +30,6 @@ public class GlobalViewModel extends ViewModel {
     }
 
     public boolean hasBook(String isbn) {
-        return Objects.requireNonNull(books.getValue()).contains(new Book("", isbn, true));
+        return Objects.requireNonNull(books.getValue()).contains(new Book("", isbn, "", true));
     }
 }

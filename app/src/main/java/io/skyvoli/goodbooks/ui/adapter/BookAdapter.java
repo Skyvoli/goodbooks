@@ -36,7 +36,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
         Book book = books.get(position);
         holder.setTitle(book.getName());
         holder.setIsbn(book.getIsbn());
-        holder.setAuthor("Autor");
+        holder.setAuthor(book.getAuthor());
     }
 
     @Override

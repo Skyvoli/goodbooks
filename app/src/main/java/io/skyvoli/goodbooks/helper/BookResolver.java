@@ -24,19 +24,21 @@ public class BookResolver {
 
     public Book resolveBook(String isbn) {
         String url = this.buildUrl(isbn);
+        String defaultName = "Titel";
+        String defaultAuthor = "Autor";
         Optional<Document> document = new RequestHandler(url).invoke();
 
         if (!document.isPresent()) {
-            return new Book("Buchtitel", isbn, false);
+            return new Book(defaultName, isbn, defaultAuthor, false);
         }
 
         List<Book> books = this.serializeXml(document.get(), isbn);
         if (books.isEmpty()) {
-            return new Book("Buchtitel", isbn, false);
+            return new Book(defaultName, isbn, defaultAuthor, false);
         }
 
         //TODO better
-        return new Book(books.get(0).getName(), isbn, true);
+        return new Book(books.get(0).getName(), isbn, books.get(0).getAuthor(), true);
     }
 
     private String buildUrl(String isbn) {
@@ -64,7 +66,7 @@ public class BookResolver {
                 }
             }
 
-            books.add(new Book(mappedData.get("dc:title"), isbn, true));
+            books.add(new Book(mappedData.get("dc:title"), isbn, mappedData.get("dc:creator"), true));
         }
         return books;
     }
