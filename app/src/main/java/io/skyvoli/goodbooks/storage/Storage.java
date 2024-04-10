@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.skyvoli.goodbooks.constants.Constants;
 import io.skyvoli.goodbooks.model.Book;
 
 public class Storage {
@@ -28,26 +29,9 @@ public class Storage {
     public void saveObject(String filename, Object object) {
         try {
             File file = new File(directory.getAbsolutePath() + File.separator + filename);
-
             Files.write(file.toPath(), new ObjectMapper().writeValueAsBytes(object));
-            logDir();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    private void logDir() {
-        File[] files = directory.listFiles();
-        if (files == null || files.length == 0) {
-            Log.d(logTag, "No files");
-            return;
-        }
-        for (File file : files) {
-            if (file.isDirectory()) {
-                Log.d(logTag, "Directory: " + file.getAbsolutePath());
-            } else {
-                Log.d(logTag, "File: " + file.getAbsolutePath());
-            }
         }
     }
 
@@ -65,8 +49,8 @@ public class Storage {
         }
     }
 
-    public Set<Book> getBooks(String filename) {
-        File file = new File(directory.getAbsolutePath() + File.separator + filename);
+    public Set<Book> getBooks() {
+        File file = new File(directory.getAbsolutePath() + File.separator + Constants.FILENAME_BOOKS);
         ObjectMapper mapper = new ObjectMapper();
         CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(Set.class, Book.class);
 

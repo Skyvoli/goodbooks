@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
         GlobalViewModel globalViewModel = new ViewModelProvider(this).get(GlobalViewModel.class);
-        globalViewModel.setBooks(new Storage(getFilesDir()).getBooks("books.json"));
+        globalViewModel.setBooks(new Storage(getFilesDir()).getBooks());
     }
 
     @Override

@@ -20,6 +20,7 @@ import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanIntentResult;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import io.skyvoli.goodbooks.constants.Constants;
 import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
@@ -113,7 +114,7 @@ public class CameraFragment extends Fragment {
                 BookResolver bookResolver = new BookResolver();
                 globalViewModel.addBook(bookResolver.resolveBook(isbn));
                 Storage storage = new Storage(requireContext().getFilesDir());
-                storage.saveObject("books.json", globalViewModel.getBooks().getValue());
+                storage.saveObject(Constants.FILENAME_BOOKS, globalViewModel.getBooks().getValue());
             }
 
             @Override
