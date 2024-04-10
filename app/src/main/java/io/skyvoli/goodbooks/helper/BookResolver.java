@@ -1,74 +1,37 @@
 package io.skyvoli.goodbooks.helper;
 
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import io.skyvoli.goodbooks.exception.BookNotFound;
 import io.skyvoli.goodbooks.model.Book;
 import io.skyvoli.goodbooks.web.RequestHandler;
+import io.skyvoli.goodbooks.web.api.BookApi;
+import io.skyvoli.goodbooks.web.api.DnbMarc21Api;
 
 public class BookResolver {
 
-    private static final String BASE_URL = "https://services.dnb.de/sru/dnb?version=1.1";
-    private static final String OPERATION = "&operation=searchRetrieve";
-    private static final String QUERY = "&query=";
-    private static final String MAXIMUM_RECORDS = "&maximumRecords=";
-    private static final String RECORD_SCHEMA = "&recordSchema=oai_dc";
+    private final BookApi dnbApi = new DnbMarc21Api();
 
     public Book resolveBook(String isbn) {
-        String url = this.buildUrl(isbn);
         String defaultName = "Titel";
         String defaultAuthor = "Autor";
-        Optional<Document> document = new RequestHandler(url).invoke();
+        Optional<Document> document = new RequestHandler(dnbApi.buildUrl(isbn)).invoke();
 
         if (!document.isPresent()) {
             return new Book(defaultName, isbn, defaultAuthor, false);
         }
-
-        List<Book> books = this.serializeXml(document.get(), isbn);
-        if (books.isEmpty()) {
-            return new Book(defaultName, isbn, defaultAuthor, false);
+        List<Book> books = new ArrayList<>();
+        try {
+            books.addAll(dnbApi.serializeDocument(document.get(), isbn));
+        } catch (BookNotFound e) {
+            books.add(new Book("Unbekannt", isbn, "Unbekannt", false));
         }
 
         //TODO better
         return new Book(books.get(0).getName(), isbn, books.get(0).getAuthor(), true);
     }
-
-    private String buildUrl(String isbn) {
-        return BASE_URL + OPERATION + QUERY + isbn + MAXIMUM_RECORDS + 5 + RECORD_SCHEMA;
-    }
-
-    private List<Book> serializeXml(Document document, String isbn) {
-
-        List<Elements> booksData = document.getElementsByTag("dc")
-                .stream()
-                .map(Element::children)
-                .collect(Collectors.toList());
-
-
-        List<Book> books = new ArrayList<>();
-
-        for (Elements bookData : booksData) {
-            Map<String, String> mappedData = new HashMap<>();
-
-            for (Element data : bookData) {
-                if (mappedData.containsKey(data.tagName())) {
-                    mappedData.put(data.tagName() + data.attributes(), mappedData.get(data.tagName()) + " + " + data.text());
-                } else {
-                    mappedData.put(data.tagName() + data.attributes(), data.text());
-                }
-            }
-
-            books.add(new Book(mappedData.get("dc:title"), isbn, mappedData.get("dc:creator"), true));
-        }
-        return books;
-    }
-
 }
