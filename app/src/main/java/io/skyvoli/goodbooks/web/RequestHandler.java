@@ -1,6 +1,7 @@
 package io.skyvoli.goodbooks.web;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,16 +18,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class RequestHandler {
+    private final String logTag = this.getClass().getSimpleName();
 
-    private final String url;
-
-    public RequestHandler(String url) {
-        this.url = url;
-    }
-
-    public Optional<Document> invoke() {
+    public Optional<Document> getDocument(String url) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<Optional<Document>> future = executorService.submit(this::fetchDocument);
+        Future<Optional<Document>> future = executorService.submit(() -> fetchDocument(url));
 
         Optional<Document> document = Optional.empty();
         try {
@@ -36,7 +32,7 @@ public class RequestHandler {
         return document;
     }
 
-    private Optional<Document> fetchDocument() {
+    private Optional<Document> fetchDocument(String url) {
         Document doc;
         try {
             doc = Jsoup.connect(url)
@@ -49,9 +45,9 @@ public class RequestHandler {
     }
 
 
-    public Drawable getImage() {
+    public Drawable getImage(String url) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<Drawable> future = executorService.submit(this::getCover);
+        Future<Drawable> future = executorService.submit(() -> fetchImage(url));
 
         Drawable cover;
         try {
@@ -62,14 +58,14 @@ public class RequestHandler {
         return cover;
     }
 
-    private Drawable getCover() {
-        //String test = "https://portal.dnb.de/opac/mvb/cover?isbn=" + isbn;
+    private Drawable fetchImage(String url) {
         try {
             InputStream is = (InputStream) new URL(url).getContent();
-            //return BitmapFactory.decodeStream((InputStream) new URL(test).getContent());
             return Drawable.createFromStream(is, "cover");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            Log.e(logTag, "Couldn't fetch image");
+            e.printStackTrace();
+            return null;
         }
     }
 

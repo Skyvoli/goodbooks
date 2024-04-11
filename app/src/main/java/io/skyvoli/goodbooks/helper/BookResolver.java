@@ -14,11 +14,10 @@ public class BookResolver {
     private final BookApi dnbApi = new DnbMarc21Api();
 
     public Book resolveBook(String isbn) {
-        Optional<Document> document = new RequestHandler(dnbApi.buildUrl(isbn)).invoke();
+        Optional<Document> document = new RequestHandler().getDocument(dnbApi.buildUrl(isbn));
         if (!document.isPresent()) {
             return new Book(isbn);
         }
-
         return dnbApi.serializeDocument(document.get(), isbn);
     }
 }

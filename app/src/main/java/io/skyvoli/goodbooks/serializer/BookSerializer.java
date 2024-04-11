@@ -30,12 +30,12 @@ public class BookSerializer extends StdSerializer<Book> {
         gen.writeStringField("part", book.getPart());
         gen.writeStringField("isbn", book.getIsbn());
         gen.writeStringField("author", book.getAuthor());
-        gen.writeBinaryField("cover", convertCover(book.getCover()));
+        gen.writeBinaryField("cover", convertToByteArray(book.getCover()));
         gen.writeBooleanField("resolved", book.isResolved());
         gen.writeEndObject();
     }
 
-    private byte[] convertCover(Drawable drawable) {
+    private byte[] convertToByteArray(Drawable drawable) {
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);

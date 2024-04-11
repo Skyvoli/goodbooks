@@ -36,7 +36,7 @@ public class DnbMarc21Api implements BookApi {
         //Autor: tag 100 code a
         Element authorData = bookData.getElementsByAttributeValueContaining("tag", "100").get(0);
         String author = getContent(authorData, "a", "Unbekannt");
-        Drawable cover = new RequestHandler(IMAGE_URL + isbn).getImage();
+        Drawable cover = new RequestHandler().getImage(IMAGE_URL + isbn);
 
         return new Book(title, part, isbn, author, cover, true);
 
