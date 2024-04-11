@@ -26,10 +26,10 @@ public class Storage {
         this.directory = directory;
     }
 
-    public void saveObject(String filename, Object object) {
+    public void saveBooks(String filename, Set<Book> books) {
         try {
             File file = new File(directory.getAbsolutePath() + File.separator + filename);
-            Files.write(file.toPath(), new ObjectMapper().writeValueAsBytes(object));
+            Files.write(file.toPath(), new ObjectMapper().writeValueAsBytes(books));
         } catch (IOException e) {
             e.printStackTrace();
         }

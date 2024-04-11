@@ -3,10 +3,16 @@ package io.skyvoli.goodbooks.model;
 import android.graphics.drawable.Drawable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Objects;
 
+import io.skyvoli.goodbooks.serializer.BookDeserializer;
+import io.skyvoli.goodbooks.serializer.BookSerializer;
+
+@JsonSerialize(using = BookSerializer.class)
+@JsonDeserialize(using = BookDeserializer.class)
 public class Book {
     private final String title;
     private final String part;
@@ -25,7 +31,7 @@ public class Book {
     }
 
     @JsonCreator
-    public Book(@JsonProperty("title") String title, @JsonProperty("part") String part, @JsonProperty("isbn") String isbn, @JsonProperty("author") String author, @JsonProperty("cover") Drawable cover, @JsonProperty("resolved") boolean resolved) {
+    public Book(String title, String part, String isbn, String author, Drawable cover, boolean resolved) {
         this.title = title;
         this.part = part;
         this.isbn = isbn;

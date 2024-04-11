@@ -114,7 +114,7 @@ public class CameraFragment extends Fragment {
                 BookResolver bookResolver = new BookResolver();
                 globalViewModel.addBook(bookResolver.resolveBook(isbn));
                 Storage storage = new Storage(requireContext().getFilesDir());
-                storage.saveObject(Constants.FILENAME_BOOKS, globalViewModel.getBooks().getValue());
+                storage.saveBooks(Constants.FILENAME_BOOKS, globalViewModel.getBooks().getValue());
             }
 
             @Override
