@@ -37,7 +37,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = books.get(position);
-        holder.setTitle(book.getName());
+        holder.setTitle(book.getTitle() + " " + book.getPart());
         holder.setIsbn(book.getIsbn());
         holder.setAuthor(book.getAuthor());
         Drawable cover = book.getCover();

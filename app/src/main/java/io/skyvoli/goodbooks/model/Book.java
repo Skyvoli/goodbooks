@@ -8,23 +8,38 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 public class Book {
-    private final String name;
+    private final String title;
+    private final String part;
     private final String isbn;
     private final String author;
     private final Drawable cover;
     private boolean resolved;
 
+    public Book(String isbn) {
+        this.title = "Unbekannt";
+        this.part = "";
+        this.isbn = isbn;
+        this.author = "Unbekannt";
+        this.cover = null;
+        this.resolved = false;
+    }
+
     @JsonCreator
-    public Book(@JsonProperty("name") String name, @JsonProperty("isbn") String isbn, @JsonProperty("author") String author, @JsonProperty("cover") Drawable cover, @JsonProperty("resolved") boolean resolved) {
-        this.name = name;
+    public Book(@JsonProperty("title") String title, @JsonProperty("part") String part, @JsonProperty("isbn") String isbn, @JsonProperty("author") String author, @JsonProperty("cover") Drawable cover, @JsonProperty("resolved") boolean resolved) {
+        this.title = title;
+        this.part = part;
         this.isbn = isbn;
         this.author = author;
         this.cover = cover;
         this.resolved = resolved;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
+    }
+
+    public String getPart() {
+        return part;
     }
 
     public String getIsbn() {
