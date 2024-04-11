@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import io.skyvoli.goodbooks.exception.BookNotFound;
 import io.skyvoli.goodbooks.model.Book;
 import io.skyvoli.goodbooks.web.RequestHandler;
 
@@ -23,12 +22,12 @@ public class DnbMarc21Api implements BookApi {
     }
 
     @Override
-    public Book serializeDocument(Document document, String isbn) throws BookNotFound {
+    public Book serializeDocument(Document document, String isbn) {
         Element bookData;
         try {
             bookData = document.getElementsByAttributeValueContaining("type", "Bibliographic").get(0);
         } catch (IndexOutOfBoundsException e) {
-            throw new BookNotFound();
+            return new Book(isbn);
         }
         //Titel: tag 245 code a + n
         Element titleData = bookData.getElementsByAttributeValueContaining("tag", "245").get(0);

@@ -4,7 +4,6 @@ import org.jsoup.nodes.Document;
 
 import java.util.Optional;
 
-import io.skyvoli.goodbooks.exception.BookNotFound;
 import io.skyvoli.goodbooks.model.Book;
 import io.skyvoli.goodbooks.web.RequestHandler;
 import io.skyvoli.goodbooks.web.api.BookApi;
@@ -20,10 +19,6 @@ public class BookResolver {
             return new Book(isbn);
         }
 
-        try {
-            return dnbApi.serializeDocument(document.get(), isbn);
-        } catch (BookNotFound e) {
-            return new Book(isbn);
-        }
+        return dnbApi.serializeDocument(document.get(), isbn);
     }
 }
