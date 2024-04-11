@@ -1,5 +1,7 @@
 package io.skyvoli.goodbooks.model;
 
+import android.graphics.drawable.Drawable;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -9,13 +11,15 @@ public class Book {
     private final String name;
     private final String isbn;
     private final String author;
+    private final Drawable cover;
     private boolean resolved;
 
     @JsonCreator
-    public Book(@JsonProperty("name") String name, @JsonProperty("isbn") String isbn, @JsonProperty("author") String author, @JsonProperty("resolved") boolean resolved) {
+    public Book(@JsonProperty("name") String name, @JsonProperty("isbn") String isbn, @JsonProperty("author") String author, @JsonProperty("cover") Drawable cover, @JsonProperty("resolved") boolean resolved) {
         this.name = name;
         this.isbn = isbn;
         this.author = author;
+        this.cover = cover;
         this.resolved = resolved;
     }
 
@@ -29,6 +33,10 @@ public class Book {
 
     public String getAuthor() {
         return author;
+    }
+
+    public Drawable getCover() {
+        return cover;
     }
 
     public boolean isResolved() {

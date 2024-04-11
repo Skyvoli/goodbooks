@@ -30,6 +30,6 @@ public class GlobalViewModel extends ViewModel {
     }
 
     public boolean hasBook(String isbn) {
-        return Objects.requireNonNull(books.getValue()).contains(new Book("", isbn, "", true));
+        return Objects.requireNonNull(books.getValue()).contains(new Book("", isbn, "", null, true));
     }
 }

@@ -1,9 +1,13 @@
 package io.skyvoli.goodbooks.web;
 
+import android.graphics.drawable.Drawable;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -43,5 +47,31 @@ public class RequestHandler {
         }
         return Optional.ofNullable(doc);
     }
+
+
+    public Drawable getImage() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Drawable> future = executorService.submit(this::getCover);
+
+        Drawable cover;
+        try {
+            cover = future.get(10, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
+            return null;
+        }
+        return cover;
+    }
+
+    private Drawable getCover() {
+        //String test = "https://portal.dnb.de/opac/mvb/cover?isbn=" + isbn;
+        try {
+            InputStream is = (InputStream) new URL(url).getContent();
+            //return BitmapFactory.decodeStream((InputStream) new URL(test).getContent());
+            return Drawable.createFromStream(is, "cover");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }

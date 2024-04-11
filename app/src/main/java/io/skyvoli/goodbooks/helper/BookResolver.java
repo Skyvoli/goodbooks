@@ -22,16 +22,16 @@ public class BookResolver {
         Optional<Document> document = new RequestHandler(dnbApi.buildUrl(isbn)).invoke();
 
         if (!document.isPresent()) {
-            return new Book(defaultName, isbn, defaultAuthor, false);
+            return new Book(defaultName, isbn, defaultAuthor, null, false);
         }
         List<Book> books = new ArrayList<>();
         try {
             books.addAll(dnbApi.serializeDocument(document.get(), isbn));
         } catch (BookNotFound e) {
-            books.add(new Book("Unbekannt", isbn, "Unbekannt", false));
+            books.add(new Book("Unbekannt", isbn, "Unbekannt", null, false));
         }
 
         //TODO better
-        return new Book(books.get(0).getName(), isbn, books.get(0).getAuthor(), true);
+        return books.get(0);
     }
 }
