@@ -1,5 +1,6 @@
 package io.skyvoli.goodbooks.ui.fragments.camera;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +26,7 @@ import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
 import io.skyvoli.goodbooks.dialog.PermissionDialog;
+import io.skyvoli.goodbooks.helper.BackgroundTask;
 import io.skyvoli.goodbooks.helper.BookResolver;
 import io.skyvoli.goodbooks.listener.ScanListener;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
@@ -111,10 +113,13 @@ public class CameraFragment extends Fragment {
         return new NoticeDialogListener() {
             @Override
             public void onDialogPositiveClick() {
-                BookResolver bookResolver = new BookResolver();
-                globalViewModel.addBook(bookResolver.resolveBook(isbn));
-                Storage storage = new Storage(requireContext().getFilesDir());
-                storage.saveBooks(Constants.FILENAME_BOOKS, globalViewModel.getBooks().getValue());
+                new BackgroundTask(() -> {
+                    Context context = requireContext();
+                    BookResolver bookResolver = new BookResolver();
+                    globalViewModel.addBook(bookResolver.resolveBook(isbn));
+                    Storage storage = new Storage(context.getFilesDir());
+                    storage.saveBooks(Constants.FILENAME_BOOKS, globalViewModel.getBooks().getValue());
+                }).start();
             }
 
             @Override

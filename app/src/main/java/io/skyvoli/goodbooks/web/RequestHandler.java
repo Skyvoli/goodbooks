@@ -55,7 +55,7 @@ public class RequestHandler {
 
         Drawable cover;
         try {
-            cover = future.get(5, TimeUnit.SECONDS);
+            cover = future.get(7, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return null;
