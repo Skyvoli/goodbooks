@@ -29,20 +29,42 @@ public class DnbMarc21Api implements BookApi {
         } catch (IndexOutOfBoundsException e) {
             return new Book(isbn);
         }
-        //Titel: tag 245 code a + n
-        Element titleData = bookData.getElementsByAttributeValueContaining("tag", "245").get(0);
+        //Titel: tag 245 code a + n TODO code b as subtitle?
+        Element titleData = getElement(bookData, "245");
         String title = getContent(titleData, "a", "Unbekannt");
+        String subTitle = getContent(titleData, "b", "");
         String part = getContent(titleData, "n", "");
-        //Autor: tag 100 code a
-        Element authorData = bookData.getElementsByAttributeValueContaining("tag", "100").get(0);
-        String author = getContent(authorData, "a", "Unbekannt");
+
+        String author = resolveAuthor(bookData);
         Drawable cover = new RequestHandler().getImage(IMAGE_URL + isbn);
 
         return new Book(title, part, isbn, author, cover, true);
 
     }
 
+    private String resolveAuthor(Element bookData) {
+        //Autor: tag 100 code a or 245 code c
+        Element authorData = getElement(bookData, "100");
+        if (authorData != null) {
+            return getContent(authorData, "a", "Unbekannt");
+        }
+
+        authorData = getElement(bookData, "245");
+        return getContent(authorData, "c", "Unbekannt");
+    }
+
+    private Element getElement(Element parent, String tag) {
+        try {
+            return parent.getElementsByAttributeValueContaining("tag", tag).get(0);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
     private String getContent(Element element, String value, String defaultValue) {
+        if (element == null) {
+            return defaultValue;
+        }
         try {
             return element.getElementsByAttributeValueContaining("code", value).get(0).text();
         } catch (IndexOutOfBoundsException e) {
