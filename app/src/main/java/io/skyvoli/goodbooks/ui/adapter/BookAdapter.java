@@ -39,7 +39,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = books.get(position);
 
-        holder.setListener(v -> Toast.makeText(context, "Clicked: " + book.getTitle() + " " + book.getPart(), Toast.LENGTH_LONG).show());
+        holder.setListener(v -> Toast.makeText(context, "Clicked: " + book.getTitle() + " " + book.getPart(), Toast.LENGTH_SHORT).show());
 
         holder.setTitle(book.getTitle() + " " + book.getPart());
         holder.setIsbn(book.getIsbn());
