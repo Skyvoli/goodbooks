@@ -24,10 +24,14 @@ public class RequestHandler {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<Optional<Document>> future = executorService.submit(() -> fetchDocument(url));
 
-        Optional<Document> document = Optional.empty();
+        Optional<Document> document;
         try {
-            document = future.get(10, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
+            document = future.get(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Optional.empty();
+        } catch (ExecutionException | TimeoutException e) {
+            return Optional.empty();
         }
         return document;
     }
@@ -51,8 +55,11 @@ public class RequestHandler {
 
         Drawable cover;
         try {
-            cover = future.get(10, TimeUnit.SECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException ignored) {
+            cover = future.get(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        } catch (ExecutionException | TimeoutException e) {
             return null;
         }
         return cover;
