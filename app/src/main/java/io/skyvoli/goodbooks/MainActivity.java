@@ -18,9 +18,10 @@ import java.util.Set;
 
 import io.skyvoli.goodbooks.databinding.ActivityMainBinding;
 import io.skyvoli.goodbooks.helper.BackgroundTask;
-import io.skyvoli.goodbooks.model.Book;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
-import io.skyvoli.goodbooks.storage.Storage;
+import io.skyvoli.goodbooks.storage.FileStorage;
+import io.skyvoli.goodbooks.storage.database.AppDatabase;
+import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,8 +52,8 @@ public class MainActivity extends AppCompatActivity {
         new BackgroundTask(() -> {
             AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "books").build();
             Set<Book> books = new HashSet<>(db.bookDao().getAll());
-            Storage storage = new Storage(getFilesDir());
-            books.forEach((book -> book.setCover(storage.getImage(book.getIsbn()))));
+            FileStorage fileStorage = new FileStorage(getFilesDir());
+            books.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
             globalViewModel.setBooksAsynchronous(books);
         }).start();
 

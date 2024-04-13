@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.model;
+package io.skyvoli.goodbooks.storage.database.dto;
 
 import android.graphics.drawable.Drawable;
 
@@ -8,17 +8,9 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import java.util.Objects;
+import java.util.Optional;
 
-import io.skyvoli.goodbooks.serializer.BookDeserializer;
-import io.skyvoli.goodbooks.serializer.BookSerializer;
-
-@JsonSerialize(using = BookSerializer.class)
-@JsonDeserialize(using = BookDeserializer.class)
 @Entity(tableName = "books")
 public class Book {
     @ColumnInfo(name = "title")
@@ -38,7 +30,7 @@ public class Book {
     private boolean resolved;
 
     @Ignore
-    public Book(String isbn) {
+    public Book(@NonNull String isbn) {
         this.title = "Unbekannt";
         this.part = "";
         this.isbn = isbn;
@@ -49,8 +41,7 @@ public class Book {
 
 
     @Ignore
-    @JsonCreator
-    public Book(String title, String part, String isbn, String author, Drawable cover, boolean resolved) {
+    public Book(String title, String part, @NonNull String isbn, String author, Drawable cover, boolean resolved) {
         this.title = title;
         this.part = part;
         this.isbn = isbn;
@@ -59,12 +50,11 @@ public class Book {
         this.resolved = resolved;
     }
 
-    public Book(String title, String part, String isbn, String author, boolean resolved) {
+    public Book(String title, String part, @NonNull String isbn, String author, boolean resolved) {
         this.title = title;
         this.part = part;
         this.isbn = isbn;
         this.author = author;
-        //get From files this.cover = cover;
         cover = null;
         this.resolved = resolved;
     }
@@ -77,6 +67,7 @@ public class Book {
         return part;
     }
 
+    @NonNull
     public String getIsbn() {
         return isbn;
     }
@@ -85,8 +76,8 @@ public class Book {
         return author;
     }
 
-    public Drawable getCover() {
-        return cover;
+    public Optional<Drawable> getCover() {
+        return Optional.ofNullable(cover);
     }
 
     public boolean isResolved() {

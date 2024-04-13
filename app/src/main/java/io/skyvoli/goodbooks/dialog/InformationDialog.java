@@ -23,7 +23,7 @@ public class InformationDialog extends AppCompatDialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(title)
                 .setMessage(message)
-                .setPositiveButton("Ok", (dialog, which) -> {});
+                .setPositiveButton("Ok", null);
         return builder.create();
     }
 }

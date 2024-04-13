@@ -15,7 +15,7 @@ import java.util.HashSet;
 
 import io.skyvoli.goodbooks.databinding.FragmentHomeBinding;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
-import io.skyvoli.goodbooks.storage.Storage;
+import io.skyvoli.goodbooks.storage.FileStorage;
 
 public class HomeFragment extends Fragment {
 
@@ -37,7 +37,8 @@ public class HomeFragment extends Fragment {
         //TODO For Debug
         button.setOnClickListener(v -> {
             new ViewModelProvider(requireActivity()).get(GlobalViewModel.class).setBooks(new HashSet<>());
-            new Storage(requireActivity().getFilesDir()).clearStorage();
+            new FileStorage(requireActivity().getFilesDir()).clearStorage();
+            requireContext().deleteDatabase("books");
         });
 
         return root;

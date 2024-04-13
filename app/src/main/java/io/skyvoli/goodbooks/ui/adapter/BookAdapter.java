@@ -12,9 +12,10 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
-import io.skyvoli.goodbooks.model.Book;
+import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.ui.BookViewHolder;
 
 public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
@@ -44,9 +45,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
         holder.setTitle(book.getTitle() + " " + book.getPart());
         holder.setIsbn(book.getIsbn());
         holder.setAuthor(book.getAuthor());
-        Drawable cover = book.getCover();
-        if (cover != null) {
-            holder.setCover(cover);
+        Optional<Drawable> cover = book.getCover();
+        if (cover.isPresent()) {
+            holder.setCover(cover.get());
         } else {
             //Default
             holder.setCover(ContextCompat.getDrawable(context, R.drawable.ruby));

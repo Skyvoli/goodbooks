@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import io.skyvoli.goodbooks.storage.database.dto.Book;
+
 public class GlobalViewModel extends ViewModel {
 
     private final MutableLiveData<Set<Book>> books;

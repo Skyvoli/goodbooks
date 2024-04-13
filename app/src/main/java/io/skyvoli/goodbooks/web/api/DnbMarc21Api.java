@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import io.skyvoli.goodbooks.model.Book;
+import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.web.RequestHandler;
 
 public class DnbMarc21Api implements BookApi {
