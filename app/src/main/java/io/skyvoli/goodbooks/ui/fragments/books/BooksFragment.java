@@ -15,8 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
+import io.skyvoli.goodbooks.BookObserver;
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
@@ -39,17 +39,21 @@ public class BooksFragment extends Fragment {
         final TextView placeholder = binding.placeholder;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        List<Book> books = new ArrayList<>(Objects.requireNonNull(globalViewModel.getBooks().getValue()));
+        List<Book> books = new ArrayList<>(globalViewModel.getBooks());
         BookAdapter adapter = new BookAdapter(books);
         recyclerView.setAdapter(adapter);
 
         button.setOnClickListener(v ->
         {
-            recyclerView.setAdapter(new BookAdapter(globalViewModel.getBooks().getValue()));
-            setPlaceholder(books, placeholder);
+            recyclerView.setAdapter(new BookAdapter(new ArrayList<>(globalViewModel.getBooks())));
+            setPlaceholder(new ArrayList<>(globalViewModel.getBooks()), placeholder);
         });
 
         setPlaceholder(books, placeholder);
+
+        if (isAdded()) {
+            globalViewModel.getBooks().addOnListChangedCallback(new BookObserver(binding, requireActivity()));
+        }
 
         return root;
     }

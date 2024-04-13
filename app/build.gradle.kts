@@ -11,10 +11,13 @@ val constraintVersion = "2.1.4"
 val lifecycleVersion = "2.7.0"
 val navigationVersion = "2.7.7"
 val junitVersion = "4.13.2"
+val roomVersion = "2.6.1"
+val databinding = "8.3.2"
 
 dependencies {
 
-    val roomVersion = "2.6.1"
+    implementation("androidx.databinding:databinding-common:$databinding")
+    implementation("androidx.databinding:databinding-runtime:$databinding")
 
     implementation("androidx.room:room-runtime:$roomVersion")
     // optional

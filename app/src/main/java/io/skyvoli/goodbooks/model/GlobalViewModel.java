@@ -1,42 +1,40 @@
 package io.skyvoli.goodbooks.model;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+
+import androidx.databinding.ObservableArrayList;
+import androidx.databinding.ObservableList;
 import androidx.lifecycle.ViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class GlobalViewModel extends ViewModel {
 
-    private final MutableLiveData<List<Book>> books;
+    private final ObservableList<Book> books;
 
     public GlobalViewModel() {
-        books = new MutableLiveData<>();
-        books.setValue(new ArrayList<>());
+        books = new ObservableArrayList<>();
     }
 
-    public LiveData<List<Book>> getBooks() {
+    public ObservableList<Book> getBooks() {
         return books;
     }
 
     public void addBook(Book book) {
-        Objects.requireNonNull(books.getValue()).add(book);
+        books.add(book);
     }
 
 
     public void clearBooks() {
-        this.books.setValue(new ArrayList<>());
+        this.books.clear();
     }
 
     public void setBooksAsynchronous(List<Book> books) {
-        this.books.postValue(books);
+        this.books.addAll(books);
     }
 
     public boolean hasBook(String isbn) {
-        return Objects.requireNonNull(books.getValue()).contains(new Book(isbn));
+        return books.contains(new Book(isbn));
     }
 }
