@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,7 +39,7 @@ public class BooksFragment extends Fragment {
         final TextView placeholder = binding.placeholder;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        List<Book> books = Objects.requireNonNull(globalViewModel.getBooks().getValue());
+        List<Book> books = new ArrayList<>(Objects.requireNonNull(globalViewModel.getBooks().getValue()));
         BookAdapter adapter = new BookAdapter(books);
         recyclerView.setAdapter(adapter);
 
