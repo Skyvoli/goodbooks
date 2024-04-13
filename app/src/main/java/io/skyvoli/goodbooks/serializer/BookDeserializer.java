@@ -1,7 +1,5 @@
 package io.skyvoli.goodbooks.serializer;
 
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -21,12 +19,8 @@ public class BookDeserializer extends JsonDeserializer<Book> {
         String part = node.get("part").asText();
         String isbn = node.get("isbn").asText();
         String author = node.get("author").asText();
-        Drawable cover = convertToDrawable(node.get("cover").binaryValue());
+        Drawable cover = Converter.convertToDrawable(node.get("cover").binaryValue());
         boolean resolved = node.get("resolved").asBoolean();
         return new Book(title, part, isbn, author, cover, resolved);
-    }
-
-    private Drawable convertToDrawable(byte[] bytes) {
-        return new BitmapDrawable(null, BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
     }
 }

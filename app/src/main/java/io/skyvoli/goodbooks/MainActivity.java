@@ -9,10 +9,16 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.room.Room;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import io.skyvoli.goodbooks.databinding.ActivityMainBinding;
+import io.skyvoli.goodbooks.helper.BackgroundTask;
+import io.skyvoli.goodbooks.model.Book;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.Storage;
 
@@ -40,7 +46,16 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
         GlobalViewModel globalViewModel = new ViewModelProvider(this).get(GlobalViewModel.class);
-        globalViewModel.setBooks(new Storage(getFilesDir()).getBooks());
+
+
+        new BackgroundTask(() -> {
+            AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "books").build();
+            Set<Book> books = new HashSet<>(db.bookDao().getAll());
+            Storage storage = new Storage(getFilesDir());
+            books.forEach((book -> book.setCover(storage.getImage(book.getIsbn()))));
+            globalViewModel.setBooksAsynchronous(books);
+        }).start();
+
     }
 
     @Override

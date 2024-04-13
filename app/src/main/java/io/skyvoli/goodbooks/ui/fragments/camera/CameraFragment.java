@@ -15,13 +15,14 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.room.Room;
 
 import com.google.zxing.client.android.Intents;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanIntentResult;
 import com.journeyapps.barcodescanner.ScanOptions;
 
-import io.skyvoli.goodbooks.constants.Constants;
+import io.skyvoli.goodbooks.AppDatabase;
 import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
@@ -29,6 +30,7 @@ import io.skyvoli.goodbooks.dialog.PermissionDialog;
 import io.skyvoli.goodbooks.helper.BackgroundTask;
 import io.skyvoli.goodbooks.helper.BookResolver;
 import io.skyvoli.goodbooks.listener.ScanListener;
+import io.skyvoli.goodbooks.model.Book;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.Storage;
 
@@ -116,9 +118,18 @@ public class CameraFragment extends Fragment {
                 new BackgroundTask(() -> {
                     Context context = requireContext();
                     BookResolver bookResolver = new BookResolver();
-                    globalViewModel.addBook(bookResolver.resolveBook(isbn));
+                    Book book = bookResolver.resolveBook(isbn);
+                    globalViewModel.addBook(book);
+
+                    //For tests
+                    //context.deleteDatabase("books");
+
+                    AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, "books").build();
+                    //db.bookDao().insert(Objects.requireNonNull(globalViewModel.getBooks().getValue()).toArray(new Book[0]));
+                    db.bookDao().insert(book);
                     Storage storage = new Storage(context.getFilesDir());
-                    storage.saveBooks(Constants.FILENAME_BOOKS, globalViewModel.getBooks().getValue());
+                    //storage.saveBooks(Constants.FILENAME_BOOKS, globalViewModel.getBooks().getValue());
+                    storage.saveImage(isbn, book.getCover());
                 }).start();
             }
 

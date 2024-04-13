@@ -29,6 +29,10 @@ public class GlobalViewModel extends ViewModel {
         this.books.setValue(books);
     }
 
+    public void setBooksAsynchronous(Set<Book> books) {
+        this.books.postValue(books);
+    }
+
     public boolean hasBook(String isbn) {
         return Objects.requireNonNull(books.getValue()).contains(new Book(isbn));
     }

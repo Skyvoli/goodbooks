@@ -2,6 +2,12 @@ package io.skyvoli.goodbooks.model;
 
 import android.graphics.drawable.Drawable;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -13,14 +19,25 @@ import io.skyvoli.goodbooks.serializer.BookSerializer;
 
 @JsonSerialize(using = BookSerializer.class)
 @JsonDeserialize(using = BookDeserializer.class)
+@Entity(tableName = "books")
 public class Book {
+    @ColumnInfo(name = "title")
     private final String title;
+    @ColumnInfo(name = "part")
     private final String part;
+
+    @NonNull
+    @PrimaryKey
     private final String isbn;
+    @ColumnInfo(name = "author")
     private final String author;
-    private final Drawable cover;
+    //@ColumnInfo(name = "cover") too big
+    @Ignore
+    private Drawable cover;
+    @ColumnInfo(name = "resolved")
     private boolean resolved;
 
+    @Ignore
     public Book(String isbn) {
         this.title = "Unbekannt";
         this.part = "";
@@ -30,6 +47,8 @@ public class Book {
         this.resolved = false;
     }
 
+
+    @Ignore
     @JsonCreator
     public Book(String title, String part, String isbn, String author, Drawable cover, boolean resolved) {
         this.title = title;
@@ -37,6 +56,16 @@ public class Book {
         this.isbn = isbn;
         this.author = author;
         this.cover = cover;
+        this.resolved = resolved;
+    }
+
+    public Book(String title, String part, String isbn, String author, boolean resolved) {
+        this.title = title;
+        this.part = part;
+        this.isbn = isbn;
+        this.author = author;
+        //get From files this.cover = cover;
+        cover = null;
         this.resolved = resolved;
     }
 
@@ -66,6 +95,10 @@ public class Book {
 
     public void setResolved(boolean resolved) {
         this.resolved = resolved;
+    }
+
+    public void setCover(Drawable cover) {
+        this.cover = cover;
     }
 
     @Override

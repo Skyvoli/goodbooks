@@ -1,5 +1,6 @@
 package io.skyvoli.goodbooks.storage;
 
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,11 +14,14 @@ import java.util.Set;
 
 import io.skyvoli.goodbooks.constants.Constants;
 import io.skyvoli.goodbooks.model.Book;
+import io.skyvoli.goodbooks.serializer.Converter;
 
 public class Storage {
 
     private final String logTag = this.getClass().getSimpleName();
     private final File directory;
+
+    private static final String IMAGE_PATH_END = "Image.jpeg";
 
     public Storage(File directory) {
         if (!directory.isDirectory()) {
@@ -30,6 +34,18 @@ public class Storage {
         try {
             File file = new File(directory.getAbsolutePath() + File.separator + filename);
             Files.write(file.toPath(), new ObjectMapper().writeValueAsBytes(books));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveImage(String isbn, Drawable cover) {
+        if (cover == null) {
+            return;
+        }
+        try {
+            File file = new File(directory.getAbsolutePath() + File.separator + isbn + IMAGE_PATH_END);
+            Files.write(file.toPath(), Converter.convertToByteArray(cover));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,5 +77,12 @@ public class Storage {
             e.printStackTrace();
         }
         return new HashSet<>();
+    }
+
+
+    public Drawable getImage(String isbn) {
+        String path = directory.getPath() + File.separator + isbn + IMAGE_PATH_END;
+        //If not found returns null
+        return Drawable.createFromPath(path);
     }
 }
