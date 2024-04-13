@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -39,7 +38,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = books.get(position);
 
-        holder.setListener(v -> Toast.makeText(context, "Clicked: " + book.getTitle() + " " + book.getPart(), Toast.LENGTH_SHORT).show());
+        holder.setListener(v -> {
+            books.remove(book);
+            notifyItemRemoved(holder.getLayoutPosition());
+        });
 
         holder.setTitle(book.getTitle() + " " + book.getPart());
         holder.setIsbn(book.getIsbn());
