@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.ui.adapter;
+package io.skyvoli.goodbooks.ui.bookcard;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -16,7 +16,6 @@ import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
-import io.skyvoli.goodbooks.ui.BookViewHolder;
 
 public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 

@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.ui;
+package io.skyvoli.goodbooks.ui.bookcard;
 
 import android.graphics.drawable.Drawable;
 import android.view.View;

@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.serializer;
+package io.skyvoli.goodbooks.converter;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;

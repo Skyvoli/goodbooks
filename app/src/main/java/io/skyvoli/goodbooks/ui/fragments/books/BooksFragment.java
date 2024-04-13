@@ -18,8 +18,8 @@ import java.util.Objects;
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
-import io.skyvoli.goodbooks.ui.BookViewHolder;
-import io.skyvoli.goodbooks.ui.adapter.BookAdapter;
+import io.skyvoli.goodbooks.ui.bookcard.BookAdapter;
+import io.skyvoli.goodbooks.ui.bookcard.BookViewHolder;
 
 public class BooksFragment extends Fragment {
 
@@ -32,15 +32,12 @@ public class BooksFragment extends Fragment {
         binding = FragmentBooksBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-
         final RecyclerView recyclerView = binding.books;
         final TextView placeholder = binding.placeholder;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         List<Book> books = Objects.requireNonNull(globalViewModel.getBooks().getValue());
-
-        RecyclerView.Adapter<BookViewHolder> adapter =
-                new BookAdapter(books);
+        RecyclerView.Adapter<BookViewHolder> adapter = new BookAdapter(books);
         recyclerView.setAdapter(adapter);
 
         if (!books.isEmpty()) {
