@@ -19,4 +19,5 @@
     <string name="bookCover">bookCover</string>
     <string name="books_placeholder">Keine Bücher vorhanden</string>
     <string name="deleteBtn">Lösche Bücher</string>
+    <string name="synchronise">Sync</string>
 </resources>

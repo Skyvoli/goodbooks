@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,7 +20,6 @@ import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.ui.bookcard.BookAdapter;
-import io.skyvoli.goodbooks.ui.bookcard.BookViewHolder;
 
 public class BooksFragment extends Fragment {
 
@@ -32,19 +32,33 @@ public class BooksFragment extends Fragment {
         binding = FragmentBooksBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        final Button button = binding.sync;
+
         final RecyclerView recyclerView = binding.books;
         final TextView placeholder = binding.placeholder;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         List<Book> books = Objects.requireNonNull(globalViewModel.getBooks().getValue());
-        RecyclerView.Adapter<BookViewHolder> adapter = new BookAdapter(books);
+        BookAdapter adapter = new BookAdapter(books);
         recyclerView.setAdapter(adapter);
 
-        if (!books.isEmpty()) {
-            placeholder.setVisibility(View.GONE);
-        }
+        button.setOnClickListener(v ->
+        {
+            recyclerView.setAdapter(new BookAdapter(globalViewModel.getBooks().getValue()));
+            setPlaceholder(books, placeholder);
+        });
+
+        setPlaceholder(books, placeholder);
 
         return root;
+    }
+
+    private void setPlaceholder(List<Book> books, TextView placeholder) {
+        if (!books.isEmpty()) {
+            placeholder.setVisibility(View.GONE);
+        } else {
+            placeholder.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
