@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
+import io.skyvoli.goodbooks.helper.listener.OnItemClickListener;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
@@ -38,9 +40,19 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = books.get(position);
 
-        holder.setListener(v -> {
-            books.remove(book);
-            notifyItemRemoved(holder.getLayoutPosition());
+        holder.setListener(new OnItemClickListener() {
+            @Override
+            public View.OnClickListener onClick() {
+                return v -> Toast.makeText(context, "Short", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public View.OnLongClickListener onLongClick() {
+                return v -> {
+                    Toast.makeText(context, "Long", Toast.LENGTH_SHORT).show();
+                    return true;
+                };
+            }
         });
 
         holder.setTitle(book.getTitle() + " " + book.getPart());

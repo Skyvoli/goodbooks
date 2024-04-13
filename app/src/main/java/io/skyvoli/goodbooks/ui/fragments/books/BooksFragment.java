@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +22,7 @@ import io.skyvoli.goodbooks.helper.observer.BookObserver;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.ui.bookcard.BookAdapter;
+import io.skyvoli.goodbooks.ui.bookcard.BookTouchHelperCallback;
 
 public class BooksFragment extends Fragment {
 
@@ -43,14 +45,17 @@ public class BooksFragment extends Fragment {
         BookAdapter adapter = new BookAdapter(books);
         recyclerView.setAdapter(adapter);
 
+        ItemTouchHelper helper = new ItemTouchHelper(new BookTouchHelperCallback(adapter));
+        helper.attachToRecyclerView(recyclerView);
+
+
+        setPlaceholder(books, placeholder);
+
         button.setOnClickListener(v ->
         {
             recyclerView.setAdapter(new BookAdapter(new ArrayList<>(globalViewModel.getBooks())));
             setPlaceholder(new ArrayList<>(globalViewModel.getBooks()), placeholder);
         });
-
-        setPlaceholder(books, placeholder);
-
         if (isAdded()) {
             globalViewModel.getBooks().addOnListChangedCallback(new BookObserver(binding, requireActivity()));
         }
