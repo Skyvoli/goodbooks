@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.converter;
+package io.skyvoli.goodbooks.helper.converter;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;

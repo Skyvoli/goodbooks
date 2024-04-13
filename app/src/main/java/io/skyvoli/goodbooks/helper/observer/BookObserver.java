@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks;
+package io.skyvoli.goodbooks.helper.observer;
 
 import android.util.Log;
 import android.view.View;
@@ -22,12 +22,12 @@ public class BookObserver extends ObservableList.OnListChangedCallback<Observabl
 
     @Override
     public void onChanged(ObservableList<Book> sender) {
-
+        Log.d("Observer", "OnChanged");
     }
 
     @Override
     public void onItemRangeChanged(ObservableList<Book> sender, int positionStart, int itemCount) {
-
+        Log.d("Observer", "OnRangeChanged");
     }
 
     @Override
@@ -52,11 +52,11 @@ public class BookObserver extends ObservableList.OnListChangedCallback<Observabl
 
     @Override
     public void onItemRangeMoved(ObservableList<Book> sender, int fromPosition, int toPosition, int itemCount) {
-
+        Log.d("Observer", "OnRangeMoved");
     }
 
     @Override
     public void onItemRangeRemoved(ObservableList<Book> sender, int positionStart, int itemCount) {
-
+        Log.d("Observer", "OnRangeRemoved");
     }
 }

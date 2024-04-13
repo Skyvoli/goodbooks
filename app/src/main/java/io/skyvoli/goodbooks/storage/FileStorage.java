@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import io.skyvoli.goodbooks.converter.Converter;
+import io.skyvoli.goodbooks.helper.converter.Converter;
 
 public class FileStorage {
 

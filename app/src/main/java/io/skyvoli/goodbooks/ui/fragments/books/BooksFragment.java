@@ -16,8 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.skyvoli.goodbooks.BookObserver;
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
+import io.skyvoli.goodbooks.helper.observer.BookObserver;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.ui.bookcard.BookAdapter;

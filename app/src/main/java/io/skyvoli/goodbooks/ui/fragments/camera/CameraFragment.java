@@ -30,12 +30,12 @@ import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
 import io.skyvoli.goodbooks.dialog.PermissionDialog;
 import io.skyvoli.goodbooks.helper.BackgroundTask;
-import io.skyvoli.goodbooks.helper.BookResolver;
-import io.skyvoli.goodbooks.listener.ScanListener;
+import io.skyvoli.goodbooks.helper.listener.ScanListener;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
+import io.skyvoli.goodbooks.web.BookResolver;
 
 public class CameraFragment extends Fragment {
 
