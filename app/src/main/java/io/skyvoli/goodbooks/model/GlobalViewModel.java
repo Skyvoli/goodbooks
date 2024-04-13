@@ -4,22 +4,22 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class GlobalViewModel extends ViewModel {
 
-    private final MutableLiveData<Set<Book>> books;
+    private final MutableLiveData<List<Book>> books;
 
     public GlobalViewModel() {
         books = new MutableLiveData<>();
-        books.setValue(new HashSet<>());
+        books.setValue(new ArrayList<>());
     }
 
-    public LiveData<Set<Book>> getBooks() {
+    public LiveData<List<Book>> getBooks() {
         return books;
     }
 
@@ -27,11 +27,12 @@ public class GlobalViewModel extends ViewModel {
         Objects.requireNonNull(books.getValue()).add(book);
     }
 
-    public void setBooks(Set<Book> books) {
-        this.books.setValue(books);
+
+    public void clearBooks() {
+        this.books.setValue(new ArrayList<>());
     }
 
-    public void setBooksAsynchronous(Set<Book> books) {
+    public void setBooksAsynchronous(List<Book> books) {
         this.books.postValue(books);
     }
 

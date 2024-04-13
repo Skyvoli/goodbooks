@@ -11,8 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import java.util.HashSet;
-
 import io.skyvoli.goodbooks.databinding.FragmentHomeBinding;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.FileStorage;
@@ -36,7 +34,7 @@ public class HomeFragment extends Fragment {
         final Button button = binding.deleteBtn;
         //TODO For Debug
         button.setOnClickListener(v -> {
-            new ViewModelProvider(requireActivity()).get(GlobalViewModel.class).setBooks(new HashSet<>());
+            new ViewModelProvider(requireActivity()).get(GlobalViewModel.class).clearBooks();
             new FileStorage(requireActivity().getFilesDir()).clearStorage();
             requireContext().deleteDatabase("books");
         });

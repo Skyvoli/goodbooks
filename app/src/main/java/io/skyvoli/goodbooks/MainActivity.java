@@ -13,8 +13,7 @@ import androidx.room.Room;
 
 import com.google.android.material.navigation.NavigationView;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import io.skyvoli.goodbooks.databinding.ActivityMainBinding;
 import io.skyvoli.goodbooks.helper.BackgroundTask;
@@ -51,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         new BackgroundTask(() -> {
             AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "books").build();
-            Set<Book> books = new HashSet<>(db.bookDao().getAll());
+            List<Book> books = db.bookDao().getAll();
             FileStorage fileStorage = new FileStorage(getFilesDir());
             books.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
             globalViewModel.setBooksAsynchronous(books);

@@ -12,11 +12,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
+import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.ui.BookViewHolder;
 import io.skyvoli.goodbooks.ui.adapter.BookAdapter;
 
@@ -36,11 +37,13 @@ public class BooksFragment extends Fragment {
         final TextView placeholder = binding.placeholder;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        List<Book> books = Objects.requireNonNull(globalViewModel.getBooks().getValue());
+
         RecyclerView.Adapter<BookViewHolder> adapter =
-                new BookAdapter(new ArrayList<>(Objects.requireNonNull(globalViewModel.getBooks().getValue())));
+                new BookAdapter(books);
         recyclerView.setAdapter(adapter);
 
-        if (!globalViewModel.getBooks().getValue().isEmpty()) {
+        if (!books.isEmpty()) {
             placeholder.setVisibility(View.GONE);
         }
 
