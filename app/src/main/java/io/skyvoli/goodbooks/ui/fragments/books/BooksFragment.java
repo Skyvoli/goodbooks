@@ -42,21 +42,19 @@ public class BooksFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         List<Book> books = new ArrayList<>(globalViewModel.getBooks());
-        BookAdapter adapter = new BookAdapter(books, getParentFragmentManager().beginTransaction());
+        BookAdapter adapter = new BookAdapter(books);
         recyclerView.setAdapter(adapter);
 
         ItemTouchHelper helper = new ItemTouchHelper(new BookTouchHelperCallback(adapter));
         helper.attachToRecyclerView(recyclerView);
 
-
+        button.setOnClickListener(v ->
+        {
+            recyclerView.setAdapter(new BookAdapter(new ArrayList<>(globalViewModel.getBooks())));
+            setPlaceholder(new ArrayList<>(globalViewModel.getBooks()), placeholder);
+        });
         setPlaceholder(books, placeholder);
         if (isAdded()) {
-            button.setOnClickListener(v ->
-            {
-                recyclerView.setAdapter(new BookAdapter(new ArrayList<>(globalViewModel.getBooks()), getParentFragmentManager().beginTransaction()));
-                setPlaceholder(new ArrayList<>(globalViewModel.getBooks()), placeholder);
-            });
-
             globalViewModel.getBooks().addOnListChangedCallback(new BookObserver(binding, requireActivity()));
         }
 

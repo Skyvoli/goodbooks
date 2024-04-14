@@ -2,6 +2,7 @@ package io.skyvoli.goodbooks.ui.bookcard;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,12 +24,10 @@ import io.skyvoli.goodbooks.storage.database.dto.Book;
 public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 
     private final List<Book> books;
-    private FragmentTransaction transaction;
     private Context context;
 
-    public BookAdapter(List<Book> books, FragmentTransaction transaction) {
+    public BookAdapter(List<Book> books) {
         this.books = books;
-        this.transaction = transaction;
     }
 
     @NonNull
@@ -55,7 +53,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
             public View.OnLongClickListener onLongClick() {
                 return v -> {
                     NavController navController = Navigation.findNavController(v);
-                    navController.navigate(R.id.to_detail);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("isbn", book.getIsbn());
+                    bundle.putInt("index", holder.getAdapterPosition());
+                    navController.navigate(R.id.to_detail, bundle);
                     return true;
                 };
             }
