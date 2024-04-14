@@ -9,8 +9,7 @@ public class BookDetailViewModel extends ViewModel {
     private Book book;
 
     public BookDetailViewModel() {
-        book = new Book("OnLoad");
-
+        //necessary
     }
 
     public Book getBook() {

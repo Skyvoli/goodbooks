@@ -35,6 +35,6 @@ public class GlobalViewModel extends ViewModel {
     }
 
     public boolean hasBook(String isbn) {
-        return books.contains(new Book(isbn));
+        return books.stream().anyMatch(book -> book.sameBook(isbn));
     }
 }

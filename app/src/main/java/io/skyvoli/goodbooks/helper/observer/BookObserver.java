@@ -14,6 +14,7 @@ public class BookObserver extends ObservableList.OnListChangedCallback<Observabl
 
     private final FragmentBooksBinding binding;
     private final FragmentActivity activity;
+    private final String logTag = this.getClass().getSimpleName();
 
     public BookObserver(FragmentBooksBinding binding, FragmentActivity activity) {
         this.binding = binding;
@@ -22,12 +23,12 @@ public class BookObserver extends ObservableList.OnListChangedCallback<Observabl
 
     @Override
     public void onChanged(ObservableList<Book> sender) {
-        Log.d("Observer", "OnChanged");
+        Log.d(logTag, "OnChanged");
     }
 
     @Override
     public void onItemRangeChanged(ObservableList<Book> sender, int positionStart, int itemCount) {
-        Log.d("Observer", "OnRangeChanged");
+        Log.d(logTag, "OnRangeChanged");
     }
 
     @Override
@@ -52,11 +53,11 @@ public class BookObserver extends ObservableList.OnListChangedCallback<Observabl
 
     @Override
     public void onItemRangeMoved(ObservableList<Book> sender, int fromPosition, int toPosition, int itemCount) {
-        Log.d("Observer", "OnRangeMoved");
+        Log.d(logTag, "OnRangeMoved");
     }
 
     @Override
     public void onItemRangeRemoved(ObservableList<Book> sender, int positionStart, int itemCount) {
-        Log.d("Observer", "OnRangeRemoved");
+        Log.d(logTag, "OnRangeRemoved");
     }
 }
