@@ -9,6 +9,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -21,10 +24,12 @@ import io.skyvoli.goodbooks.storage.database.dto.Book;
 public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 
     private final List<Book> books;
+    private FragmentTransaction transaction;
     private Context context;
 
-    public BookAdapter(List<Book> books) {
+    public BookAdapter(List<Book> books, FragmentTransaction transaction) {
         this.books = books;
+        this.transaction = transaction;
     }
 
     @NonNull
@@ -49,7 +54,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
             @Override
             public View.OnLongClickListener onLongClick() {
                 return v -> {
-                    Toast.makeText(context, "Long", Toast.LENGTH_SHORT).show();
+                    NavController navController = Navigation.findNavController(v);
+                    navController.navigate(R.id.to_detail);
                     return true;
                 };
             }

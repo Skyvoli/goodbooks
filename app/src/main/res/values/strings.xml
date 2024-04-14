@@ -20,4 +20,6 @@
     <string name="books_placeholder">Keine Bücher vorhanden</string>
     <string name="deleteBtn">Lösche Bücher</string>
     <string name="synchronise">Sync</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
