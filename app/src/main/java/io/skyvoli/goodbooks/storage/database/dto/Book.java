@@ -92,6 +92,10 @@ public class Book {
         this.cover = cover;
     }
 
+    public boolean sameBook(String isbn) {
+        return this.isbn.equals(isbn);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
