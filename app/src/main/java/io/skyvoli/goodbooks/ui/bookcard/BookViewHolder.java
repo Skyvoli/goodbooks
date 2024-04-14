@@ -9,7 +9,6 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import io.skyvoli.goodbooks.R;
-import io.skyvoli.goodbooks.helper.listener.OnItemClickListener;
 
 public class BookViewHolder extends RecyclerView.ViewHolder {
 
@@ -28,9 +27,8 @@ public class BookViewHolder extends RecyclerView.ViewHolder {
         cover = itemView.findViewById(R.id.cover);
     }
 
-    public void setListener(OnItemClickListener listener) {
-        relativeLayout.setOnClickListener(listener.onClick());
-        relativeLayout.setOnLongClickListener(listener.onLongClick());
+    public void setListener(View.OnClickListener listener) {
+        relativeLayout.setOnClickListener(listener);
     }
 
     public void setTitle(String title) {

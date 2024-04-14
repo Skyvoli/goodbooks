@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
-import io.skyvoli.goodbooks.helper.listener.OnItemClickListener;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
@@ -43,25 +41,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = books.get(position);
 
-        holder.setListener(new OnItemClickListener() {
-            @Override
-            public View.OnClickListener onClick() {
-                return v -> Toast.makeText(context, "Short", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public View.OnLongClickListener onLongClick() {
-                return v -> {
-                    NavController navController = Navigation.findNavController(v);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("isbn", book.getIsbn());
-                    bundle.putInt("index", holder.getAdapterPosition());
-                    navController.navigate(R.id.to_detail, bundle);
-                    return true;
-                };
-            }
-        });
-
         holder.setTitle(book.getTitle() + " " + book.getPart());
         holder.setIsbn(book.getIsbn());
         holder.setAuthor(book.getAuthor());
@@ -72,6 +51,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
             //Default
             holder.setCover(ContextCompat.getDrawable(context, R.drawable.ruby));
         }
+
+        holder.setListener(v -> {
+            NavController navController = Navigation.findNavController(v);
+            Bundle bundle = new Bundle();
+            bundle.putString("isbn", book.getIsbn());
+            bundle.putInt("index", holder.getAdapterPosition());
+            navController.navigate(R.id.to_detail, bundle);
+        });
     }
 
     @Override
