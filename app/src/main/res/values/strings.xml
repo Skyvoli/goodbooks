@@ -13,13 +13,11 @@
     <string name="scan">Scan</string>
     <string name="isbn_label">ISBN:</string>
     <string name="author_label">Autor:</string>
-    <string name="book_title">Book Title</string>
+    <string name="title_placeholder">Book Title</string>
     <string name="isbn_placeholder">isbn</string>
     <string name="author_placeholder">autor</string>
     <string name="bookCover">bookCover</string>
     <string name="books_placeholder">Keine Bücher vorhanden</string>
     <string name="deleteBtn">Lösche Bücher</string>
     <string name="synchronise">Sync</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

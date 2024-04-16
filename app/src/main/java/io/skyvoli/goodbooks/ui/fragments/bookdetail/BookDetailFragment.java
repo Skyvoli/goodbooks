@@ -49,9 +49,14 @@ public class BookDetailFragment extends Fragment {
 
         final TextView title = binding.title;
         final ImageView cover = binding.cover;
+        final TextView isbn = binding.isbn;
+        final TextView author = binding.author;
 
         Book book = bookDetailViewModel.getBook();
-        title.setText(book.getTitle());
+        String wholeTitle = book.getTitle() + " " + book.getPart();
+        title.setText(wholeTitle);
+        isbn.setText(book.getIsbn());
+        author.setText(book.getAuthor());
 
         Optional<Drawable> drawable = book.getCover();
         if (drawable.isPresent()) {
