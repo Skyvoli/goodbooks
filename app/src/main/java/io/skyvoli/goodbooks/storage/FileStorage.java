@@ -1,13 +1,14 @@
 package io.skyvoli.goodbooks.storage;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-
-import io.skyvoli.goodbooks.helper.converter.Converter;
 
 public class FileStorage {
 
@@ -26,7 +27,7 @@ public class FileStorage {
     public void saveImage(String isbn, Drawable cover) {
         try {
             File file = new File(directory.getAbsolutePath() + File.separator + isbn + IMAGE_PATH_END);
-            Files.write(file.toPath(), Converter.convertToByteArray(cover));
+            Files.write(file.toPath(), convertToByteArray(cover));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -50,5 +51,12 @@ public class FileStorage {
                 Log.e(logTag, "Couldn't delete file");
             }
         }
+    }
+
+    private byte[] convertToByteArray(Drawable drawable) {
+        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, output);
+        return output.toByteArray();
     }
 }
