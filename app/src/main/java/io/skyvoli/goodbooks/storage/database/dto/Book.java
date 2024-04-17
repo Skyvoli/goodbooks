@@ -16,7 +16,7 @@ public class Book {
     @ColumnInfo(name = "title")
     private final String title;
     @ColumnInfo(name = "part")
-    private final String part;
+    private final Integer part;
 
     @NonNull
     @PrimaryKey
@@ -32,7 +32,7 @@ public class Book {
     @Ignore
     public Book(@NonNull String isbn) {
         this.title = "Unbekannt";
-        this.part = "";
+        this.part = null;
         this.isbn = isbn;
         this.author = "Unbekannt";
         this.cover = null;
@@ -41,7 +41,7 @@ public class Book {
 
 
     @Ignore
-    public Book(String title, String part, @NonNull String isbn, String author, Drawable cover, boolean resolved) {
+    public Book(String title, Integer part, @NonNull String isbn, String author, Drawable cover, boolean resolved) {
         this.title = title;
         this.part = part;
         this.isbn = isbn;
@@ -50,7 +50,7 @@ public class Book {
         this.resolved = resolved;
     }
 
-    public Book(String title, String part, @NonNull String isbn, String author, boolean resolved) {
+    public Book(String title, Integer part, @NonNull String isbn, String author, boolean resolved) {
         this.title = title;
         this.part = part;
         this.isbn = isbn;
@@ -63,7 +63,7 @@ public class Book {
         return title;
     }
 
-    public String getPart() {
+    public Integer getPart() {
         return part;
     }
 

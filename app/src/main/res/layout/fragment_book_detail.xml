@@ -15,6 +15,7 @@
             android:layout_height="wrap_content"
             android:text="@string/title_placeholder"
             android:textSize="22sp"
+            android:textIsSelectable="true"
 
             android:textStyle="bold"
             android:textColor="?attr/colorOnSecondary"
@@ -58,6 +59,7 @@
             android:textSize="20sp"
             android:text="@string/isbn_placeholder"
             android:layout_marginStart="25dp"
+            android:textIsSelectable="true"
 
             app:layout_constraintTop_toBottomOf="@+id/title"
             app:layout_constraintStart_toEndOf="@+id/isbnLabel"
@@ -86,6 +88,7 @@
             android:maxLines="9"
             android:layout_marginTop="5dp"
             android:layout_marginStart="25dp"
+            android:textIsSelectable="true"
 
             app:layout_constraintTop_toBottomOf="@+id/isbn"
             app:layout_constraintStart_toEndOf="@+id/isbnLabel"

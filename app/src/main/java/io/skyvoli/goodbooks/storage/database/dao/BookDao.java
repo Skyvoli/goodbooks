@@ -10,7 +10,7 @@ import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 @Dao
 public interface BookDao {
-    @Query("SELECT * FROM books ORDER BY title")
+    @Query("SELECT * FROM books ORDER BY title, part")
     List<Book> getAll();
 
     @Insert

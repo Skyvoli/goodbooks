@@ -41,7 +41,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = books.get(position);
 
-        holder.setTitle(book.getTitle() + " " + book.getPart());
+        holder.setTitle(buildWholeTitle(book.getTitle(), book.getPart()));
         holder.setIsbn(book.getIsbn());
         holder.setAuthor(book.getAuthor());
         Optional<Drawable> cover = book.getCover();
@@ -56,7 +56,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
             NavController navController = Navigation.findNavController(v);
             Bundle bundle = new Bundle();
             bundle.putString("isbn", book.getIsbn());
-            bundle.putInt("index", holder.getAdapterPosition());
             navController.navigate(R.id.to_detail, bundle);
         });
     }
@@ -68,5 +67,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 
     public List<Book> getBooks() {
         return books;
+    }
+
+    //Copy of detail title builder
+    private String buildWholeTitle(String title, Integer part) {
+        if (part != null) {
+            return title + " " + part;
+        } else {
+            return title;
+        }
     }
 }

@@ -1,6 +1,7 @@
 package io.skyvoli.goodbooks.web.api;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -33,13 +34,34 @@ public class DnbMarc21Api implements BookApi {
         Element titleData = getElement(bookData, "245");
         String title = getContent(titleData, "a", "Unbekannt");
         String subTitle = getContent(titleData, "b", "");
-        String part = getContent(titleData, "n", "");
+        Integer part = parseToInt(getContent(titleData, "n", ""));
 
         String author = resolveAuthor(bookData);
         Drawable cover = new RequestHandler().getImage(IMAGE_URL + isbn);
 
         return new Book(title, part, isbn, author, cover, true);
 
+    }
+
+    private Integer parseToInt(String part) {
+        try {
+            return Integer.parseInt(part);
+        } catch (NumberFormatException e) {
+            Log.e(getClass().getSimpleName(), "Not a integer");
+
+            StringBuilder digits = new StringBuilder();
+
+            for (char character : part.toCharArray()) {
+                if (Character.isDigit(character)) {
+                    digits.append(character);
+                }
+            }
+
+            if (digits.length() == 0) {
+                return null;
+            }
+            return Integer.valueOf(digits.toString());
+        }
     }
 
     private String resolveAuthor(Element bookData) {

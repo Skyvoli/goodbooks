@@ -33,23 +33,9 @@ public class BookDetailFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
-        BookDetailViewModel bookDetailViewModel = new ViewModelProvider(this).get(BookDetailViewModel.class);
 
         binding = FragmentBookDetailBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-        if (getArguments() != null) {
-            Log.d("Index", String.valueOf(getArguments().getInt("index")));
-            String isbn = Optional.ofNullable(getArguments().getString("isbn")).orElse("No Isbn");
-            Book book = globalViewModel.getBooks().stream()
-                    .filter(el -> el.sameBook(isbn))
-                    .findAny()
-                    .orElse(new Book(isbn));
-            bookDetailViewModel.setBook(book);
-        } else {
-            bookDetailViewModel.setBook(new Book("No Isbn"));
-            Log.e(logTag, "Missing argument isbn");
-        }
 
         final TextView title = binding.title;
         final ImageView cover = binding.cover;
@@ -59,53 +45,92 @@ public class BookDetailFragment extends Fragment {
         final EditText editPart = binding.editPart;
         final TextInputEditText editAuthor = binding.editAuthor;
 
-        Book book = bookDetailViewModel.getBook();
-        String wholeTitle = book.getTitle() + " " + book.getPart();
-        title.setText(wholeTitle);
-        isbn.setText(book.getIsbn());
-        author.setText(book.getAuthor());
-
-        editTitle.setText(book.getTitle());
-        editPart.setText(book.getPart());
-        editAuthor.setText(book.getAuthor());
-
-        editTitle.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) {
-                Editable newTitle = editTitle.getText();
-                if (newTitle != null && !newTitle.toString().contentEquals(title.getText())) {
-                    String newWholeTitle = newTitle + " " + book.getPart();
-                    title.setText(newWholeTitle);
-                }
-            }
-        });
-        editPart.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) {
-                Editable newPart = editPart.getText();
-                //TODO validate integer
-                if (newPart != null && !newPart.toString().contentEquals(title.getText())) {
-                    String newWholeTitle = book.getTitle() + " " + newPart;
-                    title.setText(newWholeTitle);
-                }
-            }
-        });
-
-        editAuthor.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) {
-                Editable newAuthor = editAuthor.getText();
-                if (newAuthor != null && !newAuthor.toString().contentEquals(author.getText())) {
-                    author.setText(newAuthor.toString());
-                }
-            }
-        });
-
+        Book book = loadBook(getArguments(), globalViewModel);
+        //Set content
+        title.setText(buildWholeTitle(book.getTitle(), book.getPart()));
         Optional<Drawable> drawable = book.getCover();
         if (drawable.isPresent()) {
             cover.setImageDrawable(drawable.get());
         } else {
             cover.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ruby));
         }
+        isbn.setText(book.getIsbn());
+        author.setText(book.getAuthor());
+        editTitle.setText(book.getTitle());
+        Integer part = book.getPart();
+        if (part != null) {
+            editPart.setText(String.valueOf(part));
+        }
+        editAuthor.setText(book.getAuthor());
+
+        //Set listener
+        editTitle.setOnFocusChangeListener(getTitleListener(title, editTitle, book.getPart()));
+        editPart.setOnFocusChangeListener(getPartListener(title, editPart, book.getTitle()));
+        editAuthor.setOnFocusChangeListener(getAuthorListner(author, editAuthor));
 
         return root;
+    }
+
+
+    private Book loadBook(Bundle arguments, GlobalViewModel globalViewModel) {
+        if (arguments != null) {
+            String isbn = Optional.ofNullable(getArguments().getString("isbn")).orElse("No Isbn");
+            return globalViewModel.getBooks().stream()
+                    .filter(el -> el.sameBook(isbn))
+                    .findAny()
+                    .orElse(new Book(isbn));
+        } else {
+
+            Log.e(logTag, "Missing argument isbn");
+            return new Book("No Isbn");
+        }
+    }
+
+    private String buildWholeTitle(String title, Integer part) {
+        if (part != null) {
+            return title + " " + part;
+        } else {
+            return title;
+        }
+    }
+
+    private View.OnFocusChangeListener getTitleListener(TextView title, TextInputEditText
+            editTitle, Integer part) {
+        return (v, hasFocus) -> {
+            if (!hasFocus) {
+                Editable newTitle = editTitle.getText();
+                if (newTitle != null && !newTitle.toString().contentEquals(title.getText())) {
+                    title.setText(buildWholeTitle(newTitle.toString(), part));
+                }
+            }
+        };
+    }
+
+    private View.OnFocusChangeListener getPartListener(TextView title, EditText
+            editPart, String titleString) {
+        return (v, hasFocus) -> {
+            if (!hasFocus) {
+                Editable newPart = editPart.getText();
+                try {
+                    if (newPart != null && !newPart.toString().contentEquals(title.getText())) {
+                        title.setText(buildWholeTitle(titleString, Integer.valueOf(newPart.toString())));
+                    }
+                } catch (NumberFormatException e) {
+                    editPart.setText(null);
+                }
+            }
+        };
+    }
+
+    private View.OnFocusChangeListener getAuthorListner(TextView author, TextInputEditText editAuthor) {
+        return (v, hasFocus) -> {
+            if (!hasFocus) {
+                Editable newAuthor = editAuthor.getText();
+                if (newAuthor != null && !newAuthor.toString().contentEquals(author.getText())) {
+                    author.setText(newAuthor.toString());
+                }
+            }
+        };
     }
 
     @Override
