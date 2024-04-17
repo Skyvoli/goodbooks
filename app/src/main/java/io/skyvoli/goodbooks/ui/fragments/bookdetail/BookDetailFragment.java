@@ -70,13 +70,30 @@ public class BookDetailFragment extends Fragment {
         editAuthor.setText(book.getAuthor());
 
         editTitle.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                Log.d(logTag, "IN");
-            } else {
-                Log.d(logTag, "OUT");
+            if (!hasFocus) {
                 Editable newTitle = editTitle.getText();
                 if (newTitle != null && !newTitle.toString().contentEquals(title.getText())) {
-                    title.setText(newTitle.toString());
+                    String newWholeTitle = newTitle + " " + book.getPart();
+                    title.setText(newWholeTitle);
+                }
+            }
+        });
+        editPart.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                Editable newPart = editPart.getText();
+                //TODO validate integer
+                if (newPart != null && !newPart.toString().contentEquals(title.getText())) {
+                    String newWholeTitle = book.getTitle() + " " + newPart;
+                    title.setText(newWholeTitle);
+                }
+            }
+        });
+
+        editAuthor.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                Editable newAuthor = editAuthor.getText();
+                if (newAuthor != null && !newAuthor.toString().contentEquals(author.getText())) {
+                    author.setText(newAuthor.toString());
                 }
             }
         });
