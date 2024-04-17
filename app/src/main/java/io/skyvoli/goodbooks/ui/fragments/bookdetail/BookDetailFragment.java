@@ -2,10 +2,12 @@ package io.skyvoli.goodbooks.ui.fragments.bookdetail;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,6 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Optional;
 
@@ -51,12 +55,31 @@ public class BookDetailFragment extends Fragment {
         final ImageView cover = binding.cover;
         final TextView isbn = binding.isbn;
         final TextView author = binding.author;
+        final TextInputEditText editTitle = binding.editTitle;
+        final EditText editPart = binding.editPart;
+        final TextInputEditText editAuthor = binding.editAuthor;
 
         Book book = bookDetailViewModel.getBook();
         String wholeTitle = book.getTitle() + " " + book.getPart();
         title.setText(wholeTitle);
         isbn.setText(book.getIsbn());
         author.setText(book.getAuthor());
+
+        editTitle.setText(book.getTitle());
+        editPart.setText(book.getPart());
+        editAuthor.setText(book.getAuthor());
+
+        editTitle.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                Log.d(logTag, "IN");
+            } else {
+                Log.d(logTag, "OUT");
+                Editable newTitle = editTitle.getText();
+                if (newTitle != null && !newTitle.toString().contentEquals(title.getText())) {
+                    title.setText(newTitle.toString());
+                }
+            }
+        });
 
         Optional<Drawable> drawable = book.getCover();
         if (drawable.isPresent()) {

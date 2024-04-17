@@ -29,6 +29,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:contentDescription="@string/bookCover"
+            android:src="@drawable/ruby"
 
             android:layout_marginTop="15dp"
             app:layout_constraintDimensionRatio="2:3"
@@ -85,5 +86,67 @@
 
             app:layout_constraintTop_toBottomOf="@+id/isbn"
             app:layout_constraintStart_toEndOf="@+id/isbnLabel" />
+
+    <TextView
+            android:id="@+id/edits"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_title"
+            android:textSize="22sp"
+            android:layout_marginTop="15dp"
+
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSecondary"
+            app:layout_constraintTop_toBottomOf="@+id/cover"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/titleLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/title_label"
+            app:layout_constraintTop_toBottomOf="@+id/edits"
+            android:layout_marginTop="15dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/partLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            app:layout_constraintTop_toBottomOf="@+id/titleLayout"
+            android:layout_marginTop="15dp">
+
+        <EditText
+                android:id="@+id/editPart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="number"
+                android:hint="@string/part_label"
+                android:importantForAutofill="no" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/authorLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/author_label_2"
+            app:layout_constraintTop_toBottomOf="@+id/partLayout"
+            android:layout_marginTop="15dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

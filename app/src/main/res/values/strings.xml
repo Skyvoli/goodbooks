@@ -11,8 +11,11 @@
     <string name="menu_camera">Camera</string>
     <string name="menu_books">Books</string>
     <string name="scan">Scan</string>
+    <string name="title_label">Titel</string>
+    <string name="part_label">Nummer</string>
     <string name="isbn_label">ISBN:</string>
     <string name="author_label">Autor:</string>
+    <string name="author_label_2">Autor</string>
     <string name="title_placeholder">Book Title</string>
     <string name="isbn_placeholder">isbn</string>
     <string name="author_placeholder">autor</string>
@@ -20,4 +23,5 @@
     <string name="books_placeholder">Keine Bücher vorhanden</string>
     <string name="deleteBtn">Lösche Bücher</string>
     <string name="synchronise">Sync</string>
+    <string name="edit_title">Datensatz bearbeiten</string>
 </resources>
