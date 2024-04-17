@@ -14,15 +14,15 @@ import java.util.Optional;
 @Entity(tableName = "books")
 public class Book {
     @ColumnInfo(name = "title")
-    private final String title;
+    private String title;
     @ColumnInfo(name = "part")
-    private final Integer part;
+    private Integer part;
 
     @NonNull
     @PrimaryKey
     private final String isbn;
     @ColumnInfo(name = "author")
-    private final String author;
+    private String author;
     //@ColumnInfo(name = "cover") too big
     @Ignore
     private Drawable cover;
@@ -82,6 +82,19 @@ public class Book {
 
     public boolean isResolved() {
         return resolved;
+    }
+
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setPart(Integer part) {
+        this.part = part;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public void setResolved(boolean resolved) {

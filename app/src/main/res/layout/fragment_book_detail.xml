@@ -114,7 +114,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/title_label"
             app:layout_constraintTop_toBottomOf="@+id/edits"
-            android:layout_marginTop="15dp">
+            android:layout_marginTop="15dp"
+            app:errorEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTitle"
@@ -129,7 +130,8 @@
             android:layout_height="wrap_content"
 
             app:layout_constraintTop_toBottomOf="@+id/titleLayout"
-            android:layout_marginTop="15dp">
+            android:layout_marginTop="15dp"
+            app:errorEnabled="true">
 
         <EditText
                 android:id="@+id/editPart"
@@ -147,7 +149,8 @@
             android:layout_height="wrap_content"
             android:hint="@string/author_label_2"
             app:layout_constraintTop_toBottomOf="@+id/partLayout"
-            android:layout_marginTop="15dp">
+            android:layout_marginTop="15dp"
+            app:errorEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editAuthor"

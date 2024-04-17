@@ -14,10 +14,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
@@ -29,6 +32,7 @@ public class BookDetailFragment extends Fragment {
 
     private FragmentBookDetailBinding binding;
     private final String logTag = this.getClass().getSimpleName();
+    MutableLiveData<Book> book;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,39 +45,45 @@ public class BookDetailFragment extends Fragment {
         final ImageView cover = binding.cover;
         final TextView isbn = binding.isbn;
         final TextView author = binding.author;
+        final TextInputLayout partLayout = binding.partLayout;
         final TextInputEditText editTitle = binding.editTitle;
         final EditText editPart = binding.editPart;
         final TextInputEditText editAuthor = binding.editAuthor;
+        Book start = loadBook(globalViewModel);
+        book = new MutableLiveData<>(start);
 
-        Book book = loadBook(getArguments(), globalViewModel);
         //Set content
-        title.setText(buildWholeTitle(book.getTitle(), book.getPart()));
-        Optional<Drawable> drawable = book.getCover();
+        Optional<Drawable> drawable = start.getCover();
         if (drawable.isPresent()) {
             cover.setImageDrawable(drawable.get());
         } else {
             cover.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ruby));
         }
-        isbn.setText(book.getIsbn());
-        author.setText(book.getAuthor());
-        editTitle.setText(book.getTitle());
-        Integer part = book.getPart();
+        isbn.setText(start.getIsbn());
+        book.observe(getViewLifecycleOwner(), bookValue -> {
+            title.setText(buildWholeTitle(Objects.requireNonNull(book.getValue()).getTitle(), book.getValue().getPart()));
+            author.setText(bookValue.getAuthor());
+        });
+
+
+        editTitle.setText(start.getTitle());
+        Integer part = start.getPart();
         if (part != null) {
             editPart.setText(String.valueOf(part));
         }
-        editAuthor.setText(book.getAuthor());
+        editAuthor.setText(start.getAuthor());
 
         //Set listener
-        editTitle.setOnFocusChangeListener(getTitleListener(title, editTitle, book.getPart()));
-        editPart.setOnFocusChangeListener(getPartListener(title, editPart, book.getTitle()));
-        editAuthor.setOnFocusChangeListener(getAuthorListner(author, editAuthor));
+        editTitle.setOnFocusChangeListener(getTitleListener(title, editTitle, Objects.requireNonNull(book.getValue()).getPart()));
+        editPart.setOnFocusChangeListener(getPartListener(title, editPart, partLayout));
+        editAuthor.setOnFocusChangeListener(getAuthorListener(author, editAuthor));
 
         return root;
     }
 
 
-    private Book loadBook(Bundle arguments, GlobalViewModel globalViewModel) {
-        if (arguments != null) {
+    private Book loadBook(GlobalViewModel globalViewModel) {
+        if (getArguments() != null) {
             String isbn = Optional.ofNullable(getArguments().getString("isbn")).orElse("No Isbn");
             return globalViewModel.getBooks().stream()
                     .filter(el -> el.sameBook(isbn))
@@ -101,33 +111,41 @@ public class BookDetailFragment extends Fragment {
                 Editable newTitle = editTitle.getText();
                 if (newTitle != null && !newTitle.toString().contentEquals(title.getText())) {
                     title.setText(buildWholeTitle(newTitle.toString(), part));
+                    Book newBook = book.getValue();
+                    Objects.requireNonNull(newBook).setTitle(newTitle.toString());
+                    book.setValue(newBook);
                 }
             }
         };
     }
 
     private View.OnFocusChangeListener getPartListener(TextView title, EditText
-            editPart, String titleString) {
+            editPart, TextInputLayout partLayout) {
         return (v, hasFocus) -> {
             if (!hasFocus) {
                 Editable newPart = editPart.getText();
+                partLayout.setError(null);
                 try {
                     if (newPart != null && !newPart.toString().contentEquals(title.getText())) {
-                        title.setText(buildWholeTitle(titleString, Integer.valueOf(newPart.toString())));
+                        Book newBook = book.getValue();
+                        Objects.requireNonNull(newBook).setPart(Integer.valueOf(newPart.toString()));
+                        book.setValue(newBook);
                     }
                 } catch (NumberFormatException e) {
-                    editPart.setText(null);
+                    partLayout.setError("Bitte geben Sie eine Ganzzahl ein.");
                 }
             }
         };
     }
 
-    private View.OnFocusChangeListener getAuthorListner(TextView author, TextInputEditText editAuthor) {
+    private View.OnFocusChangeListener getAuthorListener(TextView author, TextInputEditText editAuthor) {
         return (v, hasFocus) -> {
             if (!hasFocus) {
                 Editable newAuthor = editAuthor.getText();
                 if (newAuthor != null && !newAuthor.toString().contentEquals(author.getText())) {
-                    author.setText(newAuthor.toString());
+                    Book newBook = book.getValue();
+                    Objects.requireNonNull(newBook).setAuthor(newAuthor.toString());
+                    book.setValue(newBook);
                 }
             }
         };
