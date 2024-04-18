@@ -15,14 +15,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
@@ -37,8 +35,8 @@ public class BookDetailFragment extends Fragment {
 
     private FragmentBookDetailBinding binding;
     private final String logTag = this.getClass().getSimpleName();
-    private MutableLiveData<Book> book;
     private Book originalBook;
+    private Book copiedBook;
     private Button submit;
 
     @Override
@@ -58,9 +56,10 @@ public class BookDetailFragment extends Fragment {
         final TextInputEditText editAuthor = binding.editAuthor;
         submit = binding.submitChanges;
         originalBook = loadBook(globalViewModel);
-        book = new MutableLiveData<>(originalBook.createClone());
+        copiedBook = originalBook.createClone();
 
         //Set content & observables
+        title.setText(buildWholeTitle(originalBook.getTitle(), originalBook.getPart()));
         Optional<Drawable> drawable = originalBook.getCover();
         if (drawable.isPresent()) {
             cover.setImageDrawable(drawable.get());
@@ -68,10 +67,7 @@ public class BookDetailFragment extends Fragment {
             cover.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ruby));
         }
         isbn.setText(originalBook.getIsbn());
-        book.observe(getViewLifecycleOwner(), bookValue -> {
-            title.setText(buildWholeTitle(Objects.requireNonNull(book.getValue()).getTitle(), book.getValue().getPart()));
-            author.setText(bookValue.getAuthor());
-        });
+        author.setText(originalBook.getAuthor());
 
         //Set editable
         editTitle.setText(originalBook.getTitle());
@@ -82,14 +78,17 @@ public class BookDetailFragment extends Fragment {
         editAuthor.setText(originalBook.getAuthor());
 
         //Set listener
-        editTitle.setOnFocusChangeListener(getTitleListener(title, editTitle, Objects.requireNonNull(book.getValue()).getPart()));
-        editPart.setOnFocusChangeListener(getPartListener(title, editPart, partLayout));
-        editAuthor.setOnFocusChangeListener(getAuthorListener(author, editAuthor));
+        editTitle.setOnFocusChangeListener(getTitleListener(editTitle));
+        editPart.setOnFocusChangeListener(getPartListener(editPart, partLayout));
+        editAuthor.setOnFocusChangeListener(getAuthorListener(editAuthor));
 
         submit.setOnClickListener(v -> {
-            Book newBook = book.getValue().createClone();
+            Book newBook = copiedBook.createClone();
             globalViewModel.updateBook(newBook);
             originalBook = newBook;
+            //Refresh
+            title.setText(buildWholeTitle(originalBook.getTitle(), originalBook.getPart()));
+            author.setText(originalBook.getAuthor());
             submit.setEnabled(false);
             new BackgroundTask(() -> {
                 AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
@@ -126,33 +125,27 @@ public class BookDetailFragment extends Fragment {
         }
     }
 
-    private View.OnFocusChangeListener getTitleListener(TextView title, TextInputEditText
-            editTitle, Integer part) {
+    private View.OnFocusChangeListener getTitleListener(TextInputEditText editTitle) {
         return (v, hasFocus) -> {
             if (!hasFocus) {
                 Editable newTitle = editTitle.getText();
-                if (newTitle != null && !newTitle.toString().contentEquals(title.getText())) {
-                    title.setText(buildWholeTitle(newTitle.toString(), part));
-                    Book newBook = book.getValue();
-                    Objects.requireNonNull(newBook).setTitle(newTitle.toString());
-                    book.setValue(newBook);
+                if (newTitle != null) {
+                    copiedBook.setTitle(newTitle.toString());
                     changed();
                 }
             }
         };
     }
 
-    private View.OnFocusChangeListener getPartListener(TextView title, EditText
-            editPart, TextInputLayout partLayout) {
+    private View.OnFocusChangeListener getPartListener(EditText
+                                                               editPart, TextInputLayout partLayout) {
         return (v, hasFocus) -> {
             if (!hasFocus) {
                 Editable newPart = editPart.getText();
                 partLayout.setError(null);
                 try {
-                    if (newPart != null && !newPart.toString().contentEquals(title.getText())) {
-                        Book newBook = book.getValue();
-                        Objects.requireNonNull(newBook).setPart(Integer.valueOf(newPart.toString()));
-                        book.setValue(newBook);
+                    if (newPart != null) {
+                        copiedBook.setPart(Integer.valueOf(newPart.toString()));
                         changed();
                     }
                 } catch (NumberFormatException e) {
@@ -162,14 +155,12 @@ public class BookDetailFragment extends Fragment {
         };
     }
 
-    private View.OnFocusChangeListener getAuthorListener(TextView author, TextInputEditText editAuthor) {
+    private View.OnFocusChangeListener getAuthorListener(TextInputEditText editAuthor) {
         return (v, hasFocus) -> {
             if (!hasFocus) {
                 Editable newAuthor = editAuthor.getText();
-                if (newAuthor != null && !newAuthor.toString().contentEquals(author.getText())) {
-                    Book newBook = book.getValue();
-                    Objects.requireNonNull(newBook).setAuthor(newAuthor.toString());
-                    book.setValue(newBook);
+                if (newAuthor != null) {
+                    copiedBook.setAuthor(newAuthor.toString());
                     changed();
                 }
             }
@@ -177,7 +168,7 @@ public class BookDetailFragment extends Fragment {
     }
 
     private void changed() {
-        submit.setEnabled(!originalBook.equals(book.getValue()));
+        submit.setEnabled(!originalBook.equals(copiedBook));
     }
 
     @Override
