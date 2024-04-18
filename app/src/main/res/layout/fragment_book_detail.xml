@@ -159,5 +159,16 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <Button
+            android:id="@+id/submitChanges"
+            android:text="@string/saveChange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+
+            android:layout_marginTop="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/authorLayout" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

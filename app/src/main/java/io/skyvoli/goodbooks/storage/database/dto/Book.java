@@ -59,6 +59,10 @@ public class Book {
         this.resolved = resolved;
     }
 
+    public Book createClone() {
+        return new Book(title, part, isbn, author, cover, resolved);
+    }
+
     public String getTitle() {
         return title;
     }
@@ -105,20 +109,20 @@ public class Book {
         this.cover = cover;
     }
 
-    public boolean sameBook(String isbn) {
+    public boolean sameIsbn(String isbn) {
         return this.isbn.equals(isbn);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Book)) return false;
         Book book = (Book) o;
-        return Objects.equals(isbn, book.isbn);
+        return Objects.equals(title, book.title) && Objects.equals(part, book.part) && Objects.equals(isbn, book.isbn) && Objects.equals(author, book.author) && Objects.equals(cover, book.cover);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isbn);
+        return Objects.hash(title, part, isbn, author, cover);
     }
 }

@@ -24,4 +24,5 @@
     <string name="deleteBtn">Lösche Bücher</string>
     <string name="synchronise">Sync</string>
     <string name="edit_title">Datensatz bearbeiten</string>
+    <string name="saveChange">Übernehmen</string>
 </resources>

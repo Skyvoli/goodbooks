@@ -3,6 +3,7 @@ package io.skyvoli.goodbooks.storage.database.dao;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import java.util.List;
 
@@ -15,4 +16,7 @@ public interface BookDao {
 
     @Insert
     void insert(Book... books);
+
+    @Update
+    void update(Book book);
 }

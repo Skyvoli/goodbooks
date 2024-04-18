@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.room.Room;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -25,14 +27,19 @@ import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.databinding.FragmentBookDetailBinding;
+import io.skyvoli.goodbooks.dialog.InformationDialog;
+import io.skyvoli.goodbooks.helper.BackgroundTask;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
+import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class BookDetailFragment extends Fragment {
 
     private FragmentBookDetailBinding binding;
     private final String logTag = this.getClass().getSimpleName();
-    MutableLiveData<Book> book;
+    private MutableLiveData<Book> book;
+    private Book originalBook;
+    private Button submit;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,34 +56,49 @@ public class BookDetailFragment extends Fragment {
         final TextInputEditText editTitle = binding.editTitle;
         final EditText editPart = binding.editPart;
         final TextInputEditText editAuthor = binding.editAuthor;
-        Book start = loadBook(globalViewModel);
-        book = new MutableLiveData<>(start);
+        submit = binding.submitChanges;
+        originalBook = loadBook(globalViewModel);
+        book = new MutableLiveData<>(originalBook.createClone());
 
-        //Set content
-        Optional<Drawable> drawable = start.getCover();
+        //Set content & observables
+        Optional<Drawable> drawable = originalBook.getCover();
         if (drawable.isPresent()) {
             cover.setImageDrawable(drawable.get());
         } else {
             cover.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ruby));
         }
-        isbn.setText(start.getIsbn());
+        isbn.setText(originalBook.getIsbn());
         book.observe(getViewLifecycleOwner(), bookValue -> {
             title.setText(buildWholeTitle(Objects.requireNonNull(book.getValue()).getTitle(), book.getValue().getPart()));
             author.setText(bookValue.getAuthor());
         });
 
-
-        editTitle.setText(start.getTitle());
-        Integer part = start.getPart();
+        //Set editable
+        editTitle.setText(originalBook.getTitle());
+        Integer part = originalBook.getPart();
         if (part != null) {
             editPart.setText(String.valueOf(part));
         }
-        editAuthor.setText(start.getAuthor());
+        editAuthor.setText(originalBook.getAuthor());
 
         //Set listener
         editTitle.setOnFocusChangeListener(getTitleListener(title, editTitle, Objects.requireNonNull(book.getValue()).getPart()));
         editPart.setOnFocusChangeListener(getPartListener(title, editPart, partLayout));
         editAuthor.setOnFocusChangeListener(getAuthorListener(author, editAuthor));
+
+        submit.setOnClickListener(v -> {
+            Book newBook = book.getValue().createClone();
+            globalViewModel.updateBook(newBook);
+            originalBook = newBook;
+            submit.setEnabled(false);
+            new BackgroundTask(() -> {
+                AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
+                db.bookDao().update(newBook);
+            }).start();
+
+            InformationDialog dialog = new InformationDialog("Gespeichert", "Die Daten wurden übernommen.");
+            dialog.show(getParentFragmentManager(), "saved");
+        });
 
         return root;
     }
@@ -86,7 +108,7 @@ public class BookDetailFragment extends Fragment {
         if (getArguments() != null) {
             String isbn = Optional.ofNullable(getArguments().getString("isbn")).orElse("No Isbn");
             return globalViewModel.getBooks().stream()
-                    .filter(el -> el.sameBook(isbn))
+                    .filter(el -> el.sameIsbn(isbn))
                     .findAny()
                     .orElse(new Book(isbn));
         } else {
@@ -114,6 +136,7 @@ public class BookDetailFragment extends Fragment {
                     Book newBook = book.getValue();
                     Objects.requireNonNull(newBook).setTitle(newTitle.toString());
                     book.setValue(newBook);
+                    changed();
                 }
             }
         };
@@ -130,6 +153,7 @@ public class BookDetailFragment extends Fragment {
                         Book newBook = book.getValue();
                         Objects.requireNonNull(newBook).setPart(Integer.valueOf(newPart.toString()));
                         book.setValue(newBook);
+                        changed();
                     }
                 } catch (NumberFormatException e) {
                     partLayout.setError("Bitte geben Sie eine Ganzzahl ein.");
@@ -146,9 +170,14 @@ public class BookDetailFragment extends Fragment {
                     Book newBook = book.getValue();
                     Objects.requireNonNull(newBook).setAuthor(newAuthor.toString());
                     book.setValue(newBook);
+                    changed();
                 }
             }
         };
+    }
+
+    private void changed() {
+        submit.setEnabled(!originalBook.equals(book.getValue()));
     }
 
     @Override
