@@ -1,174 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.fragments.bookdetail.BookDetailFragment"
-        android:paddingStart="10dp"
-        android:paddingTop="15dp"
-        android:paddingEnd="15dp">
+        tools:context=".ui.fragments.bookdetail.BookDetailFragment">
 
-    <TextView
-            android:id="@+id/title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/title_placeholder"
-            android:textSize="22sp"
-            android:textIsSelectable="true"
-
-            android:textStyle="bold"
-            android:textColor="?attr/colorOnSecondary"
-            android:layout_marginBottom="10dp"
-
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-            android:id="@+id/cover"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:contentDescription="@string/bookCover"
-            android:src="@drawable/ruby"
-
-            android:layout_marginTop="15dp"
-            app:layout_constraintDimensionRatio="2:3"
-            app:layout_constraintWidth_percent="0.4"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintStart_toEndOf="@id/title"
-            app:layout_constraintTop_toBottomOf="@+id/title" />
-
-    <TextView
-            android:id="@+id/isbnLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:layout_marginStart="10dp"
-            android:textSize="20sp"
-            app:layout_constraintWidth_percent="0.2"
-            app:layout_constraintStart_toEndOf="@id/cover"
-            android:text="@string/isbn_label"
-            app:layout_constraintTop_toBottomOf="@+id/title" />
-
-    <TextView
-            android:id="@+id/isbn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:textSize="20sp"
-            android:text="@string/isbn_placeholder"
-            android:layout_marginStart="25dp"
-            android:textIsSelectable="true"
-
-            app:layout_constraintTop_toBottomOf="@+id/title"
-            app:layout_constraintStart_toEndOf="@+id/isbnLabel"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-
-    <TextView
-            android:id="@+id/authorLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="10dp"
-            android:textSize="20sp"
-            app:layout_constraintWidth_percent="0.2"
-            app:layout_constraintStart_toEndOf="@id/cover"
-            android:text="@string/author_label"
-            app:layout_constraintTop_toBottomOf="@+id/isbnLabel" />
-
-    <TextView
-            android:id="@+id/author"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:textSize="20sp"
-            android:text="@string/author_placeholder"
-            android:ellipsize="end"
-            android:maxLines="9"
-            android:layout_marginTop="5dp"
-            android:layout_marginStart="25dp"
-            android:textIsSelectable="true"
-
-            app:layout_constraintTop_toBottomOf="@+id/isbn"
-            app:layout_constraintStart_toEndOf="@+id/isbnLabel"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/cover" />
-
-    <TextView
-            android:id="@+id/edits"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/edit_title"
-            android:textSize="22sp"
-            android:layout_marginTop="15dp"
-
-            android:textStyle="bold"
-            android:textColor="?attr/colorOnSecondary"
-            app:layout_constraintTop_toBottomOf="@+id/cover"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/titleLayout"
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/title_label"
-            app:layout_constraintTop_toBottomOf="@+id/edits"
-            android:layout_marginTop="15dp"
-            app:errorEnabled="true">
+            android:paddingStart="10dp"
+            android:paddingTop="15dp"
+            android:paddingEnd="15dp"
+            android:paddingBottom="15dp">
 
-        <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTitle"
+        <TextView
+                android:id="@+id/title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/title_placeholder"
+                android:textSize="22sp"
+                android:textIsSelectable="true"
+
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSecondary"
+                android:layout_marginBottom="10dp"
+
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+                android:id="@+id/cover"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:contentDescription="@string/bookCover"
+                android:src="@drawable/ruby"
+
+                android:layout_marginTop="15dp"
+                app:layout_constraintDimensionRatio="2:3"
+                app:layout_constraintWidth_percent="0.4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/title"
+                app:layout_constraintTop_toBottomOf="@+id/title" />
+
+        <TextView
+                android:id="@+id/isbnLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="10dp"
+                android:textSize="20sp"
+                app:layout_constraintWidth_percent="0.2"
+                app:layout_constraintStart_toEndOf="@id/cover"
+                android:text="@string/isbn_label"
+                app:layout_constraintTop_toBottomOf="@+id/title" />
+
+        <TextView
+                android:id="@+id/isbn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:textSize="20sp"
+                android:text="@string/isbn_placeholder"
+                android:layout_marginStart="25dp"
+                android:textIsSelectable="true"
+
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                app:layout_constraintStart_toEndOf="@+id/isbnLabel"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+
+        <TextView
+                android:id="@+id/authorLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="10dp"
+                android:textSize="20sp"
+                app:layout_constraintWidth_percent="0.2"
+                app:layout_constraintStart_toEndOf="@id/cover"
+                android:text="@string/author_label"
+                app:layout_constraintTop_toBottomOf="@+id/isbnLabel" />
+
+        <TextView
+                android:id="@+id/author"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:textSize="20sp"
+                android:text="@string/author_placeholder"
+                android:ellipsize="end"
+                android:maxLines="9"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="25dp"
+                android:textIsSelectable="true"
+
+                app:layout_constraintTop_toBottomOf="@+id/isbn"
+                app:layout_constraintStart_toEndOf="@+id/isbnLabel"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/cover" />
+
+        <TextView
+                android:id="@+id/edits"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_title"
+                android:textSize="22sp"
+                android:layout_marginTop="15dp"
+
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSecondary"
+                app:layout_constraintTop_toBottomOf="@+id/cover"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/titleLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:hint="@string/title_label"
+                app:layout_constraintTop_toBottomOf="@+id/edits"
+                android:layout_marginTop="15dp"
+                app:errorEnabled="true">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-    <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/partLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        </com.google.android.material.textfield.TextInputLayout>
 
-            app:layout_constraintTop_toBottomOf="@+id/titleLayout"
-            android:layout_marginTop="15dp"
-            app:errorEnabled="true">
-
-        <EditText
-                android:id="@+id/editPart"
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/partLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:inputType="number"
-                android:hint="@string/part_label"
-                android:importantForAutofill="no" />
+                android:layout_height="wrap_content"
 
-    </com.google.android.material.textfield.TextInputLayout>
+                app:layout_constraintTop_toBottomOf="@+id/titleLayout"
+                android:layout_marginTop="15dp"
+                app:errorEnabled="true">
 
-    <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/authorLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/author_label_2"
-            app:layout_constraintTop_toBottomOf="@+id/partLayout"
-            android:layout_marginTop="15dp"
-            app:errorEnabled="true">
+            <EditText
+                    android:id="@+id/editPart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="number"
+                    android:hint="@string/part_label"
+                    android:importantForAutofill="no" />
 
-        <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editAuthor"
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/authorLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:hint="@string/author_label_2"
+                app:layout_constraintTop_toBottomOf="@+id/partLayout"
+                android:layout_marginTop="15dp"
+                app:errorEnabled="true">
 
-    </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editAuthor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-    <Button
-            android:id="@+id/submitChanges"
-            android:text="@string/saveChange"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:enabled="false"
+        </com.google.android.material.textfield.TextInputLayout>
 
-            android:layout_marginTop="15dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/authorLayout" />
+        <Button
+                android:id="@+id/submitChanges"
+                android:text="@string/saveChange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
 
+                android:layout_marginTop="15dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/authorLayout" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
