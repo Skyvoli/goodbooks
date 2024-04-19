@@ -83,6 +83,7 @@ public class BookDetailFragment extends Fragment {
 
         submit.setOnClickListener(v -> {
             Book newBook = copiedBook.createClone();
+            newBook.setResolved(true);
             globalViewModel.updateBook(newBook);
             originalBook = newBook;
             //Refresh
