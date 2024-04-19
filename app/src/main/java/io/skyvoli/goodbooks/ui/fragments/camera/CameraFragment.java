@@ -29,7 +29,6 @@ import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
 import io.skyvoli.goodbooks.dialog.PermissionDialog;
-import io.skyvoli.goodbooks.helper.BackgroundTask;
 import io.skyvoli.goodbooks.helper.listener.ScanListener;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.FileStorage;
@@ -118,7 +117,7 @@ public class CameraFragment extends Fragment {
         return new NoticeDialogListener() {
             @Override
             public void onDialogPositiveClick() {
-                new BackgroundTask(() -> {
+                new Thread(() -> {
                     Context context = requireContext();
                     BookResolver bookResolver = new BookResolver();
                     Book book = bookResolver.resolveBook(isbn);

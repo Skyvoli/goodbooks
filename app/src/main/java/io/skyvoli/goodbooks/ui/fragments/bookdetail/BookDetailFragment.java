@@ -26,7 +26,6 @@ import java.util.Optional;
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.databinding.FragmentBookDetailBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
-import io.skyvoli.goodbooks.helper.BackgroundTask;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
@@ -90,7 +89,7 @@ public class BookDetailFragment extends Fragment {
             title.setText(buildWholeTitle(originalBook.getTitle(), originalBook.getPart()));
             author.setText(originalBook.getAuthor());
             submit.setEnabled(false);
-            new BackgroundTask(() -> {
+            new Thread(() -> {
                 AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
                 db.bookDao().update(newBook);
             }).start();

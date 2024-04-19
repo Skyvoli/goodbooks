@@ -22,7 +22,6 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.List;
 
 import io.skyvoli.goodbooks.databinding.ActivityMainBinding;
-import io.skyvoli.goodbooks.helper.BackgroundTask;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
@@ -54,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         GlobalViewModel globalViewModel = new ViewModelProvider(this).get(GlobalViewModel.class);
 
 
-        new BackgroundTask(() -> {
+        new Thread(() -> {
             AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "books").build();
             List<Book> books = db.bookDao().getAll();
             FileStorage fileStorage = new FileStorage(getFilesDir());

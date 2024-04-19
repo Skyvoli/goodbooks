@@ -1,5 +1,6 @@
 package io.skyvoli.goodbooks.ui.fragments.books;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,13 +17,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
 import io.skyvoli.goodbooks.helper.observer.BookObserver;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
+import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.ui.bookcard.BookAdapter;
 import io.skyvoli.goodbooks.ui.bookcard.BookTouchHelperCallback;
+import io.skyvoli.goodbooks.web.BookResolver;
 
 public class BooksFragment extends Fragment {
 
@@ -50,8 +55,18 @@ public class BooksFragment extends Fragment {
 
         button.setOnClickListener(v ->
         {
-            recyclerView.setAdapter(new BookAdapter(new ArrayList<>(globalViewModel.getBooks())));
-            setPlaceholder(new ArrayList<>(globalViewModel.getBooks()), placeholder);
+            List<String> unresolvedIsbn = books.stream()
+                    .filter((book -> !book.isResolved())).
+                    map(Book::getIsbn)
+                    .collect(Collectors.toList());
+
+            //TODO in background and reload
+            unresolvedIsbn.forEach(s -> new Thread(() -> {
+                Book resolved = new BookResolver().resolveBook(s);
+                Optional<Drawable> cover = resolved.getCover();
+                cover.ifPresent(drawable -> new FileStorage(requireContext().getFilesDir()).saveImage(resolved.getIsbn(), drawable));
+                globalViewModel.updateBook(resolved);
+            }).start());
         });
         setPlaceholder(books, placeholder);
         if (isAdded()) {
