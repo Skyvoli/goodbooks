@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -54,17 +55,28 @@ public class BooksFragment extends Fragment {
 
         button.setOnClickListener(v ->
         {
+            File dir = requireContext().getFilesDir();
+            recyclerView.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
             List<String> unresolvedIsbn = books.stream()
                     .filter((book -> !book.isResolved())).
                     map(Book::getIsbn)
                     .collect(Collectors.toList());
-            
-            unresolvedIsbn.forEach(s -> new Thread(() -> {
-                Book resolved = new BookResolver().resolveBook(s);
-                Optional<Drawable> cover = resolved.getCover();
-                cover.ifPresent(drawable -> new FileStorage(requireContext().getFilesDir()).saveImage(resolved.getIsbn(), drawable));
-                globalViewModel.updateBook(resolved);
-            }).start());
+
+            new Thread(() -> {
+                unresolvedIsbn.forEach(s -> {
+                    Book resolved = new BookResolver().resolveBook(s);
+                    Optional<Drawable> cover = resolved.getCover();
+                    cover.ifPresent(drawable -> new FileStorage(dir).saveImage(resolved.getIsbn(), drawable));
+                    globalViewModel.updateBook(resolved);
+                });
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    });
+                }
+            }).start();
         });
         if (isAdded()) {
             globalViewModel.getBooks().addOnListChangedCallback(new BookObserver(binding, requireActivity()));
@@ -82,7 +94,6 @@ public class BooksFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         setPlaceholder(books, placeholder);
         progressBar.setVisibility(View.GONE);
-
     }
 
     private void setPlaceholder(List<Book> books, TextView placeholder) {
