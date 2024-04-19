@@ -6,12 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,12 +26,15 @@ import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.ui.bookcard.BookAdapter;
-import io.skyvoli.goodbooks.ui.bookcard.BookTouchHelperCallback;
 import io.skyvoli.goodbooks.web.BookResolver;
 
 public class BooksFragment extends Fragment {
 
     private FragmentBooksBinding binding;
+    private ProgressBar progressBar;
+    private TextView placeholder;
+    private RecyclerView recyclerView;
+    private List<Book> books;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,16 +45,12 @@ public class BooksFragment extends Fragment {
 
         final Button button = binding.sync;
 
-        final RecyclerView recyclerView = binding.books;
-        final TextView placeholder = binding.placeholder;
+        recyclerView = binding.books;
+        placeholder = binding.placeholder;
+        progressBar = binding.progressBar;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        List<Book> books = new ArrayList<>(globalViewModel.getBooks());
-        BookAdapter adapter = new BookAdapter(books);
-        recyclerView.setAdapter(adapter);
-
-        ItemTouchHelper helper = new ItemTouchHelper(new BookTouchHelperCallback(adapter));
-        helper.attachToRecyclerView(recyclerView);
+        books = new ArrayList<>(globalViewModel.getBooks());
 
         button.setOnClickListener(v ->
         {
@@ -59,8 +58,7 @@ public class BooksFragment extends Fragment {
                     .filter((book -> !book.isResolved())).
                     map(Book::getIsbn)
                     .collect(Collectors.toList());
-
-            //TODO in background and reload
+            
             unresolvedIsbn.forEach(s -> new Thread(() -> {
                 Book resolved = new BookResolver().resolveBook(s);
                 Optional<Drawable> cover = resolved.getCover();
@@ -68,12 +66,23 @@ public class BooksFragment extends Fragment {
                 globalViewModel.updateBook(resolved);
             }).start());
         });
-        setPlaceholder(books, placeholder);
         if (isAdded()) {
             globalViewModel.getBooks().addOnListChangedCallback(new BookObserver(binding, requireActivity()));
         }
 
+
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        BookAdapter adapter = new BookAdapter(books);
+        recyclerView.setAdapter(adapter);
+        setPlaceholder(books, placeholder);
+        progressBar.setVisibility(View.GONE);
+
     }
 
     private void setPlaceholder(List<Book> books, TextView placeholder) {
