@@ -21,6 +21,8 @@ import androidx.room.Room;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.jsoup.internal.StringUtil;
+
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
@@ -49,7 +51,9 @@ public class BookDetailFragment extends Fragment {
         final ImageView cover = binding.cover;
         final TextView isbn = binding.isbn;
         final TextView author = binding.author;
+        final TextInputLayout titleLayout = binding.titleLayout;
         final TextInputLayout partLayout = binding.partLayout;
+        final TextInputLayout authorLayout = binding.authorLayout;
         final TextInputEditText editTitle = binding.editTitle;
         final EditText editPart = binding.editPart;
         final TextInputEditText editAuthor = binding.editAuthor;
@@ -77,9 +81,9 @@ public class BookDetailFragment extends Fragment {
         editAuthor.setText(originalBook.getAuthor());
 
         //Set listener
-        editTitle.setOnFocusChangeListener(getTitleListener(editTitle));
+        editTitle.setOnFocusChangeListener(getTitleListener(editTitle, titleLayout));
         editPart.setOnFocusChangeListener(getPartListener(editPart, partLayout));
-        editAuthor.setOnFocusChangeListener(getAuthorListener(editAuthor));
+        editAuthor.setOnFocusChangeListener(getAuthorListener(editAuthor, authorLayout));
 
         submit.setOnClickListener(v -> {
             Book newBook = copiedBook.createClone();
@@ -125,46 +129,71 @@ public class BookDetailFragment extends Fragment {
         }
     }
 
-    private View.OnFocusChangeListener getTitleListener(TextInputEditText editTitle) {
+    private View.OnFocusChangeListener getTitleListener(TextInputEditText editTitle, TextInputLayout titleLayout) {
         return (v, hasFocus) -> {
             if (!hasFocus) {
                 Editable newTitle = editTitle.getText();
                 if (newTitle != null) {
-                    copiedBook.setTitle(newTitle.toString());
+                    String formatted = formatString(newTitle.toString());
+
+                    if (formatted.length() == 0) {
+                        titleLayout.setError("Bitte geben Sie einen Titel ein.");
+                        return;
+                    }
+
+                    titleLayout.setError(null);
+                    editTitle.setText(formatted);
+                    copiedBook.setTitle(formatted);
                     changed();
                 }
             }
         };
     }
 
-    private View.OnFocusChangeListener getPartListener(EditText
-                                                               editPart, TextInputLayout partLayout) {
+    private View.OnFocusChangeListener getPartListener(EditText editPart, TextInputLayout partLayout) {
         return (v, hasFocus) -> {
             if (!hasFocus) {
                 Editable newPart = editPart.getText();
-                partLayout.setError(null);
                 try {
                     if (newPart != null) {
+                        partLayout.setError(null);
                         copiedBook.setPart(Integer.valueOf(newPart.toString()));
                         changed();
                     }
                 } catch (NumberFormatException e) {
+                    if (newPart.toString().length() > 9) {
+                        partLayout.setError("Bitte geben Sie eine kleinere Zahl ein.");
+                        return;
+                    }
                     partLayout.setError("Bitte geben Sie eine Ganzzahl ein.");
                 }
             }
         };
     }
 
-    private View.OnFocusChangeListener getAuthorListener(TextInputEditText editAuthor) {
+    private View.OnFocusChangeListener getAuthorListener(TextInputEditText editAuthor, TextInputLayout authorLayout) {
         return (v, hasFocus) -> {
             if (!hasFocus) {
                 Editable newAuthor = editAuthor.getText();
                 if (newAuthor != null) {
+                    String formatted = formatString(newAuthor.toString());
+
+                    if (formatted.length() == 0) {
+                        authorLayout.setError("Bitte geben Sie einen Autor ein.");
+                        return;
+                    }
+
+                    authorLayout.setError(null);
+                    editAuthor.setText(formatted);
                     copiedBook.setAuthor(newAuthor.toString());
                     changed();
                 }
             }
         };
+    }
+
+    private String formatString(String unformatted) {
+        return StringUtil.normaliseWhitespace(unformatted.trim());
     }
 
     private void changed() {
