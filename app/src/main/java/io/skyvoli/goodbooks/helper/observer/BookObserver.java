@@ -28,7 +28,20 @@ public class BookObserver extends ObservableList.OnListChangedCallback<Observabl
 
     @Override
     public void onItemRangeChanged(ObservableList<Book> sender, int positionStart, int itemCount) {
-        Log.d(logTag, "OnRangeChanged");
+        BookAdapter adapter = (BookAdapter) binding.books.getAdapter();
+        if (adapter == null) {
+            Log.e(getClass().getSimpleName(), "Adapter is null");
+            return;
+        }
+
+        int index = positionStart;
+        for (int count = itemCount; count > 0; count--) {
+            adapter.getBooks().set(index, sender.get(index));
+
+            int finalIndexBooks = index;
+            activity.runOnUiThread(() -> adapter.notifyItemChanged(finalIndexBooks));
+            index++;
+        }
     }
 
     @Override
@@ -41,13 +54,13 @@ public class BookObserver extends ObservableList.OnListChangedCallback<Observabl
         int index = positionStart;
         for (int count = itemCount; count > 0; count--) {
             adapter.getBooks().add(index, sender.get(index));
-            index++;
 
             int finalIndex = index;
             activity.runOnUiThread(() -> {
                 adapter.notifyItemInserted(finalIndex);
                 binding.placeholder.setVisibility(View.GONE);
             });
+            index++;
         }
     }
 
