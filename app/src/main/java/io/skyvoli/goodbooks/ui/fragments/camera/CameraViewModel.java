@@ -10,7 +10,6 @@ public class CameraViewModel extends ViewModel {
 
     public CameraViewModel() {
         isbn = new MutableLiveData<>();
-        isbn.setValue("This is camera fragment");
     }
 
     public LiveData<String> getIsbn() {
