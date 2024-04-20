@@ -10,9 +10,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="10dp"
-            android:paddingTop="15dp"
-            android:paddingEnd="15dp"
-            android:paddingBottom="15dp">
+            android:paddingTop="@dimen/parent_spacing"
+            android:paddingEnd="@dimen/parent_spacing"
+            android:paddingBottom="@dimen/parent_spacing">
 
         <TextView
                 android:id="@+id/title"

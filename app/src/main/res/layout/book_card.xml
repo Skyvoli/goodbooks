@@ -22,7 +22,7 @@
     <TextView
             android:layout_width="match_parent"
             android:id="@+id/bookTitle"
-            android:textSize="16sp"
+            android:textSize="@dimen/bookCardTextSize"
             android:layout_toEndOf="@id/cover"
             android:text="@string/title_placeholder"
             android:layout_marginStart="10dp"
@@ -46,7 +46,7 @@
             android:layout_marginStart="@dimen/cover_spacing"
             android:gravity="center"
             android:text="@string/isbn_label"
-            android:textSize="16sp" />
+            android:textSize="@dimen/bookCardTextSize" />
 
     <TextView
             android:id="@+id/isbn"
@@ -59,7 +59,7 @@
             android:layout_marginStart="@dimen/label_spacing"
             android:gravity="center"
             android:text="@string/isbn_placeholder"
-            android:textSize="16sp" />
+            android:textSize="@dimen/bookCardTextSize" />
 
     <TextView
             android:id="@+id/authorLabel"
@@ -72,7 +72,7 @@
             android:layout_marginStart="@dimen/cover_spacing"
             android:gravity="center"
             android:text="@string/author_label"
-            android:textSize="16sp" />
+            android:textSize="@dimen/bookCardTextSize" />
 
     <TextView
             android:id="@+id/author"
@@ -87,14 +87,14 @@
             android:ellipsize="end"
             android:gravity="center"
             android:text="@string/author_placeholder"
-            android:textSize="16sp" />
+            android:textSize="@dimen/bookCardTextSize" />
 
     <TextView
             android:id="@+id/border2"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginEnd="15dp"
+            android:layout_marginStart="@dimen/parent_spacing"
+            android:layout_marginEnd="@dimen/parent_spacing"
             android:layout_alignParentBottom="true"
             android:background="#808080" />
 

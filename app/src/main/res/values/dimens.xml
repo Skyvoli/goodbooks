@@ -8,4 +8,5 @@
     <dimen name="cover_spacing">25dp</dimen>
     <dimen name="label_spacing">10dp</dimen>
     <dimen name="parent_spacing">15dp</dimen>
+    <dimen name="bookCardTextSize">16sp</dimen>
 </resources>
