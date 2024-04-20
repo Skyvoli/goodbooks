@@ -11,10 +11,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="10dp"
-            android:text=""
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="@dimen/parent_spacing"
+            android:textSize="22sp"
+            android:text="@string/isbn_placeholder"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     <Button
@@ -25,8 +26,123 @@
             android:backgroundTint="?attr/colorSecondary"
             android:layout_gravity="center"
             android:text="@string/scan"
-            app:layout_constraintTop_toBottomOf="@+id/textContent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/textContent" />
+
+
+    <TextView
+            android:id="@+id/border"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="@dimen/parent_spacing"
+            android:background="#808080"
+
+            app:layout_constraintTop_toBottomOf="@+id/scanBtn" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bookData"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/parent_spacing"
+            app:layout_constraintTop_toBottomOf="@+id/border">
+
+        <TextView
+                android:id="@+id/title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/title_placeholder"
+                android:textSize="22sp"
+                android:textIsSelectable="true"
+
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSecondary"
+                android:layout_marginBottom="10dp"
+
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+                android:id="@+id/cover"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:contentDescription="@string/bookCover"
+                android:src="@drawable/ruby"
+
+                android:layout_marginTop="15dp"
+                app:layout_constraintDimensionRatio="2:3"
+                app:layout_constraintWidth_percent="0.4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@id/title"
+                app:layout_constraintTop_toBottomOf="@+id/title" />
+
+        <TextView
+                android:id="@+id/authorLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:layout_marginStart="10dp"
+                android:textSize="20sp"
+                app:layout_constraintWidth_percent="0.2"
+                app:layout_constraintStart_toEndOf="@id/cover"
+                android:text="@string/author_label"
+                app:layout_constraintTop_toBottomOf="@+id/title" />
+
+        <TextView
+                android:id="@+id/author"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:text="@string/author_placeholder"
+                android:ellipsize="end"
+                android:maxLines="9"
+                android:layout_marginTop="@dimen/parent_spacing"
+                android:layout_marginStart="25dp"
+                android:textIsSelectable="true"
+
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                app:layout_constraintStart_toEndOf="@+id/authorLabel"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+            android:id="@+id/border2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="@dimen/parent_spacing"
+            android:background="#808080"
+
+            app:layout_constraintTop_toBottomOf="@+id/bookData" />
+
+    <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="187dp"
+            android:layout_height="193dp"
+            android:id="@+id/progressBar"
+            android:visibility="gone"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/border2"
+            app:layout_constraintTop_toBottomOf="@id/border"
+            android:layout_margin="10dp"
+            android:text="" />
+
+    <Button
+            android:text="Buch hinzufügen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/addBookBtn"
+            android:layout_marginTop="@dimen/parent_spacing"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/border2" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
