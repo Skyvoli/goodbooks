@@ -17,6 +17,9 @@ public class BookResolver {
         if (!document.isPresent()) {
             return new Book(isbn);
         }
-        return dnbApi.serializeDocument(document.get(), isbn);
+
+        Book book = dnbApi.serializeDocument(document.get(), isbn);
+        book.setResolved(book.getCover().isPresent());
+        return book;
     }
 }

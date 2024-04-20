@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
             List<Book> books = db.bookDao().getAll();
             FileStorage fileStorage = new FileStorage(getFilesDir());
             books.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
-            globalViewModel.setBooksAsynchronous(books);
+            globalViewModel.addList(books);
         }).start();
     }
 

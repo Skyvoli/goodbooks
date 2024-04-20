@@ -5,6 +5,7 @@ import androidx.databinding.ObservableArrayList;
 import androidx.databinding.ObservableList;
 import androidx.lifecycle.ViewModel;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +25,7 @@ public class GlobalViewModel extends ViewModel {
 
     public void addBook(Book book) {
         books.add(book);
+        sort();
     }
 
     public void updateBook(Book newBook) {
@@ -36,18 +38,23 @@ public class GlobalViewModel extends ViewModel {
         }
 
         books.set(books.indexOf(found.get()), newBook);
+        sort();
     }
-
 
     public void clearBooks() {
         this.books.clear();
     }
 
-    public void setBooksAsynchronous(List<Book> books) {
+    public void addList(List<Book> books) {
         this.books.addAll(books);
+        sort();
     }
 
     public boolean hasBook(String isbn) {
         return books.stream().anyMatch(book -> book.sameIsbn(isbn));
+    }
+
+    private void sort() {
+        books.sort(Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER).thenComparing(Book::getPart));
     }
 }
