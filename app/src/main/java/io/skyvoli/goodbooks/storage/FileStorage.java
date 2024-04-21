@@ -9,6 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class FileStorage {
 
@@ -37,6 +38,14 @@ public class FileStorage {
         String path = directory.getPath() + File.separator + isbn + IMAGE_PATH_END;
         //If not found returns null
         return Drawable.createFromPath(path);
+    }
+
+    public void deleteImage(String isbn) {
+        try {
+            Files.delete(Paths.get(directory.getPath() + File.separator + isbn + IMAGE_PATH_END));
+        } catch (IOException e) {
+            Log.d(logTag, "Couldn't delete image");
+        }
     }
 
     public void clearStorage() {

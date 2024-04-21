@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -14,7 +17,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
@@ -23,18 +28,23 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import org.jsoup.internal.StringUtil;
 
+import java.io.File;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.databinding.FragmentBookDetailBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
+import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
+import io.skyvoli.goodbooks.dialog.PermissionDialog;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
+import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class BookDetailFragment extends Fragment {
 
     private FragmentBookDetailBinding binding;
+    private GlobalViewModel globalViewModel;
     private final String logTag = this.getClass().getSimpleName();
     private Book originalBook;
     private Book copiedBook;
@@ -42,10 +52,12 @@ public class BookDetailFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
+        globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
 
         binding = FragmentBookDetailBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        requireActivity().addMenuProvider(getMenuProvider(), getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
         final TextView title = binding.title;
         final ImageView cover = binding.cover;
@@ -93,6 +105,8 @@ public class BookDetailFragment extends Fragment {
             //Refresh
             title.setText(buildWholeTitle(originalBook.getTitle(), originalBook.getPart()));
             author.setText(originalBook.getAuthor());
+            editTitle.setText(originalBook.getTitle());
+            editAuthor.setText(originalBook.getAuthor());
             submit.setEnabled(false);
             new Thread(() -> {
                 AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
@@ -106,6 +120,42 @@ public class BookDetailFragment extends Fragment {
         return root;
     }
 
+    private MenuProvider getMenuProvider() {
+        return new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.book_detail_menu, menu);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.android_item) {
+                    PermissionDialog permissionDialog = new PermissionDialog("Buch löschen", "Möchten Sie '" + buildWholeTitle(originalBook.getTitle(), originalBook.getPart()) + "'  wirklich löschen?", true, new NoticeDialogListener() {
+                        @Override
+                        public void onDialogPositiveClick() {
+                            File dir = requireContext().getFilesDir();
+                            new Thread(() -> {
+                                AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
+                                db.bookDao().delete(originalBook);
+                                new FileStorage(dir).deleteImage(originalBook.getIsbn());
+                            }).start();
+                            globalViewModel.removeBook(originalBook);
+                            getParentFragmentManager().popBackStack();
+                        }
+
+                        @Override
+                        public void onDialogNegativeClick() {
+                            //Do nothing
+                        }
+                    });
+                    permissionDialog.show(getParentFragmentManager(), "deleteAction");
+                    return true;
+                }
+                return false;
+            }
+        };
+    }
+
 
     private Book loadBook(GlobalViewModel globalViewModel) {
         if (getArguments() != null) {
@@ -115,7 +165,6 @@ public class BookDetailFragment extends Fragment {
                     .findAny()
                     .orElse(new Book(isbn));
         } else {
-
             Log.e(logTag, "Missing argument isbn");
             return new Book("No Isbn");
         }
@@ -142,7 +191,6 @@ public class BookDetailFragment extends Fragment {
                     }
 
                     titleLayout.setError(null);
-                    editTitle.setText(formatted);
                     copiedBook.setTitle(formatted);
                     changed();
                 }
@@ -184,7 +232,6 @@ public class BookDetailFragment extends Fragment {
                     }
 
                     authorLayout.setError(null);
-                    editAuthor.setText(formatted);
                     copiedBook.setAuthor(newAuthor.toString());
                     changed();
                 }
@@ -193,7 +240,7 @@ public class BookDetailFragment extends Fragment {
     }
 
     private String formatString(String unformatted) {
-        return StringUtil.normaliseWhitespace(unformatted.trim());
+        return StringUtil.normaliseWhitespace(unformatted).trim();
     }
 
     private void changed() {

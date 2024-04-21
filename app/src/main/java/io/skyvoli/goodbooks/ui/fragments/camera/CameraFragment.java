@@ -91,7 +91,7 @@ public class CameraFragment extends Fragment {
         }
 
         PermissionDialog permissionDialog = new PermissionDialog("Buch erkannt",
-                "Soll das Buch mit ISBN " + isbn + " hinzugefügt werden?",
+                "Soll das Buch mit ISBN " + isbn + " hinzugefügt werden?", false,
                 addBookListener(globalViewModel, isbn));
         permissionDialog.show(getParentFragmentManager(), "Buch erkannt");
     }

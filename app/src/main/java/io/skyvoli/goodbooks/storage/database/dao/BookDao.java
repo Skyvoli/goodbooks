@@ -1,6 +1,7 @@
 package io.skyvoli.goodbooks.storage.database.dao;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
@@ -19,4 +20,7 @@ public interface BookDao {
 
     @Update
     void update(Book book);
+
+    @Delete
+    void delete(Book book);
 }

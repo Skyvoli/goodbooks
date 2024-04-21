@@ -13,11 +13,13 @@ public class PermissionDialog extends AppCompatDialogFragment {
 
     private final String title;
     private final String message;
+    private final boolean cancaledOnTouchOutside;
     private final NoticeDialogListener listener;
 
-    public PermissionDialog(String title, String message, NoticeDialogListener listener) {
+    public PermissionDialog(String title, String message, boolean cancaledOnTouchOutside, NoticeDialogListener listener) {
         this.title = title;
         this.message = message;
+        this.cancaledOnTouchOutside = cancaledOnTouchOutside;
         this.listener = listener;
     }
 
@@ -30,7 +32,7 @@ public class PermissionDialog extends AppCompatDialogFragment {
                 .setPositiveButton("Yes", (dialog, which) -> listener.onDialogPositiveClick())
                 .setNegativeButton("No", (dialog, which) -> listener.onDialogNegativeClick());
         Dialog dialog = builder.create();
-        dialog.setCanceledOnTouchOutside(false);
+        dialog.setCanceledOnTouchOutside(cancaledOnTouchOutside);
         return dialog;
     }
 

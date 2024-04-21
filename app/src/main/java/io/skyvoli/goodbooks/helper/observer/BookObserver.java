@@ -15,6 +15,7 @@ public class BookObserver extends ObservableList.OnListChangedCallback<Observabl
     private final FragmentBooksBinding binding;
     private final FragmentActivity activity;
     private final String logTag = this.getClass().getSimpleName();
+    private static final String ADAPTER_ERROR = "Adapter is null";
 
     public BookObserver(FragmentBooksBinding binding, FragmentActivity activity) {
         this.binding = binding;
@@ -30,7 +31,7 @@ public class BookObserver extends ObservableList.OnListChangedCallback<Observabl
     public void onItemRangeChanged(ObservableList<Book> sender, int positionStart, int itemCount) {
         BookAdapter adapter = (BookAdapter) binding.books.getAdapter();
         if (adapter == null) {
-            Log.e(getClass().getSimpleName(), "Adapter is null");
+            Log.e(getClass().getSimpleName(), ADAPTER_ERROR);
             return;
         }
 
@@ -48,7 +49,7 @@ public class BookObserver extends ObservableList.OnListChangedCallback<Observabl
     public void onItemRangeInserted(ObservableList<Book> sender, int positionStart, int itemCount) {
         BookAdapter adapter = (BookAdapter) binding.books.getAdapter();
         if (adapter == null) {
-            Log.e(getClass().getSimpleName(), "Adapter is null");
+            Log.e(getClass().getSimpleName(), ADAPTER_ERROR);
             return;
         }
         int index = positionStart;
@@ -71,6 +72,18 @@ public class BookObserver extends ObservableList.OnListChangedCallback<Observabl
 
     @Override
     public void onItemRangeRemoved(ObservableList<Book> sender, int positionStart, int itemCount) {
-        Log.d(logTag, "OnRangeRemoved");
+        BookAdapter adapter = (BookAdapter) binding.books.getAdapter();
+        if (adapter == null) {
+            Log.e(getClass().getSimpleName(), ADAPTER_ERROR);
+            return;
+        }
+        int index = positionStart;
+        for (int count = itemCount; count > 0; count--) {
+            adapter.getBooks().remove(index);
+
+            int finalIndex = index;
+            activity.runOnUiThread(() -> adapter.notifyItemRemoved(finalIndex));
+            index++;
+        }
     }
 }

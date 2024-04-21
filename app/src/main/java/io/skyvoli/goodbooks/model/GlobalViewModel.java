@@ -57,4 +57,8 @@ public class GlobalViewModel extends ViewModel {
     private void sort() {
         books.sort(Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER).thenComparing(Book::getPart));
     }
+
+    public void removeBook(Book book) {
+        books.remove(book);
+    }
 }
