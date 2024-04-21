@@ -13,6 +13,7 @@ val navigationVersion = "2.7.7"
 val junitVersion = "4.13.2"
 val roomVersion = "2.6.1"
 val databinding = "8.3.2"
+val swipeVersion = "1.2.0-alpha01"
 
 dependencies {
 
@@ -38,6 +39,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     implementation("androidx.navigation:navigation-fragment:$navigationVersion")
     implementation("androidx.navigation:navigation-ui:$navigationVersion")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:$swipeVersion")
 
     annotationProcessor("androidx.room:room-compiler:$roomVersion")
     annotationProcessor("androidx.room:room-compiler:$roomVersion")

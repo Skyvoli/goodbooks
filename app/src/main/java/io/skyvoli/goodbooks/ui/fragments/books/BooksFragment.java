@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -15,9 +15,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,8 +48,6 @@ public class BooksFragment extends Fragment {
         binding = FragmentBooksBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final Button button = binding.sync;
-
         recyclerView = binding.books;
         placeholder = binding.placeholder;
         progressBar = binding.progressBar;
@@ -55,44 +55,50 @@ public class BooksFragment extends Fragment {
 
         books = new ArrayList<>(globalViewModel.getBooks());
 
-        button.setEnabled(books.stream()
-                .filter((book -> !book.isResolved())).
-                map(Book::getIsbn).findAny().isPresent());
+        final SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
+        //Change colors
+        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_green_dark);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            swipeRefreshLayout.setRefreshing(true);
 
-
-        button.setOnClickListener(v ->
-        {
-            File dir = requireContext().getFilesDir();
-            AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
-
-            recyclerView.setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
-            button.setEnabled(false);
             List<String> unresolvedIsbn = books.stream()
                     .filter((book -> !book.isResolved())).
                     map(Book::getIsbn)
                     .collect(Collectors.toList());
+
+
+            if (unresolvedIsbn.isEmpty()) {
+                swipeRefreshLayout.setRefreshing(false);
+                Toast.makeText(getActivity(), "Alle Bücher sind bereits syncronisiert", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            File dir = requireContext().getFilesDir();
+            AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
+
+            recyclerView.setVisibility(View.INVISIBLE);
 
             new Thread(() -> {
                 unresolvedIsbn.forEach(s -> {
                     Book resolved = new BookResolver().resolveBook(s);
                     Optional<Drawable> cover = resolved.getCover();
                     cover.ifPresent(drawable -> new FileStorage(dir).saveImage(resolved.getIsbn(), drawable));
-                    
+
                     globalViewModel.updateBook(resolved);
                     db.bookDao().update(resolved);
                 });
+                books.sort(Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER).thenComparing(Book::getPart));
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() -> {
-                        progressBar.setVisibility(View.GONE);
                         recyclerView.setVisibility(View.VISIBLE);
-                        button.setEnabled(books.stream()
-                                .filter((book -> !book.isResolved())).
-                                map(Book::getIsbn).findAny().isPresent());
+                        swipeRefreshLayout.setRefreshing(false);
                     });
                 }
             }).start();
         });
+
         if (isAdded()) {
             globalViewModel.getBooks().addOnListChangedCallback(new BookObserver(binding, requireActivity()));
         }
