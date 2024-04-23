@@ -1,5 +1,7 @@
 package io.skyvoli.goodbooks.ui.fragments.bookdetail;
 
+import android.content.Intent;
+import android.graphics.ImageDecoder;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
@@ -15,6 +17,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
@@ -23,12 +28,14 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.jsoup.internal.StringUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
@@ -49,6 +56,32 @@ public class BookDetailFragment extends Fragment {
     private Book originalBook;
     private Book copiedBook;
     private Button submit;
+    private ImageView cover;
+    private static final String PICKER_TAG = "PhotoPicker";
+    private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        pickMedia = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
+            if (uri != null) {
+                requireContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                Log.d(PICKER_TAG, "Selected URI: " + uri);
+                ImageDecoder.Source source = ImageDecoder.createSource(requireContext().getContentResolver(), uri);
+                try {
+                    Drawable drawable = ImageDecoder.decodeDrawable(source);
+                    cover.setImageDrawable(drawable);
+                    copiedBook.setCover(drawable);
+                    changed();
+                } catch (IOException e) {
+                    new InformationDialog("Fehler", "Das Foto konnte nicht geladen werden").show(getParentFragmentManager(), PICKER_TAG);
+                    Log.d(PICKER_TAG, "Foto konnte nicht geladen werden");
+                }
+            } else {
+                Log.d(PICKER_TAG, "Nothing selected");
+            }
+        });
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,7 +93,7 @@ public class BookDetailFragment extends Fragment {
         requireActivity().addMenuProvider(getMenuProvider(), getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
         final TextView title = binding.title;
-        final ImageView cover = binding.cover;
+        cover = binding.cover;
         final TextView isbn = binding.isbn;
         final TextView author = binding.author;
         final TextInputLayout titleLayout = binding.titleLayout;
@@ -69,6 +102,7 @@ public class BookDetailFragment extends Fragment {
         final TextInputEditText editTitle = binding.editTitle;
         final EditText editPart = binding.editPart;
         final TextInputEditText editAuthor = binding.editAuthor;
+        final FloatingActionButton galleryButton = binding.floatingActionButton;
         submit = binding.submitChanges;
         originalBook = loadBook(globalViewModel);
         copiedBook = originalBook.createClone();
@@ -116,6 +150,12 @@ public class BookDetailFragment extends Fragment {
             InformationDialog dialog = new InformationDialog("Gespeichert", "Die Daten wurden übernommen.");
             dialog.show(getParentFragmentManager(), "saved");
         });
+
+        galleryButton.setOnClickListener(v ->
+                pickMedia.launch(new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                        .build())
+        );
 
         return root;
     }

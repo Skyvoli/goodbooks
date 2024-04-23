@@ -36,6 +36,7 @@
                 android:layout_height="0dp"
                 android:contentDescription="@string/bookCover"
                 android:src="@drawable/ruby"
+                android:background="?attr/colorOnSecondary"
 
                 android:layout_marginTop="15dp"
                 app:layout_constraintDimensionRatio="2:3"
@@ -174,6 +175,17 @@
                 android:layout_marginTop="15dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/authorLayout" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:src="@drawable/ic_menu_camera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                app:tint="?attr/colorOnSecondary"
+                android:id="@+id/floatingActionButton"
+                app:layout_constraintBottom_toBottomOf="@+id/cover"
+                app:layout_constraintEnd_toEndOf="@+id/cover"
+                android:contentDescription="Change picture" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
