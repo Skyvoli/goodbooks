@@ -49,14 +49,13 @@ import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class BookDetailFragment extends Fragment {
 
+    private static final String PICKER_TAG = "PhotoPicker";
     private FragmentBookDetailBinding binding;
     private GlobalViewModel globalViewModel;
-    private final String logTag = this.getClass().getSimpleName();
     private Book originalBook;
     private Book copiedBook;
     private Button submit;
     private ImageView cover;
-    private static final String PICKER_TAG = "PhotoPicker";
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
 
     @Override

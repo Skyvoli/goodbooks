@@ -13,14 +13,13 @@ import java.util.Optional;
 
 @Entity(tableName = "books")
 public class Book {
+    @NonNull
+    @PrimaryKey
+    private final String isbn;
     @ColumnInfo(name = "title")
     private String title;
     @ColumnInfo(name = "part")
     private Integer part;
-
-    @NonNull
-    @PrimaryKey
-    private final String isbn;
     @ColumnInfo(name = "author")
     private String author;
     //@ColumnInfo(name = "cover") too big
@@ -67,8 +66,16 @@ public class Book {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public Integer getPart() {
         return part;
+    }
+
+    public void setPart(Integer part) {
+        this.part = part;
     }
 
     @NonNull
@@ -80,33 +87,24 @@ public class Book {
         return author;
     }
 
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
     public Optional<Drawable> getCover() {
         return Optional.ofNullable(cover);
+    }
+
+    public void setCover(Drawable cover) {
+        this.cover = cover;
     }
 
     public boolean isResolved() {
         return resolved;
     }
 
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setPart(Integer part) {
-        this.part = part;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
     public void setResolved(boolean resolved) {
         this.resolved = resolved;
-    }
-
-    public void setCover(Drawable cover) {
-        this.cover = cover;
     }
 
     public boolean sameIsbn(String isbn) {

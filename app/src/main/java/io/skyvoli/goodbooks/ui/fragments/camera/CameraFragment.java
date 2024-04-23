@@ -38,10 +38,9 @@ import io.skyvoli.goodbooks.web.BookResolver;
 
 public class CameraFragment extends Fragment {
 
+    private final String logTag = this.getClass().getSimpleName();
     private FragmentCameraBinding binding;
     private CameraViewModel cameraViewModel;
-
-    private final String logTag = this.getClass().getSimpleName();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -54,9 +53,6 @@ public class CameraFragment extends Fragment {
 
         final TextView textView = binding.textContent;
         cameraViewModel.getText1().observe(getViewLifecycleOwner(), textView::setText);
-
-        final TextView textView2 = binding.textFormat;
-        cameraViewModel.getText2().observe(getViewLifecycleOwner(), textView2::setText);
 
         final Button button = binding.scanBtn;
         button.setOnClickListener(new ScanListener(barcodeLauncher));
@@ -74,7 +70,6 @@ public class CameraFragment extends Fragment {
         String isbn = result.getContents();
         Log.i(logTag, "Scanned " + isbn);
         cameraViewModel.setText1(isbn);
-        cameraViewModel.setText2(result.getFormatName());
 
         if (!isbnIsBook(isbn)) {
             InformationDialog informationDialog = new InformationDialog("418", "Ich bin kein Buch.");

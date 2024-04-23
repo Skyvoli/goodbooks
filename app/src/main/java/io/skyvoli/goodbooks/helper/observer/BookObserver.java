@@ -12,10 +12,10 @@ import io.skyvoli.goodbooks.ui.bookcard.BookAdapter;
 
 public class BookObserver extends ObservableList.OnListChangedCallback<ObservableList<Book>> {
 
+    private static final String ADAPTER_ERROR = "Adapter is null";
     private final FragmentBooksBinding binding;
     private final FragmentActivity activity;
     private final String logTag = this.getClass().getSimpleName();
-    private static final String ADAPTER_ERROR = "Adapter is null";
 
     public BookObserver(FragmentBooksBinding binding, FragmentActivity activity) {
         this.binding = binding;

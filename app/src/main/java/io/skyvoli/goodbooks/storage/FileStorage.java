@@ -13,10 +13,9 @@ import java.nio.file.Paths;
 
 public class FileStorage {
 
+    private static final String IMAGE_PATH_END = "Image.jpeg";
     private final String logTag = this.getClass().getSimpleName();
     private final File directory;
-
-    private static final String IMAGE_PATH_END = "Image.jpeg";
 
     public FileStorage(File directory) {
         if (!directory.isDirectory()) {
