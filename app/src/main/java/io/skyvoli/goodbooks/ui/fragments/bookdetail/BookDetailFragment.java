@@ -5,7 +5,6 @@ import android.graphics.ImageDecoder;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -63,28 +62,30 @@ public class BookDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         pickMedia = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
-            if (uri != null) {
-                requireContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                Log.d(PICKER_TAG, "Selected URI: " + uri);
-                ImageDecoder.Source source = ImageDecoder.createSource(requireContext().getContentResolver(), uri);
-                try {
-                    Drawable drawable = ImageDecoder.decodeDrawable(source);
-                    cover.setImageDrawable(drawable);
-                    copiedBook.setCover(drawable);
-                    changed();
-                } catch (IOException e) {
-                    new InformationDialog("Fehler", "Das Foto konnte nicht geladen werden").show(getParentFragmentManager(), PICKER_TAG);
-                    Log.d(PICKER_TAG, "Foto konnte nicht geladen werden");
-                }
-            } else {
-                Log.d(PICKER_TAG, "Nothing selected");
+            if (uri == null) {
+                return;
             }
+
+            requireContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            ImageDecoder.Source source = ImageDecoder.createSource(requireContext().getContentResolver(), uri);
+            Drawable newCover;
+            try {
+                newCover = ImageDecoder.decodeDrawable(source);
+            } catch (IOException e) {
+                new InformationDialog("Fehler", "Das Foto konnte nicht geladen werden")
+                        .show(getParentFragmentManager(), PICKER_TAG);
+                return;
+            }
+            cover.setImageDrawable(newCover);
+            copiedBook.setCover(newCover);
+            changed();
         });
         super.onCreate(savedInstanceState);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        //TODO Color palette
         globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
 
         binding = FragmentBookDetailBinding.inflate(inflater, container, false);
@@ -132,6 +133,7 @@ public class BookDetailFragment extends Fragment {
         editAuthor.setOnFocusChangeListener(getAuthorListener(editAuthor, authorLayout));
 
         submit.setOnClickListener(v -> {
+            File dir = requireContext().getFilesDir();
             Book newBook = copiedBook.createClone();
             newBook.setResolved(true);
             globalViewModel.updateBook(newBook);
@@ -145,10 +147,13 @@ public class BookDetailFragment extends Fragment {
             new Thread(() -> {
                 AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
                 db.bookDao().update(newBook);
+                if (copiedBook.getCover().isPresent()) {
+                    new FileStorage(dir).saveImage(originalBook.getIsbn(), copiedBook.getCover().get());
+                }
             }).start();
 
-            InformationDialog dialog = new InformationDialog("Gespeichert", "Die Daten wurden übernommen.");
-            dialog.show(getParentFragmentManager(), "saved");
+            new InformationDialog("Gespeichert", "Die Daten wurden übernommen.")
+                    .show(getParentFragmentManager(), "saved");
         });
 
         galleryButton.setOnClickListener(v ->
@@ -169,25 +174,13 @@ public class BookDetailFragment extends Fragment {
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.android_item) {
-                    PermissionDialog permissionDialog = new PermissionDialog("Buch löschen", "Möchten Sie '" + buildWholeTitle(originalBook.getTitle(), originalBook.getPart()) + "'  wirklich löschen?", true, new NoticeDialogListener() {
-                        @Override
-                        public void onDialogPositiveClick() {
-                            File dir = requireContext().getFilesDir();
-                            new Thread(() -> {
-                                AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
-                                db.bookDao().delete(originalBook);
-                                new FileStorage(dir).deleteImage(originalBook.getIsbn());
-                            }).start();
-                            globalViewModel.removeBook(originalBook);
-                            getParentFragmentManager().popBackStack();
-                        }
-
-                        @Override
-                        public void onDialogNegativeClick() {
-                            //Do nothing
-                        }
-                    });
+                if (menuItem.getItemId() == R.id.delete_item) {
+                    PermissionDialog permissionDialog =
+                            new PermissionDialog("Buch löschen",
+                                    "Möchten Sie '" + buildWholeTitle(originalBook.getTitle(),
+                                            originalBook.getPart()) + "'  wirklich löschen?",
+                                    true,
+                                    deleteBookListener());
                     permissionDialog.show(getParentFragmentManager(), "deleteAction");
                     return true;
                 }
@@ -198,16 +191,15 @@ public class BookDetailFragment extends Fragment {
 
 
     private Book loadBook(GlobalViewModel globalViewModel) {
-        if (getArguments() != null) {
-            String isbn = Optional.ofNullable(getArguments().getString("isbn")).orElse("No Isbn");
-            return globalViewModel.getBooks().stream()
-                    .filter(el -> el.sameIsbn(isbn))
-                    .findAny()
-                    .orElse(new Book(isbn));
-        } else {
-            Log.e(logTag, "Missing argument isbn");
-            return new Book("No Isbn");
+        if (getArguments() == null) {
+            throw new IllegalStateException("Missing argument isbn");
         }
+        String isbn = Optional.ofNullable(getArguments().getString("isbn"))
+                .orElseThrow(() -> new IllegalStateException("Missing argument isbn"));
+        return globalViewModel.getBooks().stream()
+                .filter(el -> el.sameIsbn(isbn))
+                .findAny()
+                .orElse(new Book(isbn));
     }
 
     private String buildWholeTitle(String title, Integer part) {
@@ -285,6 +277,27 @@ public class BookDetailFragment extends Fragment {
 
     private void changed() {
         submit.setEnabled(!originalBook.equals(copiedBook));
+    }
+
+    private NoticeDialogListener deleteBookListener() {
+        return new NoticeDialogListener() {
+            @Override
+            public void onDialogPositiveClick() {
+                File dir = requireContext().getFilesDir();
+                new Thread(() -> {
+                    AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
+                    db.bookDao().delete(originalBook);
+                    new FileStorage(dir).deleteImage(originalBook.getIsbn());
+                }).start();
+                globalViewModel.removeBook(originalBook);
+                getParentFragmentManager().popBackStack();
+            }
+
+            @Override
+            public void onDialogNegativeClick() {
+                //Do nothing
+            }
+        };
     }
 
     @Override
