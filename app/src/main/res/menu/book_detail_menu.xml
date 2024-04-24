@@ -3,11 +3,25 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-            android:id="@+id/android_item"
+            android:id="@+id/delete_item"
             android:title="@string/deleteBook"
             android:icon="@drawable/trash_bin"
             app:iconTint="@color/white"
             app:showAsAction="ifRoom"
            />
+    <item
+            android:id="@+id/reset_item"
+            android:title="@string/reset_book"
+            android:icon="@drawable/reset"
+            app:iconTint="@color/white"
+            app:showAsAction="ifRoom"
+            />
+    <item
+            android:id="@+id/edit_item"
+            android:title="@string/edit_book"
+            android:icon="@drawable/edit"
+            app:iconTint="@color/white"
+            app:showAsAction="ifRoom"
+            />
 
 </menu>

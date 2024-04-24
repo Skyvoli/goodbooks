@@ -185,7 +185,7 @@
                 android:id="@+id/floatingActionButton"
                 app:layout_constraintBottom_toBottomOf="@+id/cover"
                 app:layout_constraintEnd_toEndOf="@+id/cover"
-                android:contentDescription="Change picture" />
+                android:contentDescription="@string/change_picture_btn" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
