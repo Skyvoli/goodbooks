@@ -52,13 +52,12 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
         GlobalViewModel globalViewModel = new ViewModelProvider(this).get(GlobalViewModel.class);
 
-
         new Thread(() -> {
             AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "books").build();
             List<Book> books = db.bookDao().getAll();
             FileStorage fileStorage = new FileStorage(getFilesDir());
             books.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
-            globalViewModel.addList(books);
+            globalViewModel.setList(books);
         }).start();
     }
 

@@ -13,7 +13,7 @@ import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class GlobalViewModel extends ViewModel {
 
-    private final ObservableList<Book> books;
+    private ObservableList<Book> books;
 
     public GlobalViewModel() {
         books = new ObservableArrayList<>();
@@ -45,9 +45,9 @@ public class GlobalViewModel extends ViewModel {
         this.books.clear();
     }
 
-    public void addList(List<Book> books) {
+    public void setList(List<Book> books) {
+        this.books = new ObservableArrayList<>();
         this.books.addAll(books);
-        sort();
     }
 
     public boolean hasBook(String isbn) {
