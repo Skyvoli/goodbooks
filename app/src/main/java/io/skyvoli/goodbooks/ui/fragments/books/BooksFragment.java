@@ -1,13 +1,14 @@
 package io.skyvoli.goodbooks.ui.fragments.books;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -19,11 +20,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
 import io.skyvoli.goodbooks.helper.observer.BookObserver;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
@@ -63,22 +64,19 @@ public class BooksFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             swipeRefreshLayout.setRefreshing(true);
 
+            Context context = requireContext();
+
+            recyclerView.startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out));
+
+            recyclerView.setVisibility(View.INVISIBLE);
+
             List<String> unresolvedIsbn = books.stream()
                     .filter((book -> !book.isResolved())).
                     map(Book::getIsbn)
                     .collect(Collectors.toList());
 
-
-            if (unresolvedIsbn.isEmpty()) {
-                swipeRefreshLayout.setRefreshing(false);
-                Toast.makeText(getActivity(), "Alle Bücher sind bereits syncronisiert", Toast.LENGTH_LONG).show();
-                return;
-            }
-
             File dir = requireContext().getFilesDir();
             AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
-
-            recyclerView.setVisibility(View.INVISIBLE);
 
             new Thread(() -> {
                 unresolvedIsbn.forEach(s -> {
@@ -89,14 +87,25 @@ public class BooksFragment extends Fragment {
                     globalViewModel.updateBook(resolved);
                     db.bookDao().update(resolved);
                 });
-                books.sort(Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER).thenComparing(Book::getPart));
+
+                List<Book> reload = db.bookDao().getAll();
+                FileStorage fileStorage = new FileStorage(dir);
+                reload.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
+                globalViewModel.setList(reload);
+
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() -> {
+                        recyclerView.setAdapter(new BookAdapter(reload));
+                        setPlaceholder(reload, placeholder);
+                        recyclerView.clearAnimation();
+                        recyclerView.startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_in));
                         recyclerView.setVisibility(View.VISIBLE);
                         swipeRefreshLayout.setRefreshing(false);
                     });
                 }
             }).start();
+
+
         });
 
         if (isAdded()) {
