@@ -15,7 +15,7 @@
     <string name="part_label">Nummer</string>
     <string name="isbn_label">ISBN:</string>
     <string name="author_label">Autor:</string>
-    <string name="author_label_2">Autor</string>
+    <string name="author_label_2">Autor(en)</string>
     <string name="title_placeholder">Book Title</string>
     <string name="isbn_placeholder">isbn</string>
     <string name="author_placeholder">autor</string>

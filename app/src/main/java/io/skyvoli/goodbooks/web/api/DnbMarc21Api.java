@@ -6,6 +6,9 @@ import android.util.Log;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.web.RequestHandler;
 
@@ -30,17 +33,70 @@ public class DnbMarc21Api implements BookApi {
         } catch (IndexOutOfBoundsException e) {
             return new Book(isbn);
         }
-        //Titel: tag 245 code a + n TODO code b as subtitle?
-        Element titleData = getElement(bookData, "245");
-        String title = getContent(titleData, "a", "Unbekannt");
-        String subTitle = getContent(titleData, "b", "");
-        Integer part = parseToInt(getContent(titleData, "n", ""));
 
-        String author = resolveAuthor(bookData);
+        List<XmlField> titleFields = new ArrayList<>();
+        List<XmlField> subtitleFields = new ArrayList<>();
+        List<XmlField> partFields = new ArrayList<>();
+        List<XmlField> authorFields = new ArrayList<>();
+
+        //Titel: tag 245 code a + n
+        titleFields.add(new XmlField("800", "t"));
+        titleFields.add(new XmlField("245", "a"));
+        titleFields.add(new XmlField("245", "n"));
+
+        Resolved<String> resolvedTitle = resolveString(bookData, titleFields, "Unbekannt");
+
+        //if title 800 t  --> 245 a is probably subtitle else 245 code b as subtitle
+        if (resolvedTitle.with.equals(new XmlField("800", "t"))) {
+            subtitleFields.add(new XmlField("245", "a"));
+        }
+        subtitleFields.add(new XmlField("245", "b"));
+
+        Resolved<String> resolvedSubtitle = resolveString(bookData, subtitleFields, "");
+        Log.d("Subtitle", resolvedSubtitle.getValue());
+
+        partFields.add(new XmlField("245", "n"));
+        //?
+        partFields.add(new XmlField("800", "v"));
+        partFields.add(new XmlField("490", "v"));
+
+        Resolved<Integer> resolvedPart = resolveInteger(bookData, partFields);
+
+        authorFields.add(new XmlField("245", "c"));
+        authorFields.add(new XmlField("100", "a"));
+        authorFields.add(new XmlField("800", "a"));
+
+        Resolved<String> resolvedAuthor = resolveString(bookData, authorFields, "Unbekannt");
+        resolvedAuthor.setValue(formatAuthors(resolvedAuthor.getValue()));
+
         Drawable cover = new RequestHandler().getImage(IMAGE_URL + isbn, 10);
 
-        return new Book(title, part, isbn, author, cover, true);
+        return new Book(resolvedTitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), cover, true);
 
+    }
+
+    private Resolved<String> resolveString(Element bookData, List<XmlField> titleFields, String defaultValue) {
+
+        for (XmlField field : titleFields) {
+            String result = getContent(getElement(bookData, field.tag), field.code);
+            if (result != null) {
+                return new Resolved<>(result, field);
+            }
+        }
+        return new Resolved<>(defaultValue, null);
+    }
+
+    private Resolved<Integer> resolveInteger(Element bookData, List<XmlField> titleFields) {
+        for (XmlField field : titleFields) {
+            String resultAsString = getContent(getElement(bookData, field.tag), field.code);
+            if (resultAsString != null) {
+                Integer result = parseToInt(resultAsString);
+                if (result != null) {
+                    return new Resolved<>(result, field);
+                }
+            }
+        }
+        return new Resolved<>(null, null);
     }
 
     private Integer parseToInt(String part) {
@@ -64,15 +120,14 @@ public class DnbMarc21Api implements BookApi {
         }
     }
 
-    private String resolveAuthor(Element bookData) {
-        //Autor: tag 100 code a or 245 code c
-        Element authorData = getElement(bookData, "100");
-        if (authorData != null) {
-            return getContent(authorData, "a", "Unbekannt");
+    private String formatAuthors(String authors) {
+        String[] substrings = authors.split(";");
+        StringBuilder result = new StringBuilder();
+        for (String substring : substrings) {
+            result.append(substring.trim()).append("\n");
         }
-
-        authorData = getElement(bookData, "245");
-        return getContent(authorData, "c", "Unbekannt");
+        result.setLength(result.length() - 1);
+        return result.toString();
     }
 
     private Element getElement(Element parent, String tag) {
@@ -83,14 +138,14 @@ public class DnbMarc21Api implements BookApi {
         }
     }
 
-    private String getContent(Element element, String value, String defaultValue) {
+    private String getContent(Element element, String value) {
         if (element == null) {
-            return defaultValue;
+            return null;
         }
         try {
             return element.getElementsByAttributeValueContaining("code", value).get(0).text();
         } catch (IndexOutOfBoundsException e) {
-            return defaultValue;
+            return null;
         }
     }
 
