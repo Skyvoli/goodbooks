@@ -20,15 +20,13 @@ import java.util.concurrent.TimeoutException;
 public class RequestHandler {
     private final String logTag = this.getClass().getSimpleName();
 
-    public Optional<Document> getDocument(String url) {
+    public Optional<Document> getDocument(String url, int timeout) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<Optional<Document>> future = executorService.submit(() -> fetchDocument(url));
 
-
-        //TODO Timeouts adjustable
         Optional<Document> document;
         try {
-            document = future.get(7, TimeUnit.SECONDS);
+            document = future.get(timeout, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return Optional.empty();
@@ -51,13 +49,13 @@ public class RequestHandler {
     }
 
 
-    public Drawable getImage(String url) {
+    public Drawable getImage(String url, int timeout) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<Drawable> future = executorService.submit(() -> fetchImage(url));
 
         Drawable cover;
         try {
-            cover = future.get(10, TimeUnit.SECONDS);
+            cover = future.get(timeout, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return null;

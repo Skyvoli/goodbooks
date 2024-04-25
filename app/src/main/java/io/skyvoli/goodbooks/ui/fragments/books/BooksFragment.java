@@ -1,8 +1,10 @@
 package io.skyvoli.goodbooks.ui.fragments.books;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +50,7 @@ public class BooksFragment extends Fragment {
 
         binding = FragmentBooksBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+        Context context = requireContext();
 
         recyclerView = binding.books;
         placeholder = binding.placeholder;
@@ -58,13 +61,16 @@ public class BooksFragment extends Fragment {
 
         final SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
         //Change colors
-        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_dark,
-                android.R.color.holo_orange_dark,
-                android.R.color.holo_green_dark);
+        TypedValue primary = new TypedValue();
+        TypedValue secondary = new TypedValue();
+        Resources.Theme theme = context.getTheme();
+        theme.resolveAttribute(com.google.android.material.R.attr.colorPrimary, primary, true);
+        theme.resolveAttribute(com.google.android.material.R.attr.colorSecondary, secondary, true);
+
+        swipeRefreshLayout.setColorSchemeResources(primary.resourceId,
+                secondary.resourceId);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             swipeRefreshLayout.setRefreshing(true);
-
-            Context context = requireContext();
 
             recyclerView.startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out));
 
@@ -75,12 +81,13 @@ public class BooksFragment extends Fragment {
                     map(Book::getIsbn)
                     .collect(Collectors.toList());
 
-            File dir = requireContext().getFilesDir();
-            AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
+            File dir = context.getFilesDir();
+            AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, "books").build();
 
             new Thread(() -> {
+                //TODO Reload missing images?
                 unresolvedIsbn.forEach(s -> {
-                    Book resolved = new BookResolver().resolveBook(s);
+                    Book resolved = new BookResolver().resolveBook(s, 10);
                     Optional<Drawable> cover = resolved.getCover();
                     cover.ifPresent(drawable -> new FileStorage(dir).saveImage(resolved.getIsbn(), drawable));
 
@@ -88,15 +95,15 @@ public class BooksFragment extends Fragment {
                     db.bookDao().update(resolved);
                 });
 
-                List<Book> reload = db.bookDao().getAll();
+                books = db.bookDao().getAll();
                 FileStorage fileStorage = new FileStorage(dir);
-                reload.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
-                globalViewModel.setList(reload);
+                books.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
+                globalViewModel.setList(books);
 
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() -> {
-                        recyclerView.setAdapter(new BookAdapter(reload));
-                        setPlaceholder(reload, placeholder);
+                        recyclerView.setAdapter(new BookAdapter(books));
+                        setPlaceholder();
                         recyclerView.clearAnimation();
                         recyclerView.startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_in));
                         recyclerView.setVisibility(View.VISIBLE);
@@ -120,13 +127,12 @@ public class BooksFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        BookAdapter adapter = new BookAdapter(books);
-        recyclerView.setAdapter(adapter);
-        setPlaceholder(books, placeholder);
+        recyclerView.setAdapter(new BookAdapter(books));
+        setPlaceholder();
         progressBar.setVisibility(View.GONE);
     }
 
-    private void setPlaceholder(List<Book> books, TextView placeholder) {
+    private void setPlaceholder() {
         if (!books.isEmpty()) {
             placeholder.setVisibility(View.GONE);
         } else {

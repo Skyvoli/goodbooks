@@ -6,18 +6,18 @@ import androidx.lifecycle.ViewModel;
 
 public class CameraViewModel extends ViewModel {
 
-    private final MutableLiveData<String> text1;
+    private final MutableLiveData<String> isbn;
 
     public CameraViewModel() {
-        text1 = new MutableLiveData<>();
-        text1.setValue("This is camera fragment");
+        isbn = new MutableLiveData<>();
+        isbn.setValue("This is camera fragment");
     }
 
-    public LiveData<String> getText1() {
-        return text1;
+    public LiveData<String> getIsbn() {
+        return isbn;
     }
 
-    public void setText1(String text) {
-        text1.setValue(text);
+    public void setIsbn(String text) {
+        isbn.setValue(text);
     }
 }

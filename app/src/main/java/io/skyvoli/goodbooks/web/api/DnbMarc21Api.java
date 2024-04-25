@@ -37,7 +37,7 @@ public class DnbMarc21Api implements BookApi {
         Integer part = parseToInt(getContent(titleData, "n", ""));
 
         String author = resolveAuthor(bookData);
-        Drawable cover = new RequestHandler().getImage(IMAGE_URL + isbn);
+        Drawable cover = new RequestHandler().getImage(IMAGE_URL + isbn, 10);
 
         return new Book(title, part, isbn, author, cover, true);
 

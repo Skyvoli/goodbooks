@@ -12,8 +12,8 @@ public class BookResolver {
 
     private final BookApi dnbApi = new DnbMarc21Api();
 
-    public Book resolveBook(String isbn) {
-        Optional<Document> document = new RequestHandler().getDocument(dnbApi.buildUrl(isbn));
+    public Book resolveBook(String isbn, int timeout) {
+        Optional<Document> document = new RequestHandler().getDocument(dnbApi.buildUrl(isbn), timeout);
         if (!document.isPresent()) {
             return new Book(isbn);
         }

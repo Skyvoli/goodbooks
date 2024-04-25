@@ -2,7 +2,6 @@ package io.skyvoli.goodbooks.ui.fragments.camera;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,8 +21,6 @@ import com.google.zxing.client.android.Intents;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanIntentResult;
 import com.journeyapps.barcodescanner.ScanOptions;
-
-import java.util.Optional;
 
 import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
@@ -52,7 +49,7 @@ public class CameraFragment extends Fragment {
         View root = binding.getRoot();
 
         final TextView textView = binding.textContent;
-        cameraViewModel.getText1().observe(getViewLifecycleOwner(), textView::setText);
+        cameraViewModel.getIsbn().observe(getViewLifecycleOwner(), textView::setText);
 
         final Button button = binding.scanBtn;
         button.setOnClickListener(new ScanListener(barcodeLauncher));
@@ -69,35 +66,32 @@ public class CameraFragment extends Fragment {
 
         String isbn = result.getContents();
         Log.i(logTag, "Scanned " + isbn);
-        cameraViewModel.setText1(isbn);
+        cameraViewModel.setIsbn(isbn);
 
         if (!isbnIsBook(isbn)) {
-            InformationDialog informationDialog = new InformationDialog("418", "Ich bin kein Buch.");
-            informationDialog.show(getParentFragmentManager(), "418");
+            new InformationDialog("418", "Ich bin kein Buch.")
+                    .show(getParentFragmentManager(), "418");
             return;
         }
 
         GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
 
         if (globalViewModel.hasBook(isbn)) {
-            InformationDialog informationDialog = new InformationDialog("Duplikat", "Dieses Buch ist bereits vorhanden");
-            informationDialog.show(getParentFragmentManager(), "Duplikat");
+            new InformationDialog("Duplikat", "Dieses Buch ist bereits vorhanden")
+                    .show(getParentFragmentManager(), "Duplikat");
             return;
         }
 
-        PermissionDialog permissionDialog = new PermissionDialog("Buch erkannt",
-                "Soll das Buch mit ISBN " + isbn + " hinzugefügt werden?", false,
-                addBookListener(globalViewModel, isbn));
-        permissionDialog.show(getParentFragmentManager(), "Buch erkannt");
+        new PermissionDialog("Buch erkannt",
+                "Soll das Buch mit ISBN " + isbn + " hinzugefügt werden?", false, addBookListener(globalViewModel, isbn))
+                .show(getParentFragmentManager(), "Buch erkannt");
     }
 
     private void handleCanceledScan(ScanIntentResult result) {
         Intent originalIntent = result.getOriginalIntent();
         if (originalIntent == null) {
-            Log.d(logTag, "Cancelled scan");
             Toast.makeText(getActivity(), "Scan abgebrochen", Toast.LENGTH_LONG).show();
         } else if (originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
-            Log.d(logTag, "Cancelled scan due to missing camera permission");
             Toast.makeText(getActivity(), "Erlaubnis zur Nutzung der Kamera nicht gegeben", Toast.LENGTH_LONG).show();
         }
 
@@ -115,13 +109,12 @@ public class CameraFragment extends Fragment {
                 new Thread(() -> {
                     Context context = requireContext();
                     BookResolver bookResolver = new BookResolver();
-                    Book book = bookResolver.resolveBook(isbn);
+                    Book book = bookResolver.resolveBook(isbn, 7);
                     globalViewModel.addBook(book);
 
                     AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, "books").build();
                     db.bookDao().insert(book);
-                    Optional<Drawable> cover = book.getCover();
-                    cover.ifPresent(drawable -> new FileStorage(context.getFilesDir()).saveImage(isbn, drawable));
+                    book.getCover().ifPresent(cover -> new FileStorage(context.getFilesDir()).saveImage(isbn, cover));
                 }).start();
             }
 
