@@ -17,7 +17,7 @@ public class ScanListener implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         ScanOptions scanOptions = new ScanOptions();
-        scanOptions.setPrompt("Scan a barcode");
+        scanOptions.setPrompt("ISBN einscannen");
         scanOptions.setOrientationLocked(false);
         scanOptions.setDesiredBarcodeFormats(ScanOptions.EAN_13);
         scanOptions.setBeepEnabled(true);
