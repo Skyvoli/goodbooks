@@ -5,23 +5,20 @@
     <item
             android:id="@+id/delete_item"
             android:title="@string/deleteBook"
-            android:icon="@drawable/trash_bin"
+            android:icon="@drawable/ic_trash_bin"
             app:iconTint="@color/white"
-            app:showAsAction="ifRoom"
-           />
+            app:showAsAction="ifRoom" />
     <item
             android:id="@+id/reset_item"
             android:title="@string/reset_book"
             android:icon="@drawable/reset"
             app:iconTint="@color/white"
-            app:showAsAction="ifRoom"
-            />
+            app:showAsAction="ifRoom" />
     <item
             android:id="@+id/edit_item"
             android:title="@string/edit_book"
-            android:icon="@drawable/edit"
+            android:icon="@drawable/ic_edit"
             app:iconTint="@color/white"
-            app:showAsAction="ifRoom"
-            />
+            app:showAsAction="ifRoom" />
 
 </menu>

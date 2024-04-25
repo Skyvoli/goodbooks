@@ -6,19 +6,6 @@
         android:layout_height="match_parent"
         tools:context=".ui.fragments.home.HomeFragment">
 
-    <Button
-            android:id="@+id/deleteBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:backgroundTint="?attr/colorSecondary"
-            android:layout_gravity="center"
-            android:text="@string/deleteBtn"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_home" />
-
     <TextView
             android:id="@+id/text_home"
             android:layout_width="match_parent"
