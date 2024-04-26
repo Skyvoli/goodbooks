@@ -1,5 +1,7 @@
 package io.skyvoli.goodbooks.web;
 
+import android.graphics.drawable.Drawable;
+
 import org.jsoup.nodes.Document;
 
 import java.util.Optional;
@@ -19,7 +21,11 @@ public class BookResolver {
         }
 
         Book book = dnbApi.serializeDocument(document.get(), isbn, timeout);
-        book.setResolved(book.getCover().isPresent());
+        book.setCover(dnbApi.loadImage(isbn, timeout));
         return book;
+    }
+
+    public Optional<Drawable> loadImage(String isbn, int timeout) {
+        return Optional.ofNullable(dnbApi.loadImage(isbn, timeout));
     }
 }

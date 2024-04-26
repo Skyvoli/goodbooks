@@ -70,11 +70,11 @@ public class DnbMarc21Api implements BookApi {
         Resolved<String> resolvedAuthor = resolveString(bookData, authorFields, "Unbekannt");
         resolvedAuthor.setValue(formatAuthors(resolvedAuthor.getValue()));
 
-        Drawable cover = new RequestHandler().getImage(IMAGE_URL + isbn, timeout);
+        return new Book(resolvedTitle.getValue(), resolvedSubtitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), null, true);
+    }
 
-
-        return new Book(resolvedTitle.getValue(), resolvedSubtitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), cover, true);
-
+    public Drawable loadImage(String isbn, int timeout) {
+        return new RequestHandler().getImage(IMAGE_URL + isbn, timeout);
     }
 
     private Resolved<String> resolveString(Element bookData, List<XmlField> titleFields, String defaultValue) {
