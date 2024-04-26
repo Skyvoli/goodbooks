@@ -38,11 +38,6 @@ public class GlobalViewModel extends ViewModel {
         }
 
         books.set(books.indexOf(found.get()), newBook);
-        sort();
-    }
-
-    public void clearBooks() {
-        this.books.clear();
     }
 
     public void setList(List<Book> books) {
@@ -54,7 +49,7 @@ public class GlobalViewModel extends ViewModel {
         return books.stream().anyMatch(book -> book.sameIsbn(isbn));
     }
 
-    private void sort() {
+    public void sort() {
         books.sort(Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER)
                 .thenComparing((b1, b2) -> b1.comparePart(b2.getPart())));
     }

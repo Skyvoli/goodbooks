@@ -30,4 +30,5 @@
     <string name="edit_book">Buch bearbeiten</string>
     <string name="change_picture_btn">Change picture</string>
     <string name="subtitle">Buchtitel</string>
+    <string name="reload_uncompleted">Unvollständige Bücher laden</string>
 </resources>

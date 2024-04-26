@@ -139,10 +139,10 @@ public class BookDetailFragment extends Fragment {
         editAuthor.setOnFocusChangeListener(getAuthorListener(editAuthor, authorLayout));
 
         submit.setOnClickListener(v -> {
-            File dir = requireContext().getFilesDir();
             Book newBook = copiedBook.createClone();
             newBook.setResolved(true);
             globalViewModel.updateBook(newBook);
+            globalViewModel.sort();
             originalBook = newBook;
             //Refresh
             title.setText(TitleBuilder.buildWholeTitle(originalBook.getTitle(), originalBook.getSubtitle(), originalBook.getPart()));
@@ -154,7 +154,7 @@ public class BookDetailFragment extends Fragment {
                 AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
                 db.bookDao().update(newBook);
                 if (copiedBook.getCover().isPresent()) {
-                    new FileStorage(dir).saveImage(originalBook.getIsbn(), copiedBook.getCover().get());
+                    new FileStorage(requireContext().getFilesDir()).saveImage(originalBook.getIsbn(), copiedBook.getCover().get());
                 }
             }).start();
 
@@ -162,11 +162,7 @@ public class BookDetailFragment extends Fragment {
                     .show(getParentFragmentManager(), "saved");
         });
 
-        galleryButton.setOnClickListener(v ->
-                pickMedia.launch(new PickVisualMediaRequest.Builder()
-                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                        .build())
-        );
+        galleryButton.setOnClickListener(this::launchPicker);
 
         return root;
     }
@@ -338,6 +334,12 @@ public class BookDetailFragment extends Fragment {
                 //Do nothing
             }
         };
+    }
+
+    private void launchPicker(View view) {
+        pickMedia.launch(new PickVisualMediaRequest.Builder()
+                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                .build());
     }
 
     @Override
