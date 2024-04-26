@@ -81,18 +81,31 @@ public class BooksFragment extends Fragment {
                     map(Book::getIsbn)
                     .collect(Collectors.toList());
 
+            List<Book> unresolvedImages = books.stream()
+                    .filter((book -> !book.getCover().isPresent() && book.isResolved()))
+                    .collect(Collectors.toList());
+
             File dir = context.getFilesDir();
             AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, "books").build();
 
             new Thread(() -> {
-                //TODO Reload missing images?
-                unresolvedIsbn.forEach(s -> {
-                    Book resolved = new BookResolver().resolveBook(s, 10);
+                BookResolver resolver = new BookResolver();
+                unresolvedIsbn.forEach(isbn -> {
+                    Book resolved = resolver.resolveBook(isbn, 10);
                     Optional<Drawable> cover = resolved.getCover();
                     cover.ifPresent(drawable -> new FileStorage(dir).saveImage(resolved.getIsbn(), drawable));
 
                     globalViewModel.updateBook(resolved);
                     db.bookDao().update(resolved);
+                });
+
+                unresolvedImages.forEach(book -> {
+                    Optional<Drawable> cover = resolver.loadImage(book.getIsbn(), 15);
+                    cover.ifPresent(drawable -> {
+                        new FileStorage(dir).saveImage(book.getIsbn(), drawable);
+                        book.setCover(drawable);
+                        globalViewModel.updateBook(book);
+                    });
                 });
 
                 books = db.bookDao().getAll();
