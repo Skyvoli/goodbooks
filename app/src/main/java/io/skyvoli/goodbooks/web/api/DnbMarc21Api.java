@@ -40,6 +40,7 @@ public class DnbMarc21Api implements BookApi {
         List<XmlField> authorFields = new ArrayList<>();
 
         //Titel: tag 245 code a + n
+        titleFields.add(new XmlField("830", "a"));
         titleFields.add(new XmlField("800", "t"));
         titleFields.add(new XmlField("245", "a"));
         titleFields.add(new XmlField("245", "n"));
@@ -53,6 +54,7 @@ public class DnbMarc21Api implements BookApi {
         subtitleFields.add(new XmlField("245", "b"));
 
         Resolved<String> resolvedSubtitle = resolveString(bookData, subtitleFields, null);
+        resolvedSubtitle.setValue(removeUnwantedSequences(resolvedSubtitle.getValue()));
 
         partFields.add(new XmlField("245", "n"));
         //?
@@ -70,7 +72,7 @@ public class DnbMarc21Api implements BookApi {
 
         Drawable cover = new RequestHandler().getImage(IMAGE_URL + isbn, timeout);
 
-        //FIXME Filter weird String ˜Dieœ -> Die, ˜Derœ -> Der?
+
         return new Book(resolvedTitle.getValue(), resolvedSubtitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), cover, true);
 
     }
@@ -118,6 +120,13 @@ public class DnbMarc21Api implements BookApi {
             }
             return Integer.valueOf(digits.toString());
         }
+    }
+
+    private String removeUnwantedSequences(String value) {
+        if (value == null) {
+            return null;
+        }
+        return value.replace("˜Derœ", "Der").replace("˜Dieœ", "Die");
     }
 
     private String formatAuthors(String authors) {
