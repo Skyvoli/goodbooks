@@ -20,6 +20,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
@@ -35,6 +36,7 @@ import org.jsoup.internal.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
@@ -76,7 +78,7 @@ public class BookDetailFragment extends Fragment {
                         .show(getParentFragmentManager(), PICKER_TAG);
                 return;
             }
-            cover.setImageDrawable(newCover);
+            setCover(newCover);
             copiedBook.setCover(newCover);
             changed();
         });
@@ -111,12 +113,11 @@ public class BookDetailFragment extends Fragment {
 
         //Set content & observables
         title.setText(TitleBuilder.buildWholeTitle(originalBook.getTitle(), originalBook.getSubtitle(), originalBook.getPart()));
-        Optional<Drawable> drawable = originalBook.getCover();
-        if (drawable.isPresent()) {
-            cover.setImageDrawable(drawable.get());
-        } else {
-            cover.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ruby));
-        }
+
+        Drawable drawable = originalBook.getCover()
+                .orElseGet(() -> ContextCompat.getDrawable(requireContext(), R.drawable.ruby));
+        setCover(Objects.requireNonNull(drawable));
+
         isbn.setText(originalBook.getIsbn());
         author.setText(originalBook.getAuthor());
 
@@ -170,6 +171,20 @@ public class BookDetailFragment extends Fragment {
         return root;
     }
 
+    private void setCover(Drawable drawable) {
+        ((ConstraintLayout.LayoutParams) cover.getLayoutParams()).dimensionRatio
+                = String.valueOf(getRatio(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
+        cover.setImageDrawable(drawable);
+    }
+
+    private float getRatio(int width, int height) {
+        if (height != 0) {
+            return (float) width / height;
+        } else {
+            return 2.3f; // Handle divide by zero case
+        }
+    }
+
     private MenuProvider getMenuProvider() {
         return new MenuProvider() {
             @Override
@@ -209,6 +224,7 @@ public class BookDetailFragment extends Fragment {
     }
 
     private View.OnFocusChangeListener getTitleListener(TextInputEditText editTitle, TextInputLayout titleLayout) {
+        //TODO if other books with same title ask to load author and subttitle
         return (v, hasFocus) -> {
             if (!hasFocus) {
                 Editable newTitle = editTitle.getText();
