@@ -8,5 +8,5 @@ public interface BookApi {
 
     String buildUrl(String isbn);
 
-    Book serializeDocument(Document document, String isbn);
+    Book serializeDocument(Document document, String isbn, int timeout);
 }

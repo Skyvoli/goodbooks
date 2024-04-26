@@ -26,7 +26,7 @@ public class DnbMarc21Api implements BookApi {
     }
 
     @Override
-    public Book serializeDocument(Document document, String isbn) {
+    public Book serializeDocument(Document document, String isbn, int timeout) {
         Element bookData;
         try {
             bookData = document.getElementsByAttributeValueContaining("type", "Bibliographic").get(0);
@@ -52,8 +52,7 @@ public class DnbMarc21Api implements BookApi {
         }
         subtitleFields.add(new XmlField("245", "b"));
 
-        Resolved<String> resolvedSubtitle = resolveString(bookData, subtitleFields, "");
-        Log.d("Subtitle", resolvedSubtitle.getValue());
+        Resolved<String> resolvedSubtitle = resolveString(bookData, subtitleFields, null);
 
         partFields.add(new XmlField("245", "n"));
         //?
@@ -69,9 +68,10 @@ public class DnbMarc21Api implements BookApi {
         Resolved<String> resolvedAuthor = resolveString(bookData, authorFields, "Unbekannt");
         resolvedAuthor.setValue(formatAuthors(resolvedAuthor.getValue()));
 
-        Drawable cover = new RequestHandler().getImage(IMAGE_URL + isbn, 10);
+        Drawable cover = new RequestHandler().getImage(IMAGE_URL + isbn, timeout);
 
-        return new Book(resolvedTitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), cover, true);
+        //FIXME Filter weird String ˜Dieœ -> Die, ˜Derœ -> Der?
+        return new Book(resolvedTitle.getValue(), resolvedSubtitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), cover, true);
 
     }
 

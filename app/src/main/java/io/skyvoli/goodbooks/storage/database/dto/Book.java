@@ -18,6 +18,8 @@ public class Book {
     private final String isbn;
     @ColumnInfo(name = "title")
     private String title;
+    @ColumnInfo(name = "subtitle")
+    private String subtitle;
     @ColumnInfo(name = "part")
     private Integer part;
     @ColumnInfo(name = "author")
@@ -31,6 +33,7 @@ public class Book {
     @Ignore
     public Book(@NonNull String isbn) {
         this.title = "Unbekannt";
+        this.subtitle = null;
         this.part = null;
         this.isbn = isbn;
         this.author = "Unbekannt";
@@ -40,8 +43,9 @@ public class Book {
 
 
     @Ignore
-    public Book(String title, Integer part, @NonNull String isbn, String author, Drawable cover, boolean resolved) {
+    public Book(String title, String subtitle, Integer part, @NonNull String isbn, String author, Drawable cover, boolean resolved) {
         this.title = title;
+        this.subtitle = subtitle;
         this.part = part;
         this.isbn = isbn;
         this.author = author;
@@ -49,8 +53,9 @@ public class Book {
         this.resolved = resolved;
     }
 
-    public Book(String title, Integer part, @NonNull String isbn, String author, boolean resolved) {
+    public Book(String title, String subtitle, Integer part, @NonNull String isbn, String author, boolean resolved) {
         this.title = title;
+        this.subtitle = subtitle;
         this.part = part;
         this.isbn = isbn;
         this.author = author;
@@ -59,7 +64,7 @@ public class Book {
     }
 
     public Book createClone() {
-        return new Book(title, part, isbn, author, cover, resolved);
+        return new Book(title, subtitle, part, isbn, author, cover, resolved);
     }
 
     public String getTitle() {
@@ -111,16 +116,24 @@ public class Book {
         return this.isbn.equals(isbn);
     }
 
+    public String getSubtitle() {
+        return subtitle;
+    }
+
+    public void setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Book)) return false;
         Book book = (Book) o;
-        return Objects.equals(title, book.title) && Objects.equals(part, book.part) && Objects.equals(isbn, book.isbn) && Objects.equals(author, book.author) && Objects.equals(cover, book.cover);
+        return resolved == book.resolved && Objects.equals(isbn, book.isbn) && Objects.equals(title, book.title) && Objects.equals(subtitle, book.subtitle) && Objects.equals(part, book.part) && Objects.equals(author, book.author) && Objects.equals(cover, book.cover);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title, part, isbn, author, cover);
+        return Objects.hash(isbn, title, subtitle, part, author, cover, resolved);
     }
 }
