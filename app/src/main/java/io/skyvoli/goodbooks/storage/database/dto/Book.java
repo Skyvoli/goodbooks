@@ -63,6 +63,17 @@ public class Book {
         this.resolved = resolved;
     }
 
+    public int comparePart(Integer otherPart) {
+        if (part == null && otherPart == null)
+            return 0;
+        else if (part == null)
+            return 1;
+        else if (otherPart == null)
+            return -1;
+        else
+            return Integer.compare(part, otherPart);
+    }
+
     public Book createClone() {
         return new Book(title, subtitle, part, isbn, author, cover, resolved);
     }
