@@ -42,6 +42,7 @@ import io.skyvoli.goodbooks.databinding.FragmentBookDetailBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
 import io.skyvoli.goodbooks.dialog.PermissionDialog;
+import io.skyvoli.goodbooks.helper.TitleBuilder;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
@@ -97,9 +98,12 @@ public class BookDetailFragment extends Fragment {
         final TextView isbn = binding.isbn;
         final TextView author = binding.author;
         final TextInputLayout titleLayout = binding.titleLayout;
+        //TODO Nnidsgisoigjds
+        final TextInputLayout subtitleLayout = binding.subtitleLayout;
         final TextInputLayout partLayout = binding.partLayout;
         final TextInputLayout authorLayout = binding.authorLayout;
         final TextInputEditText editTitle = binding.editTitle;
+        final TextInputEditText editSubtitle = binding.editSubtitle;
         final EditText editPart = binding.editPart;
         final TextInputEditText editAuthor = binding.editAuthor;
         final FloatingActionButton galleryButton = binding.floatingActionButton;
@@ -108,7 +112,7 @@ public class BookDetailFragment extends Fragment {
         copiedBook = originalBook.createClone();
 
         //Set content & observables
-        title.setText(buildWholeTitle(originalBook.getTitle(), originalBook.getPart()));
+        title.setText(TitleBuilder.buildWholeTitle(originalBook.getTitle(), originalBook.getSubtitle(), originalBook.getPart()));
         Optional<Drawable> drawable = originalBook.getCover();
         if (drawable.isPresent()) {
             cover.setImageDrawable(drawable.get());
@@ -132,13 +136,14 @@ public class BookDetailFragment extends Fragment {
         editAuthor.setOnFocusChangeListener(getAuthorListener(editAuthor, authorLayout));
 
         submit.setOnClickListener(v -> {
+            //TODO validate input
             File dir = requireContext().getFilesDir();
             Book newBook = copiedBook.createClone();
             newBook.setResolved(true);
             globalViewModel.updateBook(newBook);
             originalBook = newBook;
             //Refresh
-            title.setText(buildWholeTitle(originalBook.getTitle(), originalBook.getPart()));
+            title.setText(TitleBuilder.buildWholeTitle(originalBook.getTitle(), originalBook.getSubtitle(), originalBook.getPart()));
             author.setText(originalBook.getAuthor());
             editTitle.setText(originalBook.getTitle());
             editAuthor.setText(originalBook.getAuthor());
@@ -176,7 +181,8 @@ public class BookDetailFragment extends Fragment {
                 if (menuItem.getItemId() == R.id.delete_item) {
                     PermissionDialog permissionDialog =
                             new PermissionDialog("Buch löschen",
-                                    "Möchten Sie '" + buildWholeTitle(originalBook.getTitle(),
+                                    "Möchten Sie '" + TitleBuilder.buildWholeTitle(originalBook.getTitle(),
+                                            originalBook.getSubtitle(),
                                             originalBook.getPart()) + "'  wirklich löschen?",
                                     true,
                                     deleteBookListener());
@@ -199,14 +205,6 @@ public class BookDetailFragment extends Fragment {
                 .filter(el -> el.sameIsbn(isbn))
                 .findAny()
                 .orElse(new Book(isbn));
-    }
-
-    private String buildWholeTitle(String title, Integer part) {
-        if (part != null) {
-            return title + " " + part;
-        } else {
-            return title;
-        }
     }
 
     private View.OnFocusChangeListener getTitleListener(TextInputEditText editTitle, TextInputLayout titleLayout) {

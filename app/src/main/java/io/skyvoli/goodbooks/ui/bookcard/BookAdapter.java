@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
+import io.skyvoli.goodbooks.helper.TitleBuilder;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
@@ -41,7 +42,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = books.get(position);
 
-        holder.setTitle(buildWholeTitle(book.getTitle(), book.getPart()));
+        holder.setTitle(TitleBuilder.buildWholeTitle(book.getTitle(), book.getSubtitle(), book.getPart()));
         holder.setIsbn(book.getIsbn());
         holder.setAuthor(book.getAuthor());
         Optional<Drawable> cover = book.getCover();
@@ -69,12 +70,4 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
         return books;
     }
 
-    //Copy of detail title builder
-    private String buildWholeTitle(String title, Integer part) {
-        if (part != null) {
-            return title + " " + part;
-        } else {
-            return title;
-        }
-    }
 }

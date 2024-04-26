@@ -11,7 +11,7 @@
     <string name="menu_camera">Camera</string>
     <string name="menu_books">Books</string>
     <string name="scan">Scan</string>
-    <string name="title_label">Titel</string>
+    <string name="title_label">Serientitel</string>
     <string name="part_label">Nummer</string>
     <string name="isbn_label">ISBN:</string>
     <string name="author_label">Autor:</string>
@@ -29,4 +29,5 @@
     <string name="reset_book">Buch erneut runterladen</string>
     <string name="edit_book">Buch bearbeiten</string>
     <string name="change_picture_btn">Change picture</string>
+    <string name="subtitle">Buchtitel</string>
 </resources>
