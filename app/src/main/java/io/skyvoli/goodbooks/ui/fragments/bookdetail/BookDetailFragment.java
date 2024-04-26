@@ -98,8 +98,6 @@ public class BookDetailFragment extends Fragment {
         final TextView isbn = binding.isbn;
         final TextView author = binding.author;
         final TextInputLayout titleLayout = binding.titleLayout;
-        //TODO Nnidsgisoigjds
-        final TextInputLayout subtitleLayout = binding.subtitleLayout;
         final TextInputLayout partLayout = binding.partLayout;
         final TextInputLayout authorLayout = binding.authorLayout;
         final TextInputEditText editTitle = binding.editTitle;
@@ -124,19 +122,22 @@ public class BookDetailFragment extends Fragment {
 
         //Set editable
         editTitle.setText(originalBook.getTitle());
-        Integer part = originalBook.getPart();
-        if (part != null) {
-            editPart.setText(String.valueOf(part));
-        }
+
+        Optional<String> subtitle = Optional.ofNullable(originalBook.getSubtitle());
+        subtitle.ifPresent(editSubtitle::setText);
+
+        Optional<Integer> part = Optional.ofNullable(originalBook.getPart());
+        part.ifPresent(integer -> editPart.setText(String.valueOf(integer)));
+
         editAuthor.setText(originalBook.getAuthor());
 
         //Set listener
         editTitle.setOnFocusChangeListener(getTitleListener(editTitle, titleLayout));
+        editSubtitle.setOnFocusChangeListener(getSubtitleListener(editSubtitle));
         editPart.setOnFocusChangeListener(getPartListener(editPart, partLayout));
         editAuthor.setOnFocusChangeListener(getAuthorListener(editAuthor, authorLayout));
 
         submit.setOnClickListener(v -> {
-            //TODO validate input
             File dir = requireContext().getFilesDir();
             Book newBook = copiedBook.createClone();
             newBook.setResolved(true);
@@ -227,6 +228,23 @@ public class BookDetailFragment extends Fragment {
         };
     }
 
+    private View.OnFocusChangeListener getSubtitleListener(TextInputEditText editSubtitle) {
+        return (v, hasFocus) -> {
+            if (!hasFocus) {
+                Editable newSubtitle = editSubtitle.getText();
+                if (newSubtitle != null) {
+                    String formatted = formatString(newSubtitle.toString());
+                    if (formatted.length() == 0) {
+                        copiedBook.setSubtitle(null);
+                    } else {
+                        copiedBook.setSubtitle(formatted);
+                    }
+                    changed();
+                }
+            }
+        };
+    }
+
     private View.OnFocusChangeListener getPartListener(EditText editPart, TextInputLayout partLayout) {
         return (v, hasFocus) -> {
             if (!hasFocus) {
@@ -242,7 +260,8 @@ public class BookDetailFragment extends Fragment {
                         partLayout.setError("Bitte geben Sie eine kleinere Zahl ein.");
                         return;
                     }
-                    partLayout.setError("Bitte geben Sie eine Ganzzahl ein.");
+                    copiedBook.setPart(null);
+                    changed();
                 }
             }
         };
@@ -253,7 +272,7 @@ public class BookDetailFragment extends Fragment {
             if (!hasFocus) {
                 Editable newAuthor = editAuthor.getText();
                 if (newAuthor != null) {
-                    String formatted = formatString(newAuthor.toString());
+                    String formatted = formatAuthor(newAuthor.toString());
 
                     if (formatted.length() == 0) {
                         authorLayout.setError("Bitte geben Sie einen Autor ein.");
@@ -261,11 +280,19 @@ public class BookDetailFragment extends Fragment {
                     }
 
                     authorLayout.setError(null);
-                    copiedBook.setAuthor(newAuthor.toString());
+                    copiedBook.setAuthor(formatted);
                     changed();
                 }
             }
         };
+    }
+
+    private String formatAuthor(String unformatted) {
+        //\n shouldn't be completely removed
+        return unformatted.trim()
+                .replaceAll(" {2,}", " ")
+                .replaceAll("\n{2,}", "\n")
+                .replace("\n ", "\n");
     }
 
     private String formatString(String unformatted) {
