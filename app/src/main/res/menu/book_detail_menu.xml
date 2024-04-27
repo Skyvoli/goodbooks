@@ -9,15 +9,9 @@
             app:iconTint="@color/white"
             app:showAsAction="ifRoom" />
     <item
-            android:id="@+id/reset_item"
-            android:title="@string/reset_book"
+            android:id="@+id/reset_image"
+            android:title="@string/reset_image"
             android:icon="@drawable/ic_reset"
-            app:iconTint="@color/white"
-            app:showAsAction="ifRoom" />
-    <item
-            android:id="@+id/edit_item"
-            android:title="@string/edit_book"
-            android:icon="@drawable/ic_edit"
             app:iconTint="@color/white"
             app:showAsAction="ifRoom" />
 

@@ -1,5 +1,6 @@
 package io.skyvoli.goodbooks.ui.fragments.bookdetail;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.ImageDecoder;
 import android.graphics.drawable.Drawable;
@@ -15,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
@@ -40,10 +42,13 @@ import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.databinding.FragmentBookDetailBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
+import io.skyvoli.goodbooks.dialog.OnlyPositiveListener;
 import io.skyvoli.goodbooks.dialog.PermissionDialog;
 import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.TitleBuilder;
+import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
+import io.skyvoli.goodbooks.web.BookResolver;
 
 public class BookDetailFragment extends Fragment {
 
@@ -177,16 +182,20 @@ public class BookDetailFragment extends Fragment {
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.delete_item) {
-                    PermissionDialog permissionDialog =
-                            new PermissionDialog("Buch löschen",
-                                    "Möchten Sie '" + TitleBuilder.buildWholeTitle(originalBook.getTitle(),
-                                            originalBook.getSubtitle(),
-                                            originalBook.getPart()) + "'  wirklich löschen?",
-                                    true,
-                                    deleteBookListener());
-                    permissionDialog.show(getParentFragmentManager(), "deleteAction");
+                int selectedItemId = menuItem.getItemId();
+                if (selectedItemId == R.id.delete_item) {
+                    new PermissionDialog("Buch löschen",
+                            "Möchten Sie '" + TitleBuilder.buildWholeTitle(originalBook.getTitle(),
+                                    originalBook.getSubtitle(),
+                                    originalBook.getPart()) + "'  wirklich löschen?",
+                            true,
+                            deleteBookListener()).show(getParentFragmentManager(), "deleteAction");
                     return true;
+                } else if (selectedItemId == R.id.reset_image) {
+                    new PermissionDialog("Bild zurücksetzen",
+                            "Möchten Sie das Bild zurücksetzen?",
+                            true,
+                            resetImageListener()).show(getParentFragmentManager(), "deleteAction");
                 }
                 return false;
             }
@@ -301,17 +310,35 @@ public class BookDetailFragment extends Fragment {
     }
 
     private NoticeDialogListener deleteBookListener() {
-        return new NoticeDialogListener() {
+        return new OnlyPositiveListener() {
             @Override
             public void onDialogPositiveClick() {
                 new Thread(() ->
                         globalController.removeBook(originalBook, requireContext())).start();
                 getParentFragmentManager().popBackStack();
             }
+        };
+    }
 
+    private NoticeDialogListener resetImageListener() {
+        return new OnlyPositiveListener() {
             @Override
-            public void onDialogNegativeClick() {
-                //Do nothing
+            public void onDialogPositiveClick() {
+                Context context = requireContext();
+                new Thread(() -> {
+                    Optional<Drawable> baseCover = new BookResolver().loadImage(originalBook.getIsbn(), 15);
+                    if (baseCover.isPresent()) {
+                        Drawable resetImage = baseCover.get();
+                        new FileStorage(context.getFilesDir()).saveImage(originalBook.getIsbn(), resetImage);
+                        originalBook.setCover(resetImage);
+                        globalController.updateBookWithCover(originalBook, context);
+                        if (isAdded()) {
+                            requireActivity().runOnUiThread(() -> setCover(resetImage));
+                        }
+                    } else {
+                        requireActivity().runOnUiThread(() -> Toast.makeText(context, "Bild konnte nicht geladen werden", Toast.LENGTH_SHORT).show());
+                    }
+                }).start();
             }
         };
     }
