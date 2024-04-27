@@ -20,10 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
@@ -33,10 +31,8 @@ import java.util.stream.Collectors;
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
+import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.observer.BookObserver;
-import io.skyvoli.goodbooks.model.GlobalViewModel;
-import io.skyvoli.goodbooks.storage.FileStorage;
-import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.ui.bookcard.BookAdapter;
 import io.skyvoli.goodbooks.web.BookResolver;
@@ -48,11 +44,11 @@ public class BooksFragment extends Fragment {
     private TextView placeholder;
     private RecyclerView recyclerView;
     private List<Book> books;
-    private GlobalViewModel globalViewModel;
+    private GlobalController globalController;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
+        globalController = new GlobalController(requireActivity());
 
         binding = FragmentBooksBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -65,7 +61,7 @@ public class BooksFragment extends Fragment {
         progressBar = binding.progressBar;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        books = new ArrayList<>(globalViewModel.getBooks());
+        books = new ArrayList<>(globalController.getBooks());
 
         final SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
 
@@ -73,7 +69,7 @@ public class BooksFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(() -> onSwipe(swipeRefreshLayout, context));
 
         if (isAdded()) {
-            globalViewModel.getBooks().addOnListChangedCallback(new BookObserver(binding, requireActivity()));
+            globalController.getBooks().addOnListChangedCallback(new BookObserver(binding, requireActivity()));
         }
 
         return root;
@@ -118,33 +114,24 @@ public class BooksFragment extends Fragment {
                     return true;
                 }
 
-                AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, "books").build();
 
                 new Thread(() -> {
                     BookResolver resolver = new BookResolver();
-                    FileStorage storage = new FileStorage(context.getFilesDir());
 
                     unresolvedIsbn.forEach(isbn -> {
                         Book resolved = resolver.resolveBook(isbn, 10);
-
-                        resolved.getCover().ifPresent(drawable ->
-                                storage.saveImage(resolved.getIsbn(), drawable));
-
-                        globalViewModel.updateBook(resolved);
-                        db.bookDao().update(resolved);
+                        globalController.updateBook(resolved, requireContext());
                     });
 
                     unresolvedImages.forEach(book -> resolver.loadImage(book.getIsbn(), 15)
                             .ifPresent(drawable -> {
-                                storage.saveImage(book.getIsbn(), drawable);
                                 book.setCover(drawable);
-                                globalViewModel.updateBook(book);
+                                globalController.updateBookWithCover(book, context);
                             }));
 
                     activity.runOnUiThread(() ->
                             Toast.makeText(context, "Reloaded", Toast.LENGTH_SHORT).show());
                 }).start();
-
 
                 return true;
             }
@@ -168,14 +155,11 @@ public class BooksFragment extends Fragment {
             recyclerView.startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out));
             recyclerView.setVisibility(View.INVISIBLE);
 
-            AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, "books").build();
-            books = db.bookDao().getAll();
-            FileStorage fileStorage = new FileStorage(context.getFilesDir());
-            books.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
-            globalViewModel.setList(books);
+            globalController.setListWithDataFromDatabase(requireContext());
 
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
+                    books = globalController.getBooks();
                     recyclerView.setAdapter(new BookAdapter(books));
                     setPlaceholder();
                     recyclerView.clearAnimation();

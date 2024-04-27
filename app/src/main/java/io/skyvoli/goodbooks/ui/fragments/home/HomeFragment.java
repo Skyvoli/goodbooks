@@ -16,7 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import io.skyvoli.goodbooks.databinding.FragmentHomeBinding;
-import io.skyvoli.goodbooks.model.GlobalViewModel;
+import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.web.BookResolver;
 
@@ -28,7 +28,7 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
-        GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
+        GlobalController globalController = new GlobalController(requireActivity());
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -46,7 +46,7 @@ public class HomeFragment extends Fragment {
                 AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, "books")
                         .build();
                 BookResolver resolver = new BookResolver();
-                globalViewModel.getBooks().forEach(book -> db.bookDao().update(resolver.resolveBook(book.getIsbn(), 20)));
+                globalController.getBooks().forEach(book -> db.bookDao().update(resolver.resolveBook(book.getIsbn(), 20)));
 
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() -> progressCircular.setVisibility(View.GONE));

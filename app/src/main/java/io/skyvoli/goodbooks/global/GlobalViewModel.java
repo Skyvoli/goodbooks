@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.model;
+package io.skyvoli.goodbooks.global;
 
 
 import androidx.databinding.ObservableArrayList;
@@ -15,20 +15,20 @@ public class GlobalViewModel extends ViewModel {
 
     private ObservableList<Book> books;
 
-    public GlobalViewModel() {
+    protected GlobalViewModel() {
         books = new ObservableArrayList<>();
     }
 
-    public ObservableList<Book> getBooks() {
+    protected ObservableList<Book> getBooks() {
         return books;
     }
 
-    public void addBook(Book book) {
+    protected void addBook(Book book) {
         books.add(book);
         sort();
     }
 
-    public void updateBook(Book newBook) {
+    protected void updateBook(Book newBook) {
         Optional<Book> found = books.stream()
                 .filter(el -> el.sameIsbn(newBook.getIsbn()))
                 .findFirst();
@@ -40,21 +40,21 @@ public class GlobalViewModel extends ViewModel {
         books.set(books.indexOf(found.get()), newBook);
     }
 
-    public void setList(List<Book> books) {
+    protected void setList(List<Book> books) {
         this.books = new ObservableArrayList<>();
         this.books.addAll(books);
     }
 
-    public boolean hasBook(String isbn) {
+    protected boolean hasBook(String isbn) {
         return books.stream().anyMatch(book -> book.sameIsbn(isbn));
     }
 
-    public void sort() {
+    protected void sort() {
         books.sort(Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER)
                 .thenComparing((b1, b2) -> b1.comparePart(b2.getPart())));
     }
 
-    public void removeBook(Book book) {
+    protected void removeBook(Book book) {
         books.remove(book);
     }
 }

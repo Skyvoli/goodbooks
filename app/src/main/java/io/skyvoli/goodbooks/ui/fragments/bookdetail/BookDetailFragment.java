@@ -25,8 +25,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.room.Room;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -34,7 +32,6 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import org.jsoup.internal.StringUtil;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,21 +41,19 @@ import io.skyvoli.goodbooks.databinding.FragmentBookDetailBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
 import io.skyvoli.goodbooks.dialog.PermissionDialog;
+import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.TitleBuilder;
-import io.skyvoli.goodbooks.model.GlobalViewModel;
-import io.skyvoli.goodbooks.storage.FileStorage;
-import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class BookDetailFragment extends Fragment {
 
     private static final String PICKER_TAG = "PhotoPicker";
     private FragmentBookDetailBinding binding;
-    private GlobalViewModel globalViewModel;
     private Book originalBook;
     private Book copiedBook;
     private Button submit;
     private ImageView cover;
+    private GlobalController globalController;
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
 
     @Override
@@ -88,11 +83,10 @@ public class BookDetailFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //TODO Color palette
-        globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
-
         binding = FragmentBookDetailBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        globalController = new GlobalController(requireActivity());
         requireActivity().addMenuProvider(getMenuProvider(), getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
         final TextView title = binding.title;
@@ -108,7 +102,7 @@ public class BookDetailFragment extends Fragment {
         final TextInputEditText editAuthor = binding.editAuthor;
         final FloatingActionButton galleryButton = binding.floatingActionButton;
         submit = binding.submitChanges;
-        originalBook = loadBook(globalViewModel);
+        originalBook = loadBook();
         copiedBook = originalBook.createClone();
 
         //Set content & observables
@@ -141,8 +135,8 @@ public class BookDetailFragment extends Fragment {
         submit.setOnClickListener(v -> {
             Book newBook = copiedBook.createClone();
             newBook.setResolved(true);
-            globalViewModel.updateBook(newBook);
-            globalViewModel.sort();
+            new Thread(() -> globalController.updateBook(newBook, requireContext())).start();
+            globalController.sort();
             originalBook = newBook;
             //Refresh
             title.setText(TitleBuilder.buildWholeTitle(originalBook.getTitle(), originalBook.getSubtitle(), originalBook.getPart()));
@@ -150,13 +144,6 @@ public class BookDetailFragment extends Fragment {
             editTitle.setText(originalBook.getTitle());
             editAuthor.setText(originalBook.getAuthor());
             submit.setEnabled(false);
-            new Thread(() -> {
-                AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
-                db.bookDao().update(newBook);
-                if (copiedBook.getCover().isPresent()) {
-                    new FileStorage(requireContext().getFilesDir()).saveImage(originalBook.getIsbn(), copiedBook.getCover().get());
-                }
-            }).start();
 
             new InformationDialog("Gespeichert", "Die Daten wurden übernommen.")
                     .show(getParentFragmentManager(), "saved");
@@ -207,16 +194,14 @@ public class BookDetailFragment extends Fragment {
     }
 
 
-    private Book loadBook(GlobalViewModel globalViewModel) {
+    private Book loadBook() {
         if (getArguments() == null) {
             throw new IllegalStateException("Missing argument isbn");
         }
         String isbn = Optional.ofNullable(getArguments().getString("isbn"))
                 .orElseThrow(() -> new IllegalStateException("Missing argument isbn"));
-        return globalViewModel.getBooks().stream()
-                .filter(el -> el.sameIsbn(isbn))
-                .findAny()
-                .orElse(new Book(isbn));
+
+        return globalController.getBook(isbn);
     }
 
     private View.OnFocusChangeListener getTitleListener(TextInputEditText editTitle, TextInputLayout titleLayout) {
@@ -319,13 +304,8 @@ public class BookDetailFragment extends Fragment {
         return new NoticeDialogListener() {
             @Override
             public void onDialogPositiveClick() {
-                File dir = requireContext().getFilesDir();
-                new Thread(() -> {
-                    AppDatabase db = Room.databaseBuilder(requireContext(), AppDatabase.class, "books").build();
-                    db.bookDao().delete(originalBook);
-                    new FileStorage(dir).deleteImage(originalBook.getIsbn());
-                }).start();
-                globalViewModel.removeBook(originalBook);
+                new Thread(() ->
+                        globalController.removeBook(originalBook, requireContext())).start();
                 getParentFragmentManager().popBackStack();
             }
 

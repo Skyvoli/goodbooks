@@ -15,7 +15,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.room.Room;
 
 import com.google.zxing.client.android.Intents;
 import com.journeyapps.barcodescanner.ScanContract;
@@ -26,10 +25,8 @@ import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
 import io.skyvoli.goodbooks.dialog.PermissionDialog;
+import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.listener.ScanListener;
-import io.skyvoli.goodbooks.model.GlobalViewModel;
-import io.skyvoli.goodbooks.storage.FileStorage;
-import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.web.BookResolver;
 
@@ -38,12 +35,15 @@ public class CameraFragment extends Fragment {
     private final String logTag = this.getClass().getSimpleName();
     private FragmentCameraBinding binding;
     private CameraViewModel cameraViewModel;
+    private GlobalController globalController;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         cameraViewModel = new ViewModelProvider(this).get(CameraViewModel.class);
         ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(new ScanContract(),
                 this::onScanResult);
+
+        globalController = new GlobalController(requireActivity());
 
         binding = FragmentCameraBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -74,16 +74,15 @@ public class CameraFragment extends Fragment {
             return;
         }
 
-        GlobalViewModel globalViewModel = new ViewModelProvider(requireActivity()).get(GlobalViewModel.class);
 
-        if (globalViewModel.hasBook(isbn)) {
+        if (globalController.hasBook(isbn)) {
             new InformationDialog("Duplikat", "Dieses Buch ist bereits vorhanden")
                     .show(getParentFragmentManager(), "Duplikat");
             return;
         }
 
         new PermissionDialog("Buch erkannt",
-                "Soll das Buch mit ISBN " + isbn + " hinzugefügt werden?", false, addBookListener(globalViewModel, isbn))
+                "Soll das Buch mit ISBN " + isbn + " hinzugefügt werden?", false, addBookListener(isbn))
                 .show(getParentFragmentManager(), "Buch erkannt");
     }
 
@@ -102,19 +101,15 @@ public class CameraFragment extends Fragment {
         return isbn.toCharArray().length == 13 && (prefix.equals("978") || prefix.equals("979"));
     }
 
-    private NoticeDialogListener addBookListener(GlobalViewModel globalViewModel, String isbn) {
+    private NoticeDialogListener addBookListener(String isbn) {
         return new NoticeDialogListener() {
             @Override
             public void onDialogPositiveClick() {
+                Context context = requireContext();
                 new Thread(() -> {
-                    Context context = requireContext();
-                    BookResolver bookResolver = new BookResolver();
-                    Book book = bookResolver.resolveBook(isbn, 7);
-                    globalViewModel.addBook(book);
+                    Book book = new BookResolver().resolveBook(isbn, 7);
+                    globalController.addBook(book, context);
 
-                    AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, "books").build();
-                    db.bookDao().insert(book);
-                    book.getCover().ifPresent(cover -> new FileStorage(context.getFilesDir()).saveImage(isbn, cover));
                 }).start();
             }
 

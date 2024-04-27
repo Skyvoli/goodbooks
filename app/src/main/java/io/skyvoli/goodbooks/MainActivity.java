@@ -10,22 +10,15 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.room.Room;
 
 import com.google.android.material.navigation.NavigationView;
 
-import java.util.List;
-
 import io.skyvoli.goodbooks.databinding.ActivityMainBinding;
-import io.skyvoli.goodbooks.model.GlobalViewModel;
-import io.skyvoli.goodbooks.storage.FileStorage;
-import io.skyvoli.goodbooks.storage.database.AppDatabase;
-import io.skyvoli.goodbooks.storage.database.dto.Book;
+import io.skyvoli.goodbooks.global.GlobalController;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,15 +43,10 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
-        GlobalViewModel globalViewModel = new ViewModelProvider(this).get(GlobalViewModel.class);
 
-        new Thread(() -> {
-            AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "books").build();
-            List<Book> books = db.bookDao().getAll();
-            FileStorage fileStorage = new FileStorage(getFilesDir());
-            books.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
-            globalViewModel.setList(books);
-        }).start();
+        new Thread(() -> new GlobalController(this)
+                .setListWithDataFromDatabase(getApplicationContext()))
+                .start();
     }
 
     @Override
