@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
+import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.helper.observer.BookObserver;
 import io.skyvoli.goodbooks.model.GlobalViewModel;
 import io.skyvoli.goodbooks.storage.FileStorage;
@@ -96,52 +97,56 @@ public class BooksFragment extends Fragment {
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.reset_item) {
+                if (menuItem.getItemId() != R.id.reset_item) {
+                    return false;
+                }
 
-                    Activity activity = requireActivity();
-                    Context context = requireContext();
+                Activity activity = requireActivity();
+                Context context = requireContext();
 
-                    List<String> unresolvedIsbn = books.stream()
-                            .filter((book -> !book.isResolved())).
-                            map(Book::getIsbn)
-                            .collect(Collectors.toList());
+                List<String> unresolvedIsbn = books.stream()
+                        .filter((book -> !book.isResolved())).
+                        map(Book::getIsbn)
+                        .collect(Collectors.toList());
 
-                    List<Book> unresolvedImages = books.stream()
-                            .filter((book -> !book.getCover().isPresent() && book.isResolved()))
-                            .collect(Collectors.toList());
+                List<Book> unresolvedImages = books.stream()
+                        .filter((book -> !book.getCover().isPresent() && book.isResolved()))
+                        .collect(Collectors.toList());
 
-
-                    AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, "books").build();
-
-                    new Thread(() -> {
-                        BookResolver resolver = new BookResolver();
-                        FileStorage storage = new FileStorage(context.getFilesDir());
-
-                        unresolvedIsbn.forEach(isbn -> {
-                            Book resolved = resolver.resolveBook(isbn, 10);
-
-                            resolved.getCover().ifPresent(drawable ->
-                                    storage.saveImage(resolved.getIsbn(), drawable));
-
-                            globalViewModel.updateBook(resolved);
-                            db.bookDao().update(resolved);
-                        });
-
-                        unresolvedImages.forEach(book -> resolver.loadImage(book.getIsbn(), 15)
-                                .ifPresent(drawable -> {
-                                    storage.saveImage(book.getIsbn(), drawable);
-                                    book.setCover(drawable);
-                                    globalViewModel.updateBook(book);
-                                }));
-
-                        activity.runOnUiThread(() ->
-                                Toast.makeText(context, "Reloaded", Toast.LENGTH_SHORT).show());
-                    }).start();
-
-
+                if (unresolvedImages.isEmpty() && unresolvedIsbn.isEmpty()) {
+                    new InformationDialog("Bücher vollständig", "Alle Bücher sind vollständig geladen").show(getParentFragmentManager(), "completed");
                     return true;
                 }
-                return false;
+
+                AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, "books").build();
+
+                new Thread(() -> {
+                    BookResolver resolver = new BookResolver();
+                    FileStorage storage = new FileStorage(context.getFilesDir());
+
+                    unresolvedIsbn.forEach(isbn -> {
+                        Book resolved = resolver.resolveBook(isbn, 10);
+
+                        resolved.getCover().ifPresent(drawable ->
+                                storage.saveImage(resolved.getIsbn(), drawable));
+
+                        globalViewModel.updateBook(resolved);
+                        db.bookDao().update(resolved);
+                    });
+
+                    unresolvedImages.forEach(book -> resolver.loadImage(book.getIsbn(), 15)
+                            .ifPresent(drawable -> {
+                                storage.saveImage(book.getIsbn(), drawable);
+                                book.setCover(drawable);
+                                globalViewModel.updateBook(book);
+                            }));
+
+                    activity.runOnUiThread(() ->
+                            Toast.makeText(context, "Reloaded", Toast.LENGTH_SHORT).show());
+                }).start();
+
+
+                return true;
             }
         };
     }
