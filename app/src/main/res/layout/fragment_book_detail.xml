@@ -30,76 +30,14 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-                android:id="@+id/cover"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:contentDescription="@string/bookCover"
-                android:src="@drawable/ruby"
-                android:background="?attr/colorOnSecondary"
-
-                android:layout_marginTop="15dp"
-                app:layout_constraintDimensionRatio="2:3"
-                app:layout_constraintWidth_percent="0.4"
-                app:layout_constraintStart_toStartOf="parent"
+        <include
+                android:id="@+id/include_card"
+                layout="@layout/book_detail_card"
+                android:layout_marginTop="@dimen/parent_spacing"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 app:layout_constraintStart_toEndOf="@id/title"
                 app:layout_constraintTop_toBottomOf="@+id/title" />
-
-        <TextView
-                android:id="@+id/isbnLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginStart="10dp"
-                android:textSize="20sp"
-                app:layout_constraintWidth_percent="0.2"
-                app:layout_constraintStart_toEndOf="@id/cover"
-                android:text="@string/isbn_label"
-                app:layout_constraintTop_toBottomOf="@+id/title" />
-
-        <TextView
-                android:id="@+id/isbn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:textSize="20sp"
-                android:text="@string/isbn_placeholder"
-                android:layout_marginStart="25dp"
-                android:textIsSelectable="true"
-
-                app:layout_constraintTop_toBottomOf="@+id/title"
-                app:layout_constraintStart_toEndOf="@+id/isbnLabel"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-
-        <TextView
-                android:id="@+id/authorLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:layout_marginStart="10dp"
-                android:textSize="20sp"
-                app:layout_constraintWidth_percent="0.2"
-                app:layout_constraintStart_toEndOf="@id/cover"
-                android:text="@string/author_label"
-                app:layout_constraintTop_toBottomOf="@+id/isbnLabel" />
-
-        <TextView
-                android:id="@+id/author"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:textSize="20sp"
-                android:text="@string/author_placeholder"
-                android:ellipsize="end"
-                android:maxLines="9"
-                android:layout_marginTop="5dp"
-                android:layout_marginStart="25dp"
-                android:textIsSelectable="true"
-
-                app:layout_constraintTop_toBottomOf="@+id/isbn"
-                app:layout_constraintStart_toEndOf="@+id/isbnLabel"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="@+id/cover" />
 
         <TextView
                 android:id="@+id/edits"
@@ -107,11 +45,11 @@
                 android:layout_height="wrap_content"
                 android:text="@string/edit_title"
                 android:textSize="22sp"
-                android:layout_marginTop="15dp"
 
                 android:textStyle="bold"
+                android:layout_marginTop="@dimen/parent_spacing"
                 android:textColor="?attr/colorOnSecondary"
-                app:layout_constraintTop_toBottomOf="@+id/cover"
+                app:layout_constraintTop_toBottomOf="@+id/include_card"
                 app:layout_constraintStart_toStartOf="parent" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -120,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/title_label"
                 app:layout_constraintTop_toBottomOf="@+id/edits"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="@dimen/parent_spacing"
                 app:errorEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -136,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/subtitle"
                 app:layout_constraintTop_toBottomOf="@+id/titleLayout"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="@dimen/input_spacing"
                 app:errorEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -152,7 +90,7 @@
                 android:layout_height="wrap_content"
 
                 app:layout_constraintTop_toBottomOf="@+id/subtitleLayout"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="@dimen/input_spacing"
                 app:errorEnabled="true">
 
             <EditText
@@ -171,7 +109,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/author_label_2"
                 app:layout_constraintTop_toBottomOf="@+id/partLayout"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="@dimen/input_spacing"
                 app:errorEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -188,20 +126,9 @@
                 android:layout_height="wrap_content"
                 android:enabled="false"
 
-                android:layout_marginTop="15dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/authorLayout" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:src="@drawable/ic_menu_camera"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                app:tint="?attr/colorOnSecondary"
-                android:id="@+id/floatingActionButton"
-                app:layout_constraintBottom_toBottomOf="@+id/cover"
-                app:layout_constraintEnd_toEndOf="@+id/cover"
-                android:contentDescription="@string/change_picture_btn" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

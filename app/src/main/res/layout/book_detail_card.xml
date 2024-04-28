@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:id="@+id/bookData"
+        android:layout_marginTop="@dimen/parent_spacing">
+
+
+    <ImageView
+            android:id="@+id/cover"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/bookCover"
+            android:src="@drawable/ruby"
+            android:background="?attr/colorOnSecondary"
+
+            app:layout_constraintDimensionRatio="2:3"
+            app:layout_constraintWidth_percent="0.4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:src="@drawable/ic_menu_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            app:tint="?attr/colorOnSecondary"
+            android:id="@+id/floatingActionButton"
+            app:layout_constraintBottom_toBottomOf="@+id/cover"
+            app:layout_constraintEnd_toEndOf="@+id/cover"
+            android:contentDescription="@string/change_picture_btn" />
+
+    <TextView
+            android:id="@+id/isbnLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textSize="20sp"
+            app:layout_constraintWidth_percent="0.2"
+            app:layout_constraintStart_toEndOf="@id/cover"
+            android:text="@string/isbn_label"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+            android:id="@+id/isbn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="@string/isbn_placeholder"
+            android:layout_marginStart="25dp"
+            android:textIsSelectable="true"
+
+            app:layout_constraintStart_toEndOf="@+id/isbnLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+            android:id="@+id/authorLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="10dp"
+            android:textSize="20sp"
+            app:layout_constraintWidth_percent="0.2"
+            app:layout_constraintStart_toEndOf="@id/cover"
+            android:text="@string/author_label"
+            app:layout_constraintTop_toBottomOf="@+id/isbnLabel" />
+
+    <TextView
+            android:id="@+id/author"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="@string/author_placeholder"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="25dp"
+            android:textIsSelectable="true"
+
+            app:layout_constraintTop_toBottomOf="@+id/isbn"
+            app:layout_constraintStart_toEndOf="@+id/isbnLabel"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

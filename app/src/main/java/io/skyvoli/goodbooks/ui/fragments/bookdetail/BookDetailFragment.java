@@ -95,9 +95,9 @@ public class BookDetailFragment extends Fragment {
         requireActivity().addMenuProvider(getMenuProvider(), getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
         final TextView title = binding.title;
-        cover = binding.cover;
-        final TextView isbn = binding.isbn;
-        final TextView author = binding.author;
+        cover = binding.includeCard.cover;
+        final TextView isbn = binding.includeCard.isbn;
+        final TextView author = binding.includeCard.author;
         final TextInputLayout titleLayout = binding.titleLayout;
         final TextInputLayout partLayout = binding.partLayout;
         final TextInputLayout authorLayout = binding.authorLayout;
@@ -105,7 +105,7 @@ public class BookDetailFragment extends Fragment {
         final TextInputEditText editSubtitle = binding.editSubtitle;
         final EditText editPart = binding.editPart;
         final TextInputEditText editAuthor = binding.editAuthor;
-        final FloatingActionButton galleryButton = binding.floatingActionButton;
+        final FloatingActionButton galleryButton = binding.includeCard.floatingActionButton;
         submit = binding.submitChanges;
         originalBook = loadBook();
         copiedBook = originalBook.createClone();
