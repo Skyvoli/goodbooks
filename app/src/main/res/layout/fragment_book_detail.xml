@@ -14,30 +14,14 @@
             android:paddingEnd="@dimen/parent_spacing"
             android:paddingBottom="@dimen/parent_spacing">
 
-        <TextView
-                android:id="@+id/title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="@string/title_placeholder"
-                android:textSize="22sp"
-                android:textIsSelectable="true"
-
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnSecondary"
-                android:layout_marginBottom="10dp"
-
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
         <include
                 android:id="@+id/include_card"
                 layout="@layout/book_detail_card"
-                android:layout_marginTop="@dimen/parent_spacing"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_constraintStart_toEndOf="@id/title"
-                app:layout_constraintTop_toBottomOf="@+id/title" />
+                app:layout_constraintStart_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
                 android:id="@+id/edits"

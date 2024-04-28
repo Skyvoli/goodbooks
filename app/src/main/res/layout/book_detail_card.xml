@@ -4,9 +4,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        android:id="@+id/bookData"
-        android:layout_marginTop="@dimen/parent_spacing">
+        android:id="@+id/bookData">
 
+    <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/title_placeholder"
+            android:textSize="22sp"
+            android:textIsSelectable="true"
+
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSecondary"
+            android:layout_marginBottom="10dp"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
             android:id="@+id/cover"
@@ -15,11 +29,12 @@
             android:contentDescription="@string/bookCover"
             android:src="@drawable/ruby"
             android:background="?attr/colorOnSecondary"
+            android:layout_marginTop="@dimen/parent_spacing"
 
             app:layout_constraintDimensionRatio="2:3"
             app:layout_constraintWidth_percent="0.4"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/title" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:src="@drawable/ic_menu_camera"
@@ -38,10 +53,11 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:textSize="20sp"
+            android:layout_marginTop="@dimen/parent_spacing"
             app:layout_constraintWidth_percent="0.2"
             app:layout_constraintStart_toEndOf="@id/cover"
             android:text="@string/isbn_label"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/title" />
 
     <TextView
             android:id="@+id/isbn"
@@ -49,12 +65,13 @@
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:text="@string/isbn_placeholder"
+            android:layout_marginTop="@dimen/parent_spacing"
             android:layout_marginStart="25dp"
             android:textIsSelectable="true"
 
             app:layout_constraintStart_toEndOf="@+id/isbnLabel"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/title" />
 
 
     <TextView
