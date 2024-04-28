@@ -31,4 +31,7 @@
     <string name="change_picture_btn">Change picture</string>
     <string name="subtitle">Buchtitel</string>
     <string name="reload_uncompleted">Unvollständige Bücher laden</string>
+    <string name="no_scanned_placeholder">Kein Buch eingescannt</string>
+    <string name="book_already_in_list">Buch ist in der Liste</string>
+    <string name="new_book">Neues Buch</string>
 </resources>

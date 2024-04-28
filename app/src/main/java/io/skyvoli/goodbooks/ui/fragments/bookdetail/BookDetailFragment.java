@@ -87,14 +87,13 @@ public class BookDetailFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //TODO Color palette
         binding = FragmentBookDetailBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         globalController = new GlobalController(requireActivity());
         requireActivity().addMenuProvider(getMenuProvider(), getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
-        final TextView title = binding.title;
+        final TextView title = binding.includeCard.title;
         cover = binding.includeCard.cover;
         final TextView isbn = binding.includeCard.isbn;
         final TextView author = binding.includeCard.author;
@@ -210,7 +209,7 @@ public class BookDetailFragment extends Fragment {
         String isbn = Optional.ofNullable(getArguments().getString("isbn"))
                 .orElseThrow(() -> new IllegalStateException("Missing argument isbn"));
 
-        return globalController.getBook(isbn);
+        return globalController.getBook(isbn).orElseThrow(() -> new IllegalStateException("Missing book"));
     }
 
     private View.OnFocusChangeListener getTitleListener(TextInputEditText editTitle, TextInputLayout titleLayout) {

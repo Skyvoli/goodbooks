@@ -25,27 +25,31 @@ import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanIntentResult;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.global.GlobalController;
+import io.skyvoli.goodbooks.helper.TitleBuilder;
 import io.skyvoli.goodbooks.helper.listener.ScanListener;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.web.BookResolver;
 
 public class CameraFragment extends Fragment {
 
-    private final String logTag = this.getClass().getSimpleName();
     private FragmentCameraBinding binding;
     private CameraViewModel cameraViewModel;
     private ProgressBar progressBar;
     private ConstraintLayout constraintLayout;
     private TextView title;
+    private TextView isbnText;
     private TextView author;
     private ImageView cover;
     private GlobalController globalController;
+    private TextView information;
+    private Button addBookBtn;
     private Book scannedBook;
 
     @Override
@@ -59,22 +63,23 @@ public class CameraFragment extends Fragment {
         binding = FragmentCameraBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final TextView textView = binding.textContent;
+        binding.bookPreview.floatingActionButton.setVisibility(View.GONE);
 
-        constraintLayout = binding.bookData;
-        title = binding.title;
-        author = binding.author;
-        cover = binding.cover;
+        constraintLayout = binding.bookPreview.bookData;
+        title = binding.bookPreview.title;
+        isbnText = binding.bookPreview.isbn;
+        author = binding.bookPreview.author;
+        cover = binding.bookPreview.cover;
+        information = binding.information;
         progressBar = binding.progressBar;
 
         constraintLayout.setVisibility(View.INVISIBLE);
 
-        cameraViewModel.getIsbn().observe(getViewLifecycleOwner(), textView::setText);
-
         final Button scanBtn = binding.scanBtn;
-        final Button addBookBtn = binding.addBookBtn;
+        addBookBtn = binding.addBookBtn;
         scanBtn.setOnClickListener(new ScanListener(barcodeLauncher));
         addBookBtn.setOnClickListener(this::addBook);
+        addBookBtn.setEnabled(false);
 
         return root;
     }
@@ -95,13 +100,17 @@ public class CameraFragment extends Fragment {
             return;
         }
 
-        if (globalController.hasBook(isbn)) {
-            new InformationDialog("Duplikat", "Dieses Buch ist bereits vorhanden")
-                    .show(getParentFragmentManager(), "Duplikat");
+        Optional<Book> dupe = globalController.getBook(isbn);
+
+        if (dupe.isPresent()) {
+            scannedBook = dupe.get();
+            refreshBook(requireContext(), true);
+            constraintLayout.setVisibility(View.VISIBLE);
             return;
         }
 
         progressBar.setVisibility(View.VISIBLE);
+        constraintLayout.setVisibility(View.INVISIBLE);
 
         new Thread(() -> {
             Context context = requireContext();
@@ -110,18 +119,9 @@ public class CameraFragment extends Fragment {
             if (!isAdded()) {
                 return;
             }
-
-
-            Optional<Drawable> drawable = scannedBook.getCover();
             requireActivity().runOnUiThread(() -> {
-                title.setText(scannedBook.getTitle());
-                author.setText(scannedBook.getAuthor());
-                if (drawable.isPresent()) {
-                    cover.setImageDrawable(drawable.get());
-                } else {
-                    //Default
-                    cover.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ruby));
-                }
+                addBookBtn.setEnabled(true);
+                refreshBook(context, false);
                 constraintLayout.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
             });
@@ -129,12 +129,51 @@ public class CameraFragment extends Fragment {
 
     }
 
+    private void setCover(Drawable drawable) {
+        ((ConstraintLayout.LayoutParams) cover.getLayoutParams()).dimensionRatio
+                = String.valueOf(getRatio(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
+        cover.setImageDrawable(drawable);
+    }
+
+    private float getRatio(int width, int height) {
+        if (height != 0) {
+            return (float) width / height;
+        } else {
+            return 2.3f; // Handle divide by zero case
+        }
+    }
+
     private void addBook(View v) {
+        addBookBtn.setEnabled(false);
         if (scannedBook == null) {
             Toast.makeText(requireContext(), "Book is null", Toast.LENGTH_SHORT).show();
             return;
         }
         new Thread(() -> globalController.addBook(scannedBook, requireContext())).start();
+
+        information.setText(R.string.book_already_in_list);
+
+        new InformationDialog("Hinzugefügt", "Das Buch wurde zur Liste hinzugefügt")
+                .show(getParentFragmentManager(), "added");
+    }
+
+    private void refreshBook(Context context, boolean isAlreadyInList) {
+        title.setText(TitleBuilder.buildWholeTitle(scannedBook.getTitle(), scannedBook.getSubtitle(), scannedBook.getPart()));
+        isbnText.setText(scannedBook.getIsbn());
+        author.setText(scannedBook.getAuthor());
+        Optional<Drawable> drawable = scannedBook.getCover();
+        if (drawable.isPresent()) {
+            setCover(drawable.get());
+        } else {
+            //Default
+            setCover(Objects.requireNonNull(ContextCompat.getDrawable(context, R.drawable.ruby)));
+        }
+
+        if (isAlreadyInList) {
+            information.setText(R.string.book_already_in_list);
+        } else {
+            information.setText(R.string.new_book);
+        }
     }
 
     private void handleCanceledScan(ScanIntentResult result) {

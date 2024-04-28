@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import java.util.List;
+import java.util.Optional;
 
 import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
@@ -56,11 +57,10 @@ public class GlobalController {
         new FileStorage(context.getFilesDir()).deleteImage(book.getIsbn());
     }
 
-    public Book getBook(String isbn) {
+    public Optional<Book> getBook(String isbn) {
         return globalViewModel.getBooks().stream()
                 .filter(el -> el.sameIsbn(isbn))
-                .findAny()
-                .orElse(new Book("Not found"));
+                .findAny();
     }
 
     public ObservableList<Book> getBooks() {
