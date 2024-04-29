@@ -47,33 +47,33 @@
             android:id="@+id/scanBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:backgroundTint="?attr/colorSecondary"
             android:layout_gravity="center"
-            android:layout_marginTop="@dimen/parent_spacing"
             android:text="@string/scan"
+            android:layout_marginTop="@dimen/parent_spacing"
+            android:layout_marginEnd="@dimen/parent_spacing"
 
-
-            app:layout_constraintTop_toBottomOf="@+id/border2"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toStartOf="@+id/addBookBtn"
+            app:layout_constraintTop_toBottomOf="@+id/information" />
 
     <Button
-            android:text="Buch hinzufügen"
+            android:text="Hinzufügen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/parent_spacing"
             android:id="@+id/addBookBtn"
+            android:backgroundTint="?attr/colorPrimaryVariant"
+            android:layout_marginTop="@dimen/parent_spacing"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/scanBtn" />
+            app:layout_constraintTop_toBottomOf="@+id/information" />
 
     <TextView
             android:text="@string/no_scanned_placeholder"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/information"
             android:textSize="20sp"
             android:layout_marginTop="@dimen/parent_spacing"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/border2" />
+            app:layout_constraintTop_toBottomOf="@+id/border2"
+            app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
