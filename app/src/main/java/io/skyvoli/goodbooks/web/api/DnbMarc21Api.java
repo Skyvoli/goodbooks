@@ -8,6 +8,8 @@ import org.jsoup.nodes.Element;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.web.RequestHandler;
@@ -127,7 +129,18 @@ public class DnbMarc21Api implements BookApi {
         if (value == null) {
             return null;
         }
-        return value.replace("˜Derœ", "Der").replace("˜Dieœ", "Die");
+
+        Pattern pattern = Pattern.compile("˜[a-zA-Z]{3}œ");
+        Matcher matcher = pattern.matcher(value);
+
+        if (matcher.find()) {
+            int start = matcher.start();
+            return new StringBuilder(value)
+                    .deleteCharAt(start)
+                    .deleteCharAt(start + 3)
+                    .toString();
+        }
+        return value;
     }
 
     private String formatAuthors(String authors) {
