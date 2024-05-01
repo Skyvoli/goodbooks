@@ -29,6 +29,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
+import io.skyvoli.goodbooks.databinding.BookDetailCardBinding;
 import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.global.GlobalController;
@@ -43,14 +44,10 @@ public class CameraFragment extends Fragment {
     private CameraViewModel cameraViewModel;
     private ProgressBar progressBar;
     private ConstraintLayout constraintLayout;
-    private TextView title;
-    private TextView isbnText;
-    private TextView author;
-    private ImageView cover;
     private GlobalController globalController;
     private TextView information;
-    private Button addBookBtn;
     private Book scannedBook;
+    private BookDetailCardBinding bookPreview;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,19 +63,17 @@ public class CameraFragment extends Fragment {
         binding.bookPreview.floatingActionButton.setVisibility(View.GONE);
 
         constraintLayout = binding.bookPreview.bookData;
-        title = binding.bookPreview.title;
-        isbnText = binding.bookPreview.isbn;
-        author = binding.bookPreview.author;
-        cover = binding.bookPreview.cover;
+        bookPreview = binding.bookPreview;
         information = binding.information;
         progressBar = binding.progressBar;
 
         constraintLayout.setVisibility(View.INVISIBLE);
 
         final Button scanBtn = binding.scanBtn;
-        addBookBtn = binding.addBookBtn;
         scanBtn.setOnClickListener(new ScanListener(barcodeLauncher));
-        addBookBtn.setOnClickListener(this::addBook);
+
+        binding.addBookBtn.setOnClickListener(this::addBook);
+        cameraViewModel.getIsNewBook().observe(getViewLifecycleOwner(), isNew -> binding.addBookBtn.setEnabled(isNew));
 
         return root;
     }
@@ -91,7 +86,7 @@ public class CameraFragment extends Fragment {
         }
 
         String isbn = result.getContents();
-        cameraViewModel.setIsbn(isbn);
+        //cameraViewModel.setIsbn(isbn);
 
         if (!isbnIsBook(isbn)) {
             new InformationDialog("418", "Ich bin kein Buch.")
@@ -119,7 +114,6 @@ public class CameraFragment extends Fragment {
                 return;
             }
             requireActivity().runOnUiThread(() -> {
-                addBookBtn.setEnabled(true);
                 refreshBook(context, false);
                 constraintLayout.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
@@ -129,6 +123,7 @@ public class CameraFragment extends Fragment {
     }
 
     private void setCover(Drawable drawable) {
+        ImageView cover = bookPreview.cover;
         ((ConstraintLayout.LayoutParams) cover.getLayoutParams()).dimensionRatio
                 = String.valueOf(getRatio(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
         cover.setImageDrawable(drawable);
@@ -143,7 +138,7 @@ public class CameraFragment extends Fragment {
     }
 
     private void addBook(View v) {
-        addBookBtn.setEnabled(false);
+        cameraViewModel.setIsNewBook(false);
         if (scannedBook == null) {
             Toast.makeText(requireContext(), "Book is null", Toast.LENGTH_SHORT).show();
             return;
@@ -157,9 +152,9 @@ public class CameraFragment extends Fragment {
     }
 
     private void refreshBook(Context context, boolean isAlreadyInList) {
-        title.setText(TitleBuilder.buildWholeTitle(scannedBook.getTitle(), scannedBook.getSubtitle(), scannedBook.getPart()));
-        isbnText.setText(scannedBook.getIsbn());
-        author.setText(scannedBook.getAuthor());
+        bookPreview.title.setText(TitleBuilder.buildWholeTitle(scannedBook.getTitle(), scannedBook.getSubtitle(), scannedBook.getPart()));
+        bookPreview.isbn.setText(scannedBook.getIsbn());
+        bookPreview.author.setText(scannedBook.getAuthor());
         Optional<Drawable> drawable = scannedBook.getCover();
         if (drawable.isPresent()) {
             setCover(drawable.get());
@@ -168,7 +163,7 @@ public class CameraFragment extends Fragment {
             setCover(Objects.requireNonNull(ContextCompat.getDrawable(context, R.drawable.ruby)));
         }
 
-        addBookBtn.setEnabled(!isAlreadyInList);
+        cameraViewModel.setIsNewBook(!isAlreadyInList);
         if (isAlreadyInList) {
             information.setText(R.string.book_already_in_list);
 

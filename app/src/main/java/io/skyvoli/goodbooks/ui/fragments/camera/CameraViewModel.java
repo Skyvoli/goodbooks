@@ -7,9 +7,11 @@ import androidx.lifecycle.ViewModel;
 public class CameraViewModel extends ViewModel {
 
     private final MutableLiveData<String> isbn;
+    private final MutableLiveData<Boolean> isNewBook;
 
     public CameraViewModel() {
         isbn = new MutableLiveData<>();
+        isNewBook = new MutableLiveData<>(false);
     }
 
     public LiveData<String> getIsbn() {
@@ -18,5 +20,13 @@ public class CameraViewModel extends ViewModel {
 
     public void setIsbn(String text) {
         isbn.setValue(text);
+    }
+
+    public MutableLiveData<Boolean> getIsNewBook() {
+        return isNewBook;
+    }
+
+    public void setIsNewBook(boolean value) {
+        isNewBook.setValue(value);
     }
 }
