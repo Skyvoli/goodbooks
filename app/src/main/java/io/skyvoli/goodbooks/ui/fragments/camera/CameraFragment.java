@@ -79,7 +79,6 @@ public class CameraFragment extends Fragment {
         addBookBtn = binding.addBookBtn;
         scanBtn.setOnClickListener(new ScanListener(barcodeLauncher));
         addBookBtn.setOnClickListener(this::addBook);
-        addBookBtn.setEnabled(false);
 
         return root;
     }
@@ -169,8 +168,10 @@ public class CameraFragment extends Fragment {
             setCover(Objects.requireNonNull(ContextCompat.getDrawable(context, R.drawable.ruby)));
         }
 
+        addBookBtn.setEnabled(!isAlreadyInList);
         if (isAlreadyInList) {
             information.setText(R.string.book_already_in_list);
+
         } else {
             information.setText(R.string.new_book);
         }
