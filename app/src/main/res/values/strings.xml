@@ -34,4 +34,5 @@
     <string name="no_scanned_placeholder">Kein Buch eingescannt</string>
     <string name="book_already_in_list">Buch ist in der Liste</string>
     <string name="new_book">Neues Buch</string>
+    <string name="add_book">Hinzufügen</string>
 </resources>

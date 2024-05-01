@@ -56,18 +56,18 @@
             app:layout_constraintTop_toBottomOf="@+id/information" />
 
     <Button
-            android:text="Hinzufügen"
+            android:text="@string/add_book"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/addBookBtn"
-            android:backgroundTint="?attr/colorPrimaryVariant"
+            android:enabled="false"
             android:layout_marginTop="@dimen/parent_spacing"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/information" />
 
     <TextView
             android:text="@string/no_scanned_placeholder"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/information"
             android:textSize="20sp"
