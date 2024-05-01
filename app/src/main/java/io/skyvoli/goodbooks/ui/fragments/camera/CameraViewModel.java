@@ -1,25 +1,19 @@
 package io.skyvoli.goodbooks.ui.fragments.camera;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class CameraViewModel extends ViewModel {
+import io.skyvoli.goodbooks.storage.database.dto.Book;
 
-    private final MutableLiveData<String> isbn;
+public class CameraViewModel extends ViewModel {
+    private final MutableLiveData<Book> book;
     private final MutableLiveData<Boolean> isNewBook;
+    private final MutableLiveData<Boolean> showBook;
 
     public CameraViewModel() {
-        isbn = new MutableLiveData<>();
-        isNewBook = new MutableLiveData<>(false);
-    }
-
-    public LiveData<String> getIsbn() {
-        return isbn;
-    }
-
-    public void setIsbn(String text) {
-        isbn.setValue(text);
+        book = new MutableLiveData<>();
+        isNewBook = new MutableLiveData<>();
+        showBook = new MutableLiveData<>(true);
     }
 
     public MutableLiveData<Boolean> getIsNewBook() {
@@ -28,5 +22,21 @@ public class CameraViewModel extends ViewModel {
 
     public void setIsNewBook(boolean value) {
         isNewBook.setValue(value);
+    }
+
+    public MutableLiveData<Book> getBook() {
+        return book;
+    }
+
+    public void setBook(Book book) {
+        this.book.setValue(book);
+    }
+
+    public MutableLiveData<Boolean> getShowBook() {
+        return showBook;
+    }
+
+    public void setShowBook(boolean value) {
+        showBook.setValue(value);
     }
 }

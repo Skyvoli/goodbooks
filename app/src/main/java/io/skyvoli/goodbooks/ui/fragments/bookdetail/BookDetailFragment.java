@@ -45,6 +45,7 @@ import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
 import io.skyvoli.goodbooks.dialog.OnlyPositiveListener;
 import io.skyvoli.goodbooks.dialog.PermissionDialog;
 import io.skyvoli.goodbooks.global.GlobalController;
+import io.skyvoli.goodbooks.helper.DimensionCalculator;
 import io.skyvoli.goodbooks.helper.TitleBuilder;
 import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
@@ -160,16 +161,8 @@ public class BookDetailFragment extends Fragment {
 
     private void setCover(Drawable drawable) {
         ((ConstraintLayout.LayoutParams) cover.getLayoutParams()).dimensionRatio
-                = String.valueOf(getRatio(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
+                = DimensionCalculator.getRatio(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
         cover.setImageDrawable(drawable);
-    }
-
-    private float getRatio(int width, int height) {
-        if (height != 0) {
-            return (float) width / height;
-        } else {
-            return 2.3f; // Handle divide by zero case
-        }
     }
 
     private MenuProvider getMenuProvider() {
