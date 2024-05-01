@@ -1,19 +1,16 @@
 package io.skyvoli.goodbooks.ui.fragments.camera;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
@@ -23,7 +20,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.zxing.client.android.Intents;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanIntentResult;
-import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -33,6 +29,7 @@ import io.skyvoli.goodbooks.databinding.BookDetailCardBinding;
 import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.global.GlobalController;
+import io.skyvoli.goodbooks.helper.DimensionCalculator;
 import io.skyvoli.goodbooks.helper.TitleBuilder;
 import io.skyvoli.goodbooks.helper.listener.ScanListener;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
@@ -42,19 +39,11 @@ public class CameraFragment extends Fragment {
 
     private FragmentCameraBinding binding;
     private CameraViewModel cameraViewModel;
-    private ProgressBar progressBar;
-    private ConstraintLayout constraintLayout;
     private GlobalController globalController;
-    private TextView information;
-    private Book scannedBook;
-    private BookDetailCardBinding bookPreview;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         cameraViewModel = new ViewModelProvider(this).get(CameraViewModel.class);
-        ActivityResultLauncher<ScanOptions> barcodeLauncher = registerForActivityResult(new ScanContract(),
-                this::onScanResult);
-
         globalController = new GlobalController(requireActivity());
 
         binding = FragmentCameraBinding.inflate(inflater, container, false);
@@ -62,22 +51,18 @@ public class CameraFragment extends Fragment {
 
         binding.bookPreview.floatingActionButton.setVisibility(View.GONE);
 
-        constraintLayout = binding.bookPreview.bookData;
-        bookPreview = binding.bookPreview;
-        information = binding.information;
-        progressBar = binding.progressBar;
+        binding.scanBtn.setOnClickListener(new ScanListener(
+                registerForActivityResult(new ScanContract(),
+                        this::onScanResult)));
 
-        constraintLayout.setVisibility(View.INVISIBLE);
-
-        final Button scanBtn = binding.scanBtn;
-        scanBtn.setOnClickListener(new ScanListener(barcodeLauncher));
+        cameraViewModel.getBook().observe(getViewLifecycleOwner(), book -> setBookView(book, binding.bookPreview));
+        cameraViewModel.getShowBook().observe(getViewLifecycleOwner(), showBook -> showBook(showBook, binding.bookPreview.bookData, binding.progressBar));
 
         binding.addBookBtn.setOnClickListener(this::addBook);
-        cameraViewModel.getIsNewBook().observe(getViewLifecycleOwner(), isNew -> binding.addBookBtn.setEnabled(isNew));
+        cameraViewModel.getIsNewBook().observe(getViewLifecycleOwner(), isNew -> setInformationText(isNew, binding.information));
 
         return root;
     }
-
 
     private void onScanResult(ScanIntentResult result) {
         if (result.getContents() == null) {
@@ -86,7 +71,6 @@ public class CameraFragment extends Fragment {
         }
 
         String isbn = result.getContents();
-        //cameraViewModel.setIsbn(isbn);
 
         if (!isbnIsBook(isbn)) {
             new InformationDialog("418", "Ich bin kein Buch.")
@@ -94,82 +78,87 @@ public class CameraFragment extends Fragment {
             return;
         }
 
-        Optional<Book> dupe = globalController.getBook(isbn);
+        Optional<Book> found = globalController.getBook(isbn);
 
-        if (dupe.isPresent()) {
-            scannedBook = dupe.get();
-            refreshBook(requireContext(), true);
-            constraintLayout.setVisibility(View.VISIBLE);
+        if (found.isPresent()) {
+            cameraViewModel.setBook(found.get());
+            cameraViewModel.setIsNewBook(false);
             return;
         }
 
-        progressBar.setVisibility(View.VISIBLE);
-        constraintLayout.setVisibility(View.INVISIBLE);
+        cameraViewModel.setShowBook(false);
 
         new Thread(() -> {
-            Context context = requireContext();
-            scannedBook = new BookResolver().resolveBook(isbn, 10);
+            Book scanedBook = new BookResolver().resolveBook(isbn, 10);
 
             if (!isAdded()) {
                 return;
             }
             requireActivity().runOnUiThread(() -> {
-                refreshBook(context, false);
-                constraintLayout.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
+                cameraViewModel.setIsNewBook(true);
+                cameraViewModel.setBook(scanedBook);
+                cameraViewModel.setShowBook(true);
             });
         }).start();
 
     }
 
-    private void setCover(Drawable drawable) {
-        ImageView cover = bookPreview.cover;
-        ((ConstraintLayout.LayoutParams) cover.getLayoutParams()).dimensionRatio
-                = String.valueOf(getRatio(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()));
-        cover.setImageDrawable(drawable);
+    private void setInformationText(Boolean isNew, TextView information) {
+
+        if (isNew == null) {
+            information.setText(R.string.no_scanned_placeholder);
+            binding.addBookBtn.setEnabled(false);
+            return;
+        }
+
+        binding.addBookBtn.setEnabled(isNew);
+        if (isNew) {
+            information.setText(R.string.new_book);
+        } else {
+            information.setText(R.string.book_already_in_list);
+        }
     }
 
-    private float getRatio(int width, int height) {
-        if (height != 0) {
-            return (float) width / height;
-        } else {
-            return 2.3f; // Handle divide by zero case
+    private void showBook(Boolean showBook, ConstraintLayout constraintLayout, ProgressBar progressBar) {
+        if (showBook == null) {
+            throw new NullPointerException();
         }
+        if (showBook) {
+            constraintLayout.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+        } else {
+            constraintLayout.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setBookView(Book book, BookDetailCardBinding bookPreview) {
+        bookPreview.title.setText(TitleBuilder.buildWholeTitle(book.getTitle(), book.getSubtitle(), book.getPart()));
+        bookPreview.isbn.setText(book.getIsbn());
+        bookPreview.author.setText(book.getAuthor());
+        Optional<Drawable> drawable = book.getCover();
+        if (drawable.isPresent()) {
+            setCover(drawable.get(), bookPreview);
+        } else {
+            setCover(Objects.requireNonNull(ContextCompat.getDrawable(requireContext(), R.drawable.ruby)), bookPreview);
+        }
+    }
+
+    private void setCover(Drawable drawable, BookDetailCardBinding bookPreview) {
+        ImageView cover = bookPreview.cover;
+        ((ConstraintLayout.LayoutParams) cover.getLayoutParams()).dimensionRatio
+                = DimensionCalculator.getRatio(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        cover.setImageDrawable(drawable);
     }
 
     private void addBook(View v) {
         cameraViewModel.setIsNewBook(false);
-        if (scannedBook == null) {
-            Toast.makeText(requireContext(), "Book is null", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        new Thread(() -> globalController.addBook(scannedBook, requireContext())).start();
+        Book bookToAdd = cameraViewModel.getBook().getValue();
 
-        information.setText(R.string.book_already_in_list);
+        new Thread(() -> globalController.addBook(bookToAdd, requireContext())).start();
 
         new InformationDialog("Hinzugefügt", "Das Buch wurde zur Liste hinzugefügt")
                 .show(getParentFragmentManager(), "added");
-    }
-
-    private void refreshBook(Context context, boolean isAlreadyInList) {
-        bookPreview.title.setText(TitleBuilder.buildWholeTitle(scannedBook.getTitle(), scannedBook.getSubtitle(), scannedBook.getPart()));
-        bookPreview.isbn.setText(scannedBook.getIsbn());
-        bookPreview.author.setText(scannedBook.getAuthor());
-        Optional<Drawable> drawable = scannedBook.getCover();
-        if (drawable.isPresent()) {
-            setCover(drawable.get());
-        } else {
-            //Default
-            setCover(Objects.requireNonNull(ContextCompat.getDrawable(context, R.drawable.ruby)));
-        }
-
-        cameraViewModel.setIsNewBook(!isAlreadyInList);
-        if (isAlreadyInList) {
-            information.setText(R.string.book_already_in_list);
-
-        } else {
-            information.setText(R.string.new_book);
-        }
     }
 
     private void handleCanceledScan(ScanIntentResult result) {
