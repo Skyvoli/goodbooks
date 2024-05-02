@@ -1,61 +1,54 @@
 package io.skyvoli.goodbooks.ui.fragments.series;
 
+import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.Optional;
 
-import io.skyvoli.goodbooks.databinding.FragmentSeriesBinding;
-import io.skyvoli.goodbooks.ui.fragments.series.PlaceholderContent.PlaceholderItem;
+import io.skyvoli.goodbooks.R;
+import io.skyvoli.goodbooks.storage.database.dto.Book;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link PlaceholderItem}.
- * TODO: Replace the implementation with code for your data type.
- */
-public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder> {
+public class SeriesAdapter extends RecyclerView.Adapter<SeriesViewHolder> {
 
-    private final List<PlaceholderItem> mValues;
+    private final List<Book> series;
 
-    public SeriesAdapter(List<PlaceholderItem> items) {
-        mValues = items;
+    private Context context;
+
+    public SeriesAdapter(List<Book> items) {
+        series = items;
+    }
+
+    @NonNull
+    @Override
+    public SeriesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View photoView = inflater.inflate(R.layout.series_card, parent, false);
+        return new SeriesViewHolder(photoView);
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-        return new ViewHolder(FragmentSeriesBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-
-    }
-
-    @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+    public void onBindViewHolder(@NonNull final SeriesViewHolder holder, int position) {
+        Book book = series.get(position);
+        Optional<Drawable> cover = book.getCover();
+        if (cover.isPresent()) {
+            holder.setCover(cover.get());
+        } else {
+            //Default
+            holder.setCover(ContextCompat.getDrawable(context, R.drawable.ruby));
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public PlaceholderItem mItem;
-
-        public ViewHolder(FragmentSeriesBinding binding) {
-            super(binding.getRoot());
-            mIdView = binding.itemNumber;
-            mContentView = binding.content;
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
-        }
+        return series.size();
     }
 }
