@@ -10,4 +10,5 @@
     <dimen name="parent_spacing">15dp</dimen>
     <dimen name="bookCardTextSize">16sp</dimen>
     <dimen name="input_spacing">5dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>
