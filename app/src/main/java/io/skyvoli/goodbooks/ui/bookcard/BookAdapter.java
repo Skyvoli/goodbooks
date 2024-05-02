@@ -1,22 +1,17 @@
 package io.skyvoli.goodbooks.ui.bookcard;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
-import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
+import io.skyvoli.goodbooks.helper.ImageLoader;
 import io.skyvoli.goodbooks.helper.TitleBuilder;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 
@@ -41,25 +36,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = books.get(position);
-
         holder.setTitle(TitleBuilder.buildWholeTitle(book.getTitle(), book.getSubtitle(), book.getPart()));
         holder.setIsbn(book.getIsbn());
         holder.setAuthor(book.getAuthor());
-        Optional<Drawable> cover = book.getCover();
-        if (cover.isPresent()) {
-            holder.setCover(cover.get());
-        } else {
-            //Default
-            holder.setCover(ContextCompat.getDrawable(context, R.drawable.ruby));
-        }
-
-        //TODO Outside
-        holder.setListener(v -> {
-            NavController navController = Navigation.findNavController(v);
-            Bundle bundle = new Bundle();
-            bundle.putString("isbn", book.getIsbn());
-            navController.navigate(R.id.to_detail, bundle);
-        });
+        ImageLoader.load(context, book.getNullableCover(), holder.getCover());
     }
 
     @Override

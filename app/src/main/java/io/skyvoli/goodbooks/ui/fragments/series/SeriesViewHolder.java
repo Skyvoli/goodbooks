@@ -1,6 +1,5 @@
 package io.skyvoli.goodbooks.ui.fragments.series;
 
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -18,7 +17,7 @@ public class SeriesViewHolder extends RecyclerView.ViewHolder {
         cover = itemView.findViewById(R.id.cover);
     }
 
-    public void setCover(Drawable cover) {
-        this.cover.setImageDrawable(cover);
+    public ImageView getCover() {
+        return cover;
     }
 }

@@ -1,19 +1,17 @@
 package io.skyvoli.goodbooks.ui.fragments.series;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
-import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
+import io.skyvoli.goodbooks.helper.ImageLoader;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class SeriesAdapter extends RecyclerView.Adapter<SeriesViewHolder> {
@@ -37,14 +35,7 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final SeriesViewHolder holder, int position) {
-        Book book = series.get(position);
-        Optional<Drawable> cover = book.getCover();
-        if (cover.isPresent()) {
-            holder.setCover(cover.get());
-        } else {
-            //Default
-            holder.setCover(ContextCompat.getDrawable(context, R.drawable.ruby));
-        }
+        ImageLoader.load(context, series.get(position).getNullableCover(), holder.getCover());
     }
 
     @Override
