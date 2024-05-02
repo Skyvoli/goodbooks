@@ -17,7 +17,7 @@ public class ImageLoader {
     public static void load(Context context, Drawable cover, ImageView imageView) {
         Glide.with(context)
                 .load(cover)
-                .placeholder(R.drawable.ruby)
+                .fallback(R.drawable.ruby)
                 .into(imageView);
     }
 }

@@ -13,6 +13,7 @@ import java.util.Optional;
 import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
+import io.skyvoli.goodbooks.ui.fragments.series.Series;
 
 public class GlobalController {
 
@@ -29,7 +30,17 @@ public class GlobalController {
                 .bookDao().getAll();
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
         books.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
-        globalViewModel.setList(books);
+        globalViewModel.setBooks(books);
+
+        List<Series> seriesList = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build()
+                .bookDao().getSeries();
+
+        seriesList.forEach(series -> series.setCover(books.stream().filter(
+                book -> book.getTitle().equalsIgnoreCase(series.getTitle())
+        ).findFirst().orElse(new Book("")).getNullableCover()));
+
+        globalViewModel.setSeries(seriesList);
+
     }
 
     public void addBook(Book book, Context context) {
@@ -67,8 +78,8 @@ public class GlobalController {
         return globalViewModel.getBooks();
     }
 
-    public boolean hasBook(String isbn) {
-        return globalViewModel.hasBook(isbn);
+    public ObservableList<Series> getSeries() {
+        return globalViewModel.getSeries();
     }
 
     public void sort() {

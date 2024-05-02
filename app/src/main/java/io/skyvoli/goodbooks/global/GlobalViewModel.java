@@ -10,17 +10,24 @@ import java.util.List;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.storage.database.dto.Book;
+import io.skyvoli.goodbooks.ui.fragments.series.Series;
 
 public class GlobalViewModel extends ViewModel {
 
     private ObservableList<Book> books;
+    private ObservableList<Series> series;
 
     protected GlobalViewModel() {
         books = new ObservableArrayList<>();
+        series = new ObservableArrayList<>();
     }
 
     protected ObservableList<Book> getBooks() {
         return books;
+    }
+
+    protected ObservableList<Series> getSeries() {
+        return series;
     }
 
     protected void addBook(Book book) {
@@ -40,9 +47,14 @@ public class GlobalViewModel extends ViewModel {
         books.set(books.indexOf(found.get()), newBook);
     }
 
-    protected void setList(List<Book> books) {
+    protected void setBooks(List<Book> books) {
         this.books = new ObservableArrayList<>();
         this.books.addAll(books);
+    }
+
+    protected void setSeries(List<Series> series) {
+        this.series = new ObservableArrayList<>();
+        this.series.addAll(series);
     }
 
     protected boolean hasBook(String isbn) {
