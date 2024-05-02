@@ -34,7 +34,11 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final SeriesViewHolder holder, int position) {
-        ImageLoader.load(context, series.get(position).getCover(), holder.getCover());
+        Series series = this.series.get(position);
+        ImageLoader.load(context, series.getCover(), holder.getCover());
+
+        holder.setMultiple(series.getCountedBooks() > 1);
+
     }
 
     @Override
