@@ -33,4 +33,10 @@
             android:id="@+id/nav_book_detail"
             android:name="io.skyvoli.goodbooks.ui.fragments.bookdetail.BookDetailFragment" />
 
+    <fragment
+            android:id="@+id/nav_series"
+            android:name="io.skyvoli.goodbooks.ui.fragments.series.SeriesFragment"
+            android:label="Series"
+            tools:layout="@layout/fragment_series" />
+
 </navigation>
