@@ -3,6 +3,7 @@ package io.skyvoli.goodbooks.storage.database.dto;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -109,6 +110,10 @@ public class Book {
 
     public Optional<Drawable> getCover() {
         return Optional.ofNullable(cover);
+    }
+
+    public @Nullable Drawable getNullableCover() {
+        return cover;
     }
 
     public void setCover(Drawable cover) {

@@ -14,6 +14,7 @@ val junitVersion = "4.13.2"
 val roomVersion = "2.6.1"
 val databinding = "8.3.2"
 val swipeVersion = "1.2.0-alpha01"
+val glideVersion = "4.11.0"
 
 dependencies {
 
@@ -40,7 +41,9 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment:$navigationVersion")
     implementation("androidx.navigation:navigation-ui:$navigationVersion")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:$swipeVersion")
+    implementation("com.github.bumptech.glide:glide:$glideVersion")
 
+    annotationProcessor("com.github.bumptech.glide:compiler:$glideVersion")
     annotationProcessor("androidx.room:room-compiler:$roomVersion")
     annotationProcessor("androidx.room:room-compiler:$roomVersion")
     annotationProcessor("androidx.room:room-compiler:$roomVersion")
