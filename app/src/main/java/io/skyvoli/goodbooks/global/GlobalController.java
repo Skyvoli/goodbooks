@@ -25,7 +25,7 @@ public class GlobalController {
         globalViewModel = new ViewModelProvider(activity).get(GlobalViewModel.class);
     }
 
-    public void setListWithDataFromDatabase(Context context) {
+    public void setListsWithDataFromDatabase(Context context) {
         List<Book> books = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build()
                 .bookDao().getAll();
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
