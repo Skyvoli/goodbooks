@@ -53,6 +53,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
             holder.setCover(ContextCompat.getDrawable(context, R.drawable.ruby));
         }
 
+        //TODO Outside
         holder.setListener(v -> {
             NavController navController = Navigation.findNavController(v);
             Bundle bundle = new Bundle();
