@@ -5,6 +5,30 @@
         android:layout_height="wrap_content"
         android:id="@+id/series">
 
+    <View
+            android:id="@+id/multiple_books"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="?attr/colorOnSecondary"
+            android:layout_marginBottom="2dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            app:layout_constraintBottom_toTopOf="@id/multiple_books_2"
+            app:layout_constraintStart_toStartOf="@+id/multiple_books_2"
+            app:layout_constraintEnd_toEndOf="@+id/multiple_books_2" />
+
+    <View
+            android:id="@+id/multiple_books_2"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="?attr/colorOnSecondary"
+            android:layout_marginBottom="2dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            app:layout_constraintBottom_toTopOf="@id/cover"
+            app:layout_constraintStart_toStartOf="@+id/cover"
+            app:layout_constraintEnd_toEndOf="@+id/cover" />
+
     <ImageView
             android:id="@+id/cover"
             android:layout_width="match_parent"
@@ -13,7 +37,7 @@
             android:src="@drawable/ruby"
             android:background="?attr/colorOnSecondary"
             android:layout_marginStart="12.5dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="25dp"
             android:layout_marginEnd="12.5dp"
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
