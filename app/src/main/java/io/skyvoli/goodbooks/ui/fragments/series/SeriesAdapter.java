@@ -12,15 +12,14 @@ import java.util.List;
 
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.helper.ImageLoader;
-import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class SeriesAdapter extends RecyclerView.Adapter<SeriesViewHolder> {
 
-    private final List<Book> series;
+    private final List<Series> series;
 
     private Context context;
 
-    public SeriesAdapter(List<Book> items) {
+    public SeriesAdapter(List<Series> items) {
         series = items;
     }
 
@@ -35,7 +34,7 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final SeriesViewHolder holder, int position) {
-        ImageLoader.load(context, series.get(position).getNullableCover(), holder.getCover());
+        ImageLoader.load(context, series.get(position).getCover(), holder.getCover());
     }
 
     @Override
