@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
 
         new Thread(() -> new GlobalController(this)
-                .setListWithDataFromDatabase(getApplicationContext()))
+                .setListsWithDataFromDatabase(getApplicationContext()))
                 .start();
     }
 

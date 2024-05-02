@@ -2,9 +2,7 @@ package io.skyvoli.goodbooks.ui.fragments.books;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,6 +30,7 @@ import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.global.GlobalController;
+import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
 import io.skyvoli.goodbooks.helper.observer.BookObserver;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.ui.bookcard.BookAdapter;
@@ -65,7 +64,7 @@ public class BooksFragment extends Fragment {
 
         final SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
 
-        setSwipeColorScheme(swipeRefreshLayout, context);
+        SwipeColorSchemeConfigurator.setSwipeColorScheme(swipeRefreshLayout, context);
         swipeRefreshLayout.setOnRefreshListener(() -> onSwipe(swipeRefreshLayout, context));
 
         if (isAdded()) {
@@ -138,24 +137,13 @@ public class BooksFragment extends Fragment {
         };
     }
 
-    private void setSwipeColorScheme(SwipeRefreshLayout swipeRefreshLayout, Context context) {
-        //Change colors
-        TypedValue primary = new TypedValue();
-        TypedValue secondary = new TypedValue();
-        Resources.Theme theme = context.getTheme();
-        theme.resolveAttribute(com.google.android.material.R.attr.colorPrimary, primary, true);
-        theme.resolveAttribute(com.google.android.material.R.attr.colorSecondary, secondary, true);
-
-        swipeRefreshLayout.setColorSchemeResources(primary.resourceId, secondary.resourceId);
-    }
-
     private void onSwipe(SwipeRefreshLayout swipeRefreshLayout, Context context) {
         swipeRefreshLayout.setRefreshing(true);
         new Thread(() -> {
             recyclerView.startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out));
             recyclerView.setVisibility(View.INVISIBLE);
 
-            globalController.setListWithDataFromDatabase(requireContext());
+            globalController.setListsWithDataFromDatabase(requireContext());
 
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
