@@ -32,6 +32,10 @@ public class GlobalController {
         books.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
         globalViewModel.setBooks(books);
 
+        globalViewModel.setSeries(createSeries(context, books));
+    }
+
+    private List<Series> createSeries(Context context, List<Book> books) {
         List<Series> seriesList = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build()
                 .bookDao().getSeries();
 
@@ -39,8 +43,7 @@ public class GlobalController {
                 book -> book.getTitle().equalsIgnoreCase(series.getTitle())
         ).findFirst().orElse(new Book("")).getNullableCover()));
 
-        globalViewModel.setSeries(seriesList);
-
+        return seriesList;
     }
 
     public void addBook(Book book, Context context) {

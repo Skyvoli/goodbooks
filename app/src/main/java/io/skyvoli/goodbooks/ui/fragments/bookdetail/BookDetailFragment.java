@@ -111,7 +111,7 @@ public class BookDetailFragment extends Fragment {
         copiedBook = originalBook.createClone();
 
         //Set content & observables
-        title.setText(TitleBuilder.buildWholeTitle(originalBook.getTitle(), originalBook.getSubtitle(), originalBook.getPart()));
+        title.setText(TitleBuilder.buildTitle(originalBook.getTitle(), originalBook.getSubtitle(), originalBook.getPart()));
 
         Drawable drawable = originalBook.getCover()
                 .orElseGet(() -> ContextCompat.getDrawable(requireContext(), R.drawable.ruby));
@@ -144,7 +144,7 @@ public class BookDetailFragment extends Fragment {
             globalController.sort();
             originalBook = newBook;
             //Refresh
-            title.setText(TitleBuilder.buildWholeTitle(originalBook.getTitle(), originalBook.getSubtitle(), originalBook.getPart()));
+            title.setText(TitleBuilder.buildTitle(originalBook.getTitle(), originalBook.getSubtitle(), originalBook.getPart()));
             author.setText(originalBook.getAuthor());
             editTitle.setText(originalBook.getTitle());
             editAuthor.setText(originalBook.getAuthor());
@@ -177,7 +177,7 @@ public class BookDetailFragment extends Fragment {
                 int selectedItemId = menuItem.getItemId();
                 if (selectedItemId == R.id.delete_item) {
                     new PermissionDialog("Buch löschen",
-                            "Möchten Sie '" + TitleBuilder.buildWholeTitle(originalBook.getTitle(),
+                            "Möchten Sie '" + TitleBuilder.buildTitle(originalBook.getTitle(),
                                     originalBook.getSubtitle(),
                                     originalBook.getPart()) + "'  wirklich löschen?",
                             true,
