@@ -7,18 +7,22 @@
         <item
                 android:id="@+id/nav_home"
                 android:icon="@drawable/ic_menu_home"
+                android:menuCategory="secondary"
                 android:title="@string/menu_home" />
         <item
                 android:id="@+id/nav_camera"
                 android:icon="@drawable/ic_menu_camera"
+                android:menuCategory="secondary"
                 android:title="@string/menu_camera" />
         <item
                 android:id="@+id/nav_books"
                 android:icon="@drawable/ic_menu_books"
+                android:menuCategory="secondary"
                 android:title="@string/menu_books" />
         <item
                 android:id="@+id/nav_series"
                 android:icon="@drawable/ic_menu_books"
+                android:menuCategory="secondary"
                 android:title="@string/menu_series" />
     </group>
 </menu>
