@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.ui.bookcard;
+package io.skyvoli.goodbooks.ui.recyclerviews.bookcard;
 
 import android.os.Bundle;
 import android.view.View;

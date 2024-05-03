@@ -17,16 +17,17 @@ import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.databinding.FragmentSeriesBinding;
 import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
-import io.skyvoli.goodbooks.ui.seriescard.SeriesAdapter;
+import io.skyvoli.goodbooks.ui.recyclerviews.seriescard.SeriesAdapter;
 
 public class SeriesFragment extends Fragment {
 
     private GlobalController globalController;
+    private FragmentSeriesBinding binding;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        FragmentSeriesBinding binding = FragmentSeriesBinding.inflate(inflater, container, false);
+        binding = FragmentSeriesBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         globalController = new GlobalController(requireActivity());
@@ -62,5 +63,11 @@ public class SeriesFragment extends Fragment {
                 });
             }
         }).start();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

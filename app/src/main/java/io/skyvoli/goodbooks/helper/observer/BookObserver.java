@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
-import io.skyvoli.goodbooks.ui.bookcard.BookAdapter;
+import io.skyvoli.goodbooks.ui.recyclerviews.bookcard.BookAdapter;
 
 public class BookObserver extends ObservableList.OnListChangedCallback<ObservableList<Book>> {
 
