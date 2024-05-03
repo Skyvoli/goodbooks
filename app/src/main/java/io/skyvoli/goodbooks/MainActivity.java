@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
@@ -44,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        setDrawerCallback(drawer);
+
         new Thread(() -> new GlobalController(this)
                 .setListsWithDataFromDatabase(getApplicationContext()))
                 .start();
@@ -71,5 +75,38 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return super.dispatchTouchEvent(event);
+    }
+
+    private void setDrawerCallback(DrawerLayout drawer) {
+        OnBackPressedCallback drawerCallback = new OnBackPressedCallback(false) {
+            @Override
+            public void handleOnBackPressed() {
+                drawer.closeDrawers();
+            }
+        };
+
+        this.getOnBackPressedDispatcher().addCallback(this, drawerCallback);
+
+        drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+                //ignored
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+                drawerCallback.setEnabled(true);
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                drawerCallback.setEnabled(false);
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                //ignored
+            }
+        });
     }
 }
