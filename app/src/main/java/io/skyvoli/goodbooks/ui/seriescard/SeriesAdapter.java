@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.ui.fragments.series;
+package io.skyvoli.goodbooks.ui.seriescard;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,6 +12,7 @@ import java.util.List;
 
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.helper.ImageLoader;
+import io.skyvoli.goodbooks.ui.fragments.series.Series;
 
 public class SeriesAdapter extends RecyclerView.Adapter<SeriesViewHolder> {
 
@@ -34,10 +35,10 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final SeriesViewHolder holder, int position) {
-        Series series = this.series.get(position);
-        ImageLoader.load(context, series.getCover(), holder.getCover());
+        Series oneSeries = this.series.get(position);
+        ImageLoader.load(context, oneSeries.getCover(), holder.getCover());
 
-        holder.setMultiple(series.getCountedBooks() > 1);
+        holder.setMultiple(oneSeries.getCountedBooks() > 1);
 
     }
 

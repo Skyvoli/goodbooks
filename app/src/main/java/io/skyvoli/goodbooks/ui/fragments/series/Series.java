@@ -37,6 +37,10 @@ public class Series {
         this.cover = cover;
     }
 
+    public int getCountedBooks() {
+        return countedBooks;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -48,9 +52,5 @@ public class Series {
     @Override
     public int hashCode() {
         return Objects.hash(title, cover);
-    }
-
-    public int getCountedBooks() {
-        return countedBooks;
     }
 }

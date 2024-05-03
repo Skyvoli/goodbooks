@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.ui.fragments.series;
+package io.skyvoli.goodbooks.ui.seriescard;
 
 import android.view.View;
 import android.widget.ImageView;

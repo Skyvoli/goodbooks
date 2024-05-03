@@ -6,7 +6,7 @@ public class TitleBuilder {
         throw new IllegalStateException("Utility class");
     }
 
-    public static String buildWholeTitle(String title, String subtitle, Integer part) {
+    public static String buildTitle(String title, String subtitle, Integer part) {
         if (subtitle != null) {
             return title + " - " + subtitle;
         }
@@ -15,6 +15,19 @@ public class TitleBuilder {
         }
 
         return title;
+
+    }
+
+    public static String buildCompleteTitle(String title, String subtitle, Integer part) {
+        StringBuilder stringBuilder = new StringBuilder(title);
+        if (subtitle != null) {
+            stringBuilder.append(" - ").append(subtitle);
+        }
+        if (part != null) {
+            stringBuilder.append(" (").append(part).append(")");
+        }
+
+        return stringBuilder.toString();
 
     }
 }

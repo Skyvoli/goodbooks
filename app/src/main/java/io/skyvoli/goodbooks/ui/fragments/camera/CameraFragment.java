@@ -133,7 +133,7 @@ public class CameraFragment extends Fragment {
     }
 
     private void setBookView(Book book, BookDetailCardBinding bookPreview) {
-        bookPreview.title.setText(TitleBuilder.buildWholeTitle(book.getTitle(), book.getSubtitle(), book.getPart()));
+        bookPreview.title.setText(TitleBuilder.buildCompleteTitle(book.getTitle(), book.getSubtitle(), book.getPart()));
         bookPreview.isbn.setText(book.getIsbn());
         bookPreview.author.setText(book.getAuthor());
         Optional<Drawable> drawable = book.getCover();

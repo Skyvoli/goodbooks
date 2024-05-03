@@ -36,7 +36,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = books.get(position);
-        holder.setTitle(TitleBuilder.buildWholeTitle(book.getTitle(), book.getSubtitle(), book.getPart()));
+        holder.setTitle(TitleBuilder.buildTitle(book.getTitle(), book.getSubtitle(), book.getPart()));
         holder.setIsbn(book.getIsbn());
         holder.setAuthor(book.getAuthor());
         ImageLoader.load(context, book.getNullableCover(), holder.getCover());
