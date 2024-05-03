@@ -33,7 +33,7 @@ import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
 import io.skyvoli.goodbooks.helper.observer.BookObserver;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
-import io.skyvoli.goodbooks.ui.bookcard.BookAdapter;
+import io.skyvoli.goodbooks.ui.recyclerviews.bookcard.BookAdapter;
 import io.skyvoli.goodbooks.web.BookResolver;
 
 public class BooksFragment extends Fragment {

@@ -37,6 +37,26 @@
             android:id="@+id/nav_series"
             android:name="io.skyvoli.goodbooks.ui.fragments.series.SeriesFragment"
             android:label="Series"
-            tools:layout="@layout/fragment_series" />
+            tools:layout="@layout/fragment_series">
+        <action
+                android:id="@+id/to_series_books"
+                app:destination="@+id/nav_series_books"
+                app:enterAnim="@anim/fade_in"
+                app:exitAnim="@anim/fade_out"
+                app:popEnterAnim="@anim/fade_in"
+                app:popExitAnim="@anim/fade_out" />
+    </fragment>
+
+    <fragment
+            android:id="@+id/nav_series_books"
+            android:name="io.skyvoli.goodbooks.ui.fragments.seriesbooks.SeriesBooks">
+        <action
+                android:id="@+id/to_detail"
+                app:destination="@+id/nav_book_detail"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
 
 </navigation>
