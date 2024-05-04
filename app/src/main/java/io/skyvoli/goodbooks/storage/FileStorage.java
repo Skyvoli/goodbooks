@@ -47,20 +47,6 @@ public class FileStorage {
         }
     }
 
-    public void clearStorage() {
-        File[] files = directory.listFiles();
-        if (files == null) {
-            return;
-        }
-        for (File file : files) {
-            try {
-                Files.delete(file.toPath());
-            } catch (IOException e) {
-                Log.e(logTag, "Couldn't delete file");
-            }
-        }
-    }
-
     private byte[] convertToByteArray(Drawable drawable) {
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
         ByteArrayOutputStream output = new ByteArrayOutputStream();

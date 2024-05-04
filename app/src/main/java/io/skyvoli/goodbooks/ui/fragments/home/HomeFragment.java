@@ -1,8 +1,6 @@
 package io.skyvoli.goodbooks.ui.fragments.home;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +11,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.room.Room;
 
 import io.skyvoli.goodbooks.databinding.FragmentHomeBinding;
 import io.skyvoli.goodbooks.global.GlobalController;
-import io.skyvoli.goodbooks.storage.database.AppDatabase;
-import io.skyvoli.goodbooks.web.BookResolver;
 
 public class HomeFragment extends Fragment {
 
@@ -40,18 +35,11 @@ public class HomeFragment extends Fragment {
 
         magicButton.setOnClickListener(v -> {
             progressCircular.setVisibility(View.VISIBLE);
-            Context context = requireContext();
             new Thread(() -> {
-
-                AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, "books")
-                        .build();
-                BookResolver resolver = new BookResolver();
-                globalController.getBooks().forEach(book -> db.bookDao().update(resolver.resolveBook(book.getIsbn(), 20)));
-
+                //Fixme Used for debug etc.
                 if (isAdded()) {
                     requireActivity().runOnUiThread(() -> progressCircular.setVisibility(View.GONE));
                 }
-                Log.d("", "Resolved");
             }).start();
         });
 
