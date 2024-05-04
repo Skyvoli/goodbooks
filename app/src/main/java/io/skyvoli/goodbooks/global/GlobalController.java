@@ -13,7 +13,7 @@ import java.util.Optional;
 import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
-import io.skyvoli.goodbooks.ui.fragments.series.Series;
+import io.skyvoli.goodbooks.storage.database.dto.Series;
 
 public class GlobalController {
 
@@ -36,12 +36,16 @@ public class GlobalController {
     }
 
     private List<Series> createSeries(Context context, List<Book> books) {
-        List<Series> seriesList = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build()
-                .bookDao().getSeries();
+        AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build();
+        List<Series> seriesList = db.seriesDao().getSeries();
 
-        seriesList.forEach(series -> series.setCover(books.stream().filter(
-                book -> book.getTitle().equalsIgnoreCase(series.getTitle())
-        ).findFirst().orElse(new Book("")).getNullableCover()));
+        seriesList.forEach(series -> {
+            series.setCover(books.stream()
+                    .filter(book -> book.getTitle().equalsIgnoreCase(series.getTitle()))
+                    .findFirst()
+                    .orElse(new Book("")).getNullableCover());
+            series.setCountedBooks(db.seriesDao().getCountOfSeries(series.getTitle()));
+        });
 
         return seriesList;
     }

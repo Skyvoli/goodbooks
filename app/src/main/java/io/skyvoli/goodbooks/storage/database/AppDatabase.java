@@ -7,12 +7,15 @@ import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import io.skyvoli.goodbooks.storage.database.dao.BookDao;
+import io.skyvoli.goodbooks.storage.database.dao.SeriesDao;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
-import io.skyvoli.goodbooks.storage.database.dto.SeriesDto;
+import io.skyvoli.goodbooks.storage.database.dto.Series;
 
-@Database(entities = {Book.class, SeriesDto.class}, version = 3)
+@Database(entities = {Book.class, Series.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract BookDao bookDao();
+
+    public abstract SeriesDao seriesDao();
 
     public static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
