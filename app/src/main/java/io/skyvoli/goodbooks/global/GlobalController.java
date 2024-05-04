@@ -20,24 +20,25 @@ public class GlobalController {
     private final GlobalViewModel globalViewModel;
     private static final String DATABASE_NAME = "books";
 
+    private final AppDatabase db;
+
 
     public GlobalController(FragmentActivity activity) {
         globalViewModel = new ViewModelProvider(activity).get(GlobalViewModel.class);
+        db = Room.databaseBuilder(activity.getApplicationContext(), AppDatabase.class, DATABASE_NAME).build();
     }
 
     public void setListsWithDataFromDatabase(Context context) {
-        List<Book> books = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build()
-                .bookDao().getAll();
+        List<Book> books = db.bookDao().getAll();
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
         books.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
         globalViewModel.setBooks(books);
 
-        globalViewModel.setSeries(createSeries(context, books));
+        globalViewModel.setSeries(createSeries(books));
     }
 
-    private List<Series> createSeries(Context context, List<Book> books) {
-        AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build();
-        List<Series> seriesList = db.seriesDao().getSeries();
+    private List<Series> createSeries(List<Book> books) {
+        List<Series> seriesList = db.seriesDao().getSeriesDto();
 
         seriesList.forEach(series -> {
             series.setCover(books.stream()
@@ -52,31 +53,29 @@ public class GlobalController {
 
     public void addBook(Book book, Context context) {
         globalViewModel.addBook(book);
-        Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build()
-                .bookDao().insert(book);
+        db.bookDao().insert(book);
         book.getCover().ifPresent(cover -> new FileStorage(context.getFilesDir()).saveImage(book.getIsbn(), cover));
         addSeries(book, context);
     }
 
     private void addSeries(Book book, Context context) {
-        if (Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build().seriesDao().getSeriesDto()
+        if (db.seriesDao().getSeriesDto()
                 .stream().anyMatch(series -> series.getTitle().equalsIgnoreCase(book.getTitle()))) {
             //&& series.getAuthor().equalsIgnoreCase(book.getAuthor()))) {
             return;
         }
 
-        Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build().seriesDao()
-                .insert(new Series(0, book.getTitle(), book.getNullableCover(), book.getAuthor(), 1));
+        db.seriesDao().insert(
+                new Series(book.getTitle(), book.getNullableCover(), book.getAuthor(), 1));
     }
 
     public void updateBook(Book book, String previousTitle, Context context) {
         updateBookWithCover(book, context);
-        AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build();
         db.bookDao().update(book);
         if (db.seriesDao().getCountOfSeries(previousTitle) == 0) {
-            if (Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build().seriesDao().getSeriesDto()
+            if (db.seriesDao().getSeriesDto()
                     .stream().anyMatch(series -> series.getTitle().equalsIgnoreCase(book.getTitle()))) {
-                deleteSeries(db, previousTitle);
+                deleteSeries(previousTitle);
                 return;
             }
             Series series = db.seriesDao().getSeriesDtoByTitle(previousTitle).get(0);
@@ -95,14 +94,13 @@ public class GlobalController {
 
     public void removeBook(Book book, Context context) {
         globalViewModel.removeBook(book);
-        AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build();
         db.bookDao().delete(book);
         new FileStorage(context.getFilesDir()).deleteImage(book.getIsbn());
 
-        deleteSeries(db, book.getTitle());
+        deleteSeries(book.getTitle());
     }
 
-    private void deleteSeries(AppDatabase db, String title) {
+    private void deleteSeries(String title) {
         if (db.seriesDao().getCountOfSeries(title) == 0) {
             Series series = db.seriesDao().getSeriesDtoByTitle(title).get(0);
             db.seriesDao().delete(series);
