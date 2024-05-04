@@ -46,12 +46,13 @@ public class DnbMarc21Api implements BookApi {
         titleFields.add(new XmlField("800", "t"));
         titleFields.add(new XmlField("245", "a"));
         titleFields.add(new XmlField("245", "n"));
+        titleFields.add(new XmlField("490", "a"));
 
         Resolved<String> resolvedTitle = resolveString(bookData, titleFields, "Unbekannt");
         resolvedTitle.setValue(removeUnwantedSequences(resolvedTitle.getValue()));
 
         //if title 800 t  --> 245 a is probably subtitle else 245 code b as subtitle
-        if (resolvedTitle.with.equals(new XmlField("800", "t"))) {
+        if (resolvedTitle.with.equals(new XmlField("830", "a")) || resolvedTitle.with.equals(new XmlField("800", "t"))) {
             subtitleFields.add(new XmlField("245", "a"));
         }
         subtitleFields.add(new XmlField("245", "b"));
