@@ -8,8 +8,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import io.skyvoli.goodbooks.storage.database.dao.BookDao;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
+import io.skyvoli.goodbooks.storage.database.dto.SeriesDto;
 
-@Database(entities = {Book.class}, version = 2)
+@Database(entities = {Book.class, SeriesDto.class}, version = 3)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract BookDao bookDao();
 
@@ -17,6 +18,14 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE books ADD COLUMN subtitle TEXT");
+        }
+    };
+
+    public static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS series (seriesId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                    "title TEXT, author TEXT)");
         }
     };
 }
