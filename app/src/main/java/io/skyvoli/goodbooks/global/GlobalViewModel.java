@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.storage.database.dto.Book;
-import io.skyvoli.goodbooks.ui.fragments.series.Series;
+import io.skyvoli.goodbooks.storage.database.dto.Series;
 
 public class GlobalViewModel extends ViewModel {
 

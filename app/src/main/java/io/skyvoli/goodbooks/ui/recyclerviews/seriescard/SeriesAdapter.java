@@ -12,7 +12,7 @@ import java.util.List;
 
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.helper.ImageLoader;
-import io.skyvoli.goodbooks.ui.fragments.series.Series;
+import io.skyvoli.goodbooks.storage.database.dto.Series;
 
 public class SeriesAdapter extends RecyclerView.Adapter<SeriesViewHolder> {
 
