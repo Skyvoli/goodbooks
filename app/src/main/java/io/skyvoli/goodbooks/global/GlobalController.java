@@ -55,12 +55,37 @@ public class GlobalController {
         Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build()
                 .bookDao().insert(book);
         book.getCover().ifPresent(cover -> new FileStorage(context.getFilesDir()).saveImage(book.getIsbn(), cover));
+        addSeries(book, context);
     }
 
-    public void updateBook(Book book, Context context) {
+    private void addSeries(Book book, Context context) {
+        if (Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build().seriesDao().getSeriesDto()
+                .stream().anyMatch(series -> series.getTitle().equalsIgnoreCase(book.getTitle()))) {
+            //&& series.getAuthor().equalsIgnoreCase(book.getAuthor()))) {
+            return;
+        }
+
+        Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build().seriesDao()
+                .insert(new Series(0, book.getTitle(), book.getNullableCover(), book.getAuthor(), 1));
+    }
+
+    public void updateBook(Book book, String previousTitle, Context context) {
         updateBookWithCover(book, context);
         AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build();
         db.bookDao().update(book);
+        if (db.seriesDao().getCountOfSeries(previousTitle) == 0) {
+            if (Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build().seriesDao().getSeriesDto()
+                    .stream().anyMatch(series -> series.getTitle().equalsIgnoreCase(book.getTitle()))) {
+                deleteSeries(db, previousTitle);
+                return;
+            }
+            Series series = db.seriesDao().getSeriesDtoByTitle(previousTitle).get(0);
+            series.setTitle(book.getTitle());
+            series.setAuthor(book.getAuthor());
+            db.seriesDao().update(series);
+            return;
+        }
+        addSeries(book, context);
     }
 
     public void updateBookWithCover(Book book, Context context) {
@@ -70,9 +95,18 @@ public class GlobalController {
 
     public void removeBook(Book book, Context context) {
         globalViewModel.removeBook(book);
-        Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build()
-                .bookDao().delete(book);
+        AppDatabase db = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME).build();
+        db.bookDao().delete(book);
         new FileStorage(context.getFilesDir()).deleteImage(book.getIsbn());
+
+        deleteSeries(db, book.getTitle());
+    }
+
+    private void deleteSeries(AppDatabase db, String title) {
+        if (db.seriesDao().getCountOfSeries(title) == 0) {
+            Series series = db.seriesDao().getSeriesDtoByTitle(title).get(0);
+            db.seriesDao().delete(series);
+        }
     }
 
     public Optional<Book> getBook(String isbn) {
