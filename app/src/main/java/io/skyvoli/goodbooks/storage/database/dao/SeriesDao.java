@@ -16,8 +16,11 @@ public interface SeriesDao {
     @Query("SELECT 0 as seriesId, title, author FROM books GROUP BY title")
     List<Series> getSeries();
 
-    @Query("SELECT * FROM Series ORDER BY title")
+    @Query("SELECT * FROM series ORDER BY title")
     List<Series> getSeriesDto();
+
+    @Query("SELECT * FROM series WHERE title LIKE :title")
+    List<Series> getSeriesDtoByTitle(String title);
 
     @Query("SELECT COUNT(*) as countedBooks FROM books WHERE title LIKE :title")
     int getCountOfSeries(String title);

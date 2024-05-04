@@ -11,13 +11,13 @@ import androidx.room.PrimaryKey;
 public class Series {
 
     @PrimaryKey(autoGenerate = true)
-    private final int seriesId;
+    private int seriesId;
     @ColumnInfo(name = "title")
-    private final String title;
+    private String title;
     @Ignore
     private Drawable cover;
     @ColumnInfo(name = "author")
-    private final String author;
+    private String author;
     @Ignore
     private int countedBooks;
 
@@ -48,6 +48,14 @@ public class Series {
 
     public Drawable getCover() {
         return cover;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public void setCover(Drawable cover) {

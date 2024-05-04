@@ -140,7 +140,7 @@ public class BookDetailFragment extends Fragment {
         submit.setOnClickListener(v -> {
             Book newBook = copiedBook.createClone();
             newBook.setResolved(true);
-            new Thread(() -> globalController.updateBook(newBook, requireContext())).start();
+            new Thread(() -> globalController.updateBook(newBook, originalBook.getTitle(), requireContext())).start();
             globalController.sort();
             originalBook = newBook;
             //Refresh
