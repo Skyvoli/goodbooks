@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 2,
-    "identityHash": "3c9b1134bd2332fd5293fdbe05fd593f",
+    "version": 3,
+    "identityHash": "59d124bdcde3ce1b38b4d6480277cb85",
     "entities": [
       {
         "tableName": "books",
@@ -56,7 +56,7 @@
       },
       {
         "tableName": "series",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`seriesId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT, `author` TEXT, `countedBooks` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`seriesId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT, `author` TEXT)",
         "fields": [
           {
             "fieldPath": "seriesId",
@@ -75,12 +75,6 @@
             "columnName": "author",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "countedBooks",
-            "columnName": "countedBooks",
-            "affinity": "INTEGER",
-            "notNull": true
           }
         ],
         "primaryKey": {
@@ -96,7 +90,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3c9b1134bd2332fd5293fdbe05fd593f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '59d124bdcde3ce1b38b4d6480277cb85')"
     ]
   }
 }
