@@ -11,7 +11,7 @@ import io.skyvoli.goodbooks.storage.database.dao.SeriesDao;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.storage.database.dto.Series;
 
-@Database(entities = {Book.class, Series.class}, version = 4)
+@Database(entities = {Book.class, Series.class}, version = 5)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract BookDao bookDao();
 
@@ -55,6 +55,17 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE newBooks RENAME TO books");
             database.execSQL("UPDATE books SET seriesId = (SELECT s.seriesId FROM books, series s WHERE books.title LIKE s.title)");
 
+        }
+    };
+
+    public static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS newSeries (seriesId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                    "title TEXT)");
+            database.execSQL("INSERT INTO newSeries (seriesId, title) SELECT seriesId, title FROM series");
+            database.execSQL("DROP TABLE series");
+            database.execSQL("ALTER TABLE newSeries RENAME TO series");
         }
     };
 }
