@@ -16,21 +16,18 @@ public class Series {
     private String title;
     @Ignore
     private Drawable cover;
-    @ColumnInfo(name = "author")
-    private String author;
     @Ignore
     private int countedBooks;
 
     @Ignore
-    public Series(String title, Drawable cover, String author, int countedBooks) {
+    public Series(String title, Drawable cover, int countedBooks) {
         this.title = title;
         this.cover = cover;
-        this.author = author;
         this.countedBooks = countedBooks;
     }
 
-    public Series(long seriesId, String title, String author) {
-        this(title, null, author, 1);
+    public Series(long seriesId, String title) {
+        this(title, null, 1);
         this.seriesId = seriesId;
     }
 
@@ -42,20 +39,12 @@ public class Series {
         return title;
     }
 
-    public String getAuthor() {
-        return author;
-    }
-
     public Drawable getCover() {
         return cover;
     }
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
     }
 
     public void setCover(Drawable cover) {

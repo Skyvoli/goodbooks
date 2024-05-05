@@ -25,7 +25,8 @@ public class GlobalController {
 
     public GlobalController(FragmentActivity activity) {
         globalViewModel = new ViewModelProvider(activity).get(GlobalViewModel.class);
-        db = Room.databaseBuilder(activity.getApplicationContext(), AppDatabase.class, DATABASE_NAME).build();
+        db = Room.databaseBuilder(activity.getApplicationContext(), AppDatabase.class, DATABASE_NAME)
+                .build();
     }
 
     public void setListsWithDataFromDatabase(Context context) {
@@ -67,7 +68,7 @@ public class GlobalController {
         }
 
         long seriesId = db.seriesDao().insert(
-                new Series(book.getTitle(), book.getNullableCover(), book.getAuthor(), 1));
+                new Series(book.getTitle(), book.getNullableCover(), 1));
         globalViewModel.setSeries(db.seriesDao().getSeriesDto());
         return seriesId;
     }
@@ -86,7 +87,6 @@ public class GlobalController {
                 //"Renaming"
                 Series series = db.seriesDao().getSeriesDtoByTitle(previousTitle).get(0);
                 series.setTitle(book.getTitle());
-                series.setAuthor(book.getAuthor());
                 db.seriesDao().update(series);
             }
         } else {

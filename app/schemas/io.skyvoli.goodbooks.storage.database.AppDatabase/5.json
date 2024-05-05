@@ -1,0 +1,108 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 5,
+    "identityHash": "e3699083ceb45b5e8861588dcc6ae189",
+    "entities": [
+      {
+        "tableName": "books",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`isbn` TEXT NOT NULL, `title` TEXT, `subtitle` TEXT, `part` INTEGER, `author` TEXT, `resolved` INTEGER NOT NULL, `seriesId` INTEGER NOT NULL, PRIMARY KEY(`isbn`), FOREIGN KEY(`seriesId`) REFERENCES `series`(`seriesId`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "isbn",
+            "columnName": "isbn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "subtitle",
+            "columnName": "subtitle",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "part",
+            "columnName": "part",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "author",
+            "columnName": "author",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "resolved",
+            "columnName": "resolved",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seriesId",
+            "columnName": "seriesId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "isbn"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "series",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "seriesId"
+            ],
+            "referencedColumns": [
+              "seriesId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "series",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`seriesId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "seriesId",
+            "columnName": "seriesId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "seriesId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e3699083ceb45b5e8861588dcc6ae189')"
+    ]
+  }
+}
