@@ -55,36 +55,42 @@ public class GlobalController {
         globalViewModel.addBook(book);
         db.bookDao().insert(book);
         book.getCover().ifPresent(cover -> new FileStorage(context.getFilesDir()).saveImage(book.getIsbn(), cover));
-        addSeries(book, context);
+        createNewSeries(book);
     }
 
-    private void addSeries(Book book, Context context) {
-        if (db.seriesDao().getSeriesDto()
-                .stream().anyMatch(series -> series.getTitle().equalsIgnoreCase(book.getTitle()))) {
-            //&& series.getAuthor().equalsIgnoreCase(book.getAuthor()))) {
+    private void createNewSeries(Book book) {
+        if (seriesExists(book.getTitle())) {
             return;
         }
 
         db.seriesDao().insert(
                 new Series(book.getTitle(), book.getNullableCover(), book.getAuthor(), 1));
+        globalViewModel.setSeries(db.seriesDao().getSeriesDto());
     }
 
     public void updateBook(Book book, String previousTitle, Context context) {
         updateBookWithCover(book, context);
         db.bookDao().update(book);
+
         if (db.seriesDao().getCountOfSeries(previousTitle) == 0) {
-            if (db.seriesDao().getSeriesDto()
-                    .stream().anyMatch(series -> series.getTitle().equalsIgnoreCase(book.getTitle()))) {
+            if (seriesExists(book.getTitle())) {
+                //No renaming needed
                 deleteSeries(previousTitle);
-                return;
+            } else {
+                //"Renaming"
+                Series series = db.seriesDao().getSeriesDtoByTitle(previousTitle).get(0);
+                series.setTitle(book.getTitle());
+                series.setAuthor(book.getAuthor());
+                db.seriesDao().update(series);
             }
-            Series series = db.seriesDao().getSeriesDtoByTitle(previousTitle).get(0);
-            series.setTitle(book.getTitle());
-            series.setAuthor(book.getAuthor());
-            db.seriesDao().update(series);
             return;
         }
-        addSeries(book, context);
+        createNewSeries(book);
+    }
+
+    private boolean seriesExists(String title) {
+        return db.seriesDao().getSeriesDto()
+                .stream().anyMatch(series -> series.getTitle().equalsIgnoreCase(title));
     }
 
     public void updateBookWithCover(Book book, Context context) {

@@ -6,13 +6,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.util.Objects;
 import java.util.Optional;
 
-@Entity(tableName = "books")
+@Entity(tableName = "books",
+        foreignKeys = @ForeignKey(entity = Series.class,
+                parentColumns = "seriesId",
+                childColumns = "seriesId",
+                onDelete = ForeignKey.RESTRICT))
 public class Book {
     @NonNull
     @PrimaryKey
@@ -30,6 +35,9 @@ public class Book {
     private Drawable cover;
     @ColumnInfo(name = "resolved")
     private boolean resolved;
+
+    @ColumnInfo(name = "seriesId")
+    private int seriesId;
 
     @Ignore
     public Book(@NonNull String isbn) {
@@ -54,7 +62,7 @@ public class Book {
         this.resolved = resolved;
     }
 
-    public Book(String title, String subtitle, Integer part, @NonNull String isbn, String author, boolean resolved) {
+    public Book(String title, String subtitle, Integer part, @NonNull String isbn, String author, boolean resolved, int seriesId) {
         this.title = title;
         this.subtitle = subtitle;
         this.part = part;
@@ -62,6 +70,7 @@ public class Book {
         this.author = author;
         cover = null;
         this.resolved = resolved;
+        this.seriesId = seriesId;
     }
 
     public int comparePart(Integer otherPart) {
@@ -151,5 +160,13 @@ public class Book {
     @Override
     public int hashCode() {
         return Objects.hash(isbn, title, subtitle, part, author, cover, resolved);
+    }
+
+    public int getSeriesId() {
+        return seriesId;
+    }
+
+    public void setSeriesId(int seriesId) {
+        this.seriesId = seriesId;
     }
 }
