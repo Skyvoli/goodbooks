@@ -26,7 +26,7 @@ public interface SeriesDao {
     int getCountOfSeries(String title);
 
     @Insert
-    void insert(Series... series);
+    long insert(Series series);
 
     @Update
     void update(Series series);

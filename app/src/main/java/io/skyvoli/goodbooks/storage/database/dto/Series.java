@@ -11,7 +11,7 @@ import androidx.room.PrimaryKey;
 public class Series {
 
     @PrimaryKey(autoGenerate = true)
-    private int seriesId = 0;
+    private long seriesId = 0;
     @ColumnInfo(name = "title")
     private String title;
     @Ignore
@@ -29,12 +29,12 @@ public class Series {
         this.countedBooks = countedBooks;
     }
 
-    public Series(int seriesId, String title, String author) {
+    public Series(long seriesId, String title, String author) {
         this(title, null, author, 1);
         this.seriesId = seriesId;
     }
 
-    public int getSeriesId() {
+    public long getSeriesId() {
         return seriesId;
     }
 
