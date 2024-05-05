@@ -37,7 +37,7 @@ public class Book {
     private boolean resolved;
 
     @ColumnInfo(name = "seriesId")
-    private int seriesId;
+    private long seriesId;
 
     @Ignore
     public Book(@NonNull String isbn) {
@@ -62,7 +62,7 @@ public class Book {
         this.resolved = resolved;
     }
 
-    public Book(String title, String subtitle, Integer part, @NonNull String isbn, String author, boolean resolved, int seriesId) {
+    public Book(String title, String subtitle, Integer part, @NonNull String isbn, String author, boolean resolved, long seriesId) {
         this.title = title;
         this.subtitle = subtitle;
         this.part = part;
@@ -162,11 +162,11 @@ public class Book {
         return Objects.hash(isbn, title, subtitle, part, author, cover, resolved);
     }
 
-    public int getSeriesId() {
+    public long getSeriesId() {
         return seriesId;
     }
 
-    public void setSeriesId(int seriesId) {
+    public void setSeriesId(long seriesId) {
         this.seriesId = seriesId;
     }
 }

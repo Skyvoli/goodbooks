@@ -52,29 +52,35 @@ public class GlobalController {
     }
 
     public void addBook(Book book, Context context) {
+        long seriesId = createNewSeries(book);
+        book.setSeriesId(seriesId);
         globalViewModel.addBook(book);
         db.bookDao().insert(book);
         book.getCover().ifPresent(cover -> new FileStorage(context.getFilesDir()).saveImage(book.getIsbn(), cover));
-        createNewSeries(book);
+
     }
 
-    private void createNewSeries(Book book) {
-        if (seriesExists(book.getTitle())) {
-            return;
+    private long createNewSeries(Book book) {
+        Optional<Series> found = seriesExists(book.getTitle());
+        if (found.isPresent()) {
+            return found.get().getSeriesId();
         }
 
-        db.seriesDao().insert(
+        long seriesId = db.seriesDao().insert(
                 new Series(book.getTitle(), book.getNullableCover(), book.getAuthor(), 1));
         globalViewModel.setSeries(db.seriesDao().getSeriesDto());
+        return seriesId;
     }
 
     public void updateBook(Book book, String previousTitle, Context context) {
         updateBookWithCover(book, context);
-        db.bookDao().update(book);
 
-        if (db.seriesDao().getCountOfSeries(previousTitle) == 0) {
-            if (seriesExists(book.getTitle())) {
-                //No renaming needed
+        if (db.seriesDao().getCountOfSeries(previousTitle) <= 1) {
+            Optional<Series> found = seriesExists(book.getTitle());
+            if (found.isPresent()) {
+                //Change reference and delete old series
+                book.setSeriesId(found.get().getSeriesId());
+                db.bookDao().update(book);
                 deleteSeries(previousTitle);
             } else {
                 //"Renaming"
@@ -83,14 +89,18 @@ public class GlobalController {
                 series.setAuthor(book.getAuthor());
                 db.seriesDao().update(series);
             }
-            return;
+        } else {
+            long id = createNewSeries(book);
+            book.setSeriesId(id);
+            db.bookDao().update(book);
         }
-        createNewSeries(book);
+
+
     }
 
-    private boolean seriesExists(String title) {
+    private Optional<Series> seriesExists(String title) {
         return db.seriesDao().getSeriesDto()
-                .stream().anyMatch(series -> series.getTitle().equalsIgnoreCase(title));
+                .stream().filter(series -> series.getTitle().equalsIgnoreCase(title)).findAny();
     }
 
     public void updateBookWithCover(Book book, Context context) {
