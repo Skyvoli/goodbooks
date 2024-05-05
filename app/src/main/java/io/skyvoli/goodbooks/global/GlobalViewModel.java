@@ -57,10 +57,6 @@ public class GlobalViewModel extends ViewModel {
         this.series.addAll(series);
     }
 
-    protected boolean hasBook(String isbn) {
-        return books.stream().anyMatch(book -> book.sameIsbn(isbn));
-    }
-
     protected void sort() {
         books.sort(Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER)
                 .thenComparing((b1, b2) -> b1.comparePart(b2.getPart())));

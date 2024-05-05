@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         setDrawerCallback(drawer);
 
         new Thread(() -> new GlobalController(this)
-                .setListsWithDataFromDatabase(getApplicationContext()))
+                .setupListsWithDataFromDatabase(getApplicationContext()))
                 .start();
     }
 

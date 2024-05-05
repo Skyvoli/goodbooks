@@ -22,30 +22,30 @@ public class GlobalController {
 
     private final AppDatabase db;
 
-
     public GlobalController(FragmentActivity activity) {
         globalViewModel = new ViewModelProvider(activity).get(GlobalViewModel.class);
         db = Room.databaseBuilder(activity.getApplicationContext(), AppDatabase.class, DATABASE_NAME)
                 .build();
     }
 
-    public void setListsWithDataFromDatabase(Context context) {
+    public void setupListsWithDataFromDatabase(Context context) {
         List<Book> books = db.bookDao().getAll();
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
         books.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
         globalViewModel.setBooks(books);
 
-        globalViewModel.setSeries(createSeries(books));
+        globalViewModel.setSeries(fetchSeries(books));
     }
 
-    private List<Series> createSeries(List<Book> books) {
+    private List<Series> fetchSeries(List<Book> books) {
         List<Series> seriesList = db.seriesDao().getSeriesDto();
 
         seriesList.forEach(series -> {
             series.setCover(books.stream()
                     .filter(book -> book.getTitle().equalsIgnoreCase(series.getTitle()))
                     .findFirst()
-                    .orElse(new Book("")).getNullableCover());
+                    .orElseThrow(() -> new IllegalStateException("Series without any books"))
+                    .getNullableCover());
             series.setCountedBooks(db.seriesDao().getCountOfSeries(series.getTitle()));
         });
 
@@ -53,8 +53,7 @@ public class GlobalController {
     }
 
     public void addBook(Book book, Context context) {
-        long seriesId = createNewSeries(book);
-        book.setSeriesId(seriesId);
+        book.setSeriesId(createNewSeries(book));
         globalViewModel.addBook(book);
         db.bookDao().insert(book);
         book.getCover().ifPresent(cover -> new FileStorage(context.getFilesDir()).saveImage(book.getIsbn(), cover));
@@ -64,9 +63,11 @@ public class GlobalController {
     private long createNewSeries(Book book) {
         Optional<Series> found = seriesExists(book.getTitle());
         if (found.isPresent()) {
+            //Series already exists
             return found.get().getSeriesId();
         }
 
+        //New series
         long seriesId = db.seriesDao().insert(
                 new Series(book.getTitle(), book.getNullableCover(), 1));
         globalViewModel.setSeries(db.seriesDao().getSeriesDto());

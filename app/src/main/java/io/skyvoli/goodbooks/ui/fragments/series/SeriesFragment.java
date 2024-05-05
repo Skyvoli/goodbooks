@@ -51,7 +51,7 @@ public class SeriesFragment extends Fragment {
             recyclerView.startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out));
             recyclerView.setVisibility(View.INVISIBLE);
 
-            globalController.setListsWithDataFromDatabase(requireContext());
+            globalController.setupListsWithDataFromDatabase(requireContext());
 
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
