@@ -8,10 +8,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import io.skyvoli.goodbooks.storage.database.dao.BookDao;
 import io.skyvoli.goodbooks.storage.database.dao.SeriesDao;
-import io.skyvoli.goodbooks.storage.database.dto.Book;
-import io.skyvoli.goodbooks.storage.database.dto.Series;
+import io.skyvoli.goodbooks.storage.database.entities.BookEntity;
+import io.skyvoli.goodbooks.storage.database.entities.SeriesEntity;
 
-@Database(entities = {Book.class, Series.class}, version = 5)
+@Database(entities = {BookEntity.class, SeriesEntity.class}, version = 5)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract BookDao bookDao();
 

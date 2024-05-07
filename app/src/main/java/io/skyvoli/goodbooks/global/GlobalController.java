@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,8 @@ import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.storage.database.dto.Series;
+import io.skyvoli.goodbooks.storage.database.entities.BookEntity;
+import io.skyvoli.goodbooks.storage.database.entities.SeriesEntity;
 
 public class GlobalController {
 
@@ -29,25 +32,33 @@ public class GlobalController {
     }
 
     public void setupListsWithDataFromDatabase(Context context) {
-        List<Book> books = db.bookDao().getAll();
+        List<BookEntity> bookEntities = db.bookDao().getAll();
+        List<Book> books = new ArrayList<>();
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
-        books.forEach((book -> book.setCover(fileStorage.getImage(book.getIsbn()))));
+        bookEntities.forEach(bookEntity -> books
+                .add(new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
+                        bookEntity.getPart(), bookEntity.getIsbn(),
+                        bookEntity.getAuthor(),
+                        fileStorage.getImage(bookEntity.getIsbn()),
+                        bookEntity.isResolved())));
         globalViewModel.setBooks(books);
-
         globalViewModel.setSeries(fetchSeries(books));
     }
 
     private List<Series> fetchSeries(List<Book> books) {
-        List<Series> seriesList = db.seriesDao().getSeriesDto();
+        List<SeriesEntity> seriesEntities = db.seriesDao().getSeriesDto();
+        List<Series> seriesList = new ArrayList<>();
 
-        seriesList.forEach(series -> {
-            series.setCover(books.stream()
-                    .filter(book -> book.getTitle().equalsIgnoreCase(series.getTitle()))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("Series without any books"))
-                    .getNullableCover());
-            series.setCountedBooks(db.seriesDao().getCountOfSeries(series.getTitle()));
-        });
+        //TODO properly
+        seriesEntities.forEach(seriesEntity ->
+                seriesList.add(new Series(
+                        seriesEntity.getTitle(),
+                        books.stream()
+                                .filter(book -> book.getTitle().equalsIgnoreCase(seriesEntity.getTitle()))
+                                .findFirst()
+                                .orElseThrow(() -> new IllegalStateException("Series without any books"))
+                                .getNullableCover(),
+                        db.seriesDao().getCountOfSeries(seriesEntity.getTitle()))));
 
         return seriesList;
     }
@@ -55,22 +66,24 @@ public class GlobalController {
     public void addBook(Book book, Context context) {
         book.setSeriesId(createNewSeries(book));
         globalViewModel.addBook(book);
-        db.bookDao().insert(book);
+        db.bookDao().insert(book.getEntity());
         book.getCover().ifPresent(cover -> new FileStorage(context.getFilesDir()).saveImage(book.getIsbn(), cover));
 
     }
 
     private long createNewSeries(Book book) {
-        Optional<Series> found = seriesExists(book.getTitle());
-        if (found.isPresent()) {
+        List<SeriesEntity> found = seriesExists(book.getTitle());
+        if (found.size() > 0) {
             //Series already exists
-            return found.get().getSeriesId();
+            //TODO better
+            return found.get(0).getSeriesId();
         }
 
         //New series
-        long seriesId = db.seriesDao().insert(
-                new Series(book.getTitle(), book.getNullableCover(), 1));
-        globalViewModel.setSeries(db.seriesDao().getSeriesDto());
+        Series newSeries = new Series(book.getTitle(), book.getNullableCover(), 1);
+        long seriesId = db.seriesDao().insert(newSeries.getEntity());
+        //TODO better
+        globalViewModel.setSeries(fetchSeries(globalViewModel.getBooks()));
         return seriesId;
     }
 
@@ -78,30 +91,28 @@ public class GlobalController {
         updateBookWithCover(book, context);
 
         if (db.seriesDao().getCountOfSeries(previousTitle) <= 1) {
-            Optional<Series> found = seriesExists(book.getTitle());
-            if (found.isPresent()) {
-                //Change reference and delete old series
-                book.setSeriesId(found.get().getSeriesId());
-                db.bookDao().update(book);
+            List<SeriesEntity> found = seriesExists(book.getTitle());
+            if (found.size() > 0) {
+                //Change reference and delete old
+                //TODO by id
+                book.setSeriesId(found.get(0).getSeriesId());
+                db.bookDao().update(book.getEntity());
                 deleteSeries(previousTitle);
             } else {
                 //"Renaming"
-                Series series = db.seriesDao().getSeriesDtoByTitle(previousTitle).get(0);
+                SeriesEntity series = db.seriesDao().getSeriesDtoByTitle(previousTitle).get(0);
                 series.setTitle(book.getTitle());
                 db.seriesDao().update(series);
             }
         } else {
             long id = createNewSeries(book);
             book.setSeriesId(id);
-            db.bookDao().update(book);
+            db.bookDao().update(book.getEntity());
         }
-
-
     }
 
-    private Optional<Series> seriesExists(String title) {
-        return db.seriesDao().getSeriesDto()
-                .stream().filter(series -> series.getTitle().equalsIgnoreCase(title)).findAny();
+    private List<SeriesEntity> seriesExists(String title) {
+        return db.seriesDao().getSeriesDtoByTitle(title);
     }
 
     public void updateBookWithCover(Book book, Context context) {
@@ -111,7 +122,7 @@ public class GlobalController {
 
     public void removeBook(Book book, Context context) {
         globalViewModel.removeBook(book);
-        db.bookDao().delete(book);
+        db.bookDao().delete(book.getEntity());
         new FileStorage(context.getFilesDir()).deleteImage(book.getIsbn());
 
         deleteSeries(book.getTitle());
@@ -119,8 +130,8 @@ public class GlobalController {
 
     private void deleteSeries(String title) {
         if (db.seriesDao().getCountOfSeries(title) == 0) {
-            Series series = db.seriesDao().getSeriesDtoByTitle(title).get(0);
-            db.seriesDao().delete(series);
+            //TODO better
+            db.seriesDao().delete(db.seriesDao().getSeriesDtoByTitle(title).get(0));
         }
     }
 

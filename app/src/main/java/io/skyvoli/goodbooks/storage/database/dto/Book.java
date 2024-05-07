@@ -4,42 +4,22 @@ import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.ForeignKey;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
 
 import java.util.Objects;
 import java.util.Optional;
 
-@Entity(tableName = "books",
-        foreignKeys = @ForeignKey(entity = Series.class,
-                parentColumns = "seriesId",
-                childColumns = "seriesId",
-                onDelete = ForeignKey.RESTRICT))
-public class Book {
-    @NonNull
-    @PrimaryKey
-    private final String isbn;
-    @ColumnInfo(name = "title")
-    private String title;
-    @ColumnInfo(name = "subtitle")
-    private String subtitle;
-    @ColumnInfo(name = "part")
-    private Integer part;
-    @ColumnInfo(name = "author")
-    private String author;
-    //@ColumnInfo(name = "cover") too big
-    @Ignore
-    private Drawable cover;
-    @ColumnInfo(name = "resolved")
-    private boolean resolved;
+import io.skyvoli.goodbooks.storage.database.entities.BookEntity;
 
-    @ColumnInfo(name = "seriesId")
+public class Book {
+    private final String isbn;
+    private String title;
+    private String subtitle;
+    private Integer part;
+    private String author;
+    private Drawable cover;
+    private boolean resolved;
     private long seriesId;
 
-    @Ignore
     public Book(@NonNull String isbn) {
         this.title = "Unbekannt";
         this.subtitle = null;
@@ -50,8 +30,6 @@ public class Book {
         this.resolved = false;
     }
 
-
-    @Ignore
     public Book(String title, String subtitle, Integer part, @NonNull String isbn, String author, Drawable cover, boolean resolved) {
         this.title = title;
         this.subtitle = subtitle;
@@ -60,17 +38,6 @@ public class Book {
         this.author = author;
         this.cover = cover;
         this.resolved = resolved;
-    }
-
-    public Book(String title, String subtitle, Integer part, @NonNull String isbn, String author, boolean resolved, long seriesId) {
-        this.title = title;
-        this.subtitle = subtitle;
-        this.part = part;
-        this.isbn = isbn;
-        this.author = author;
-        cover = null;
-        this.resolved = resolved;
-        this.seriesId = seriesId;
     }
 
     public int comparePart(Integer otherPart) {
@@ -168,5 +135,9 @@ public class Book {
 
     public void setSeriesId(long seriesId) {
         this.seriesId = seriesId;
+    }
+
+    public BookEntity getEntity() {
+        return new BookEntity(title, subtitle, part, isbn, author, resolved, seriesId);
     }
 }
