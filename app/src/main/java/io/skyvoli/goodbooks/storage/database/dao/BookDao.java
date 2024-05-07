@@ -8,19 +8,19 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import io.skyvoli.goodbooks.storage.database.dto.Book;
+import io.skyvoli.goodbooks.storage.database.entities.BookEntity;
 
 @Dao
 public interface BookDao {
     @Query("SELECT * FROM books ORDER BY title, part")
-    List<Book> getAll();
+    List<BookEntity> getAll();
 
     @Insert
-    void insert(Book... books);
+    void insert(BookEntity... books);
 
     @Update
-    void update(Book book);
+    void update(BookEntity book);
 
     @Delete
-    void delete(Book book);
+    void delete(BookEntity book);
 }

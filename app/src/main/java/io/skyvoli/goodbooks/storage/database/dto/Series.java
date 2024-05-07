@@ -2,33 +2,21 @@ package io.skyvoli.goodbooks.storage.database.dto;
 
 import android.graphics.drawable.Drawable;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
 import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
 
-@Entity(tableName = "series")
+import io.skyvoli.goodbooks.storage.database.entities.SeriesEntity;
+
 public class Series {
-
-    @PrimaryKey(autoGenerate = true)
-    private long seriesId = 0;
-    @ColumnInfo(name = "title")
+    private long seriesId;
     private String title;
     @Ignore
     private Drawable cover;
-    @Ignore
     private int countedBooks;
 
-    @Ignore
     public Series(String title, Drawable cover, int countedBooks) {
         this.title = title;
         this.cover = cover;
         this.countedBooks = countedBooks;
-    }
-
-    public Series(long seriesId, String title) {
-        this(title, null, 1);
-        this.seriesId = seriesId;
     }
 
     public long getSeriesId() {
@@ -57,5 +45,9 @@ public class Series {
 
     public int getCountedBooks() {
         return countedBooks;
+    }
+
+    public SeriesEntity getEntity() {
+        return new SeriesEntity(seriesId, title);
     }
 }
