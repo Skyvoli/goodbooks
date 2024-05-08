@@ -1,25 +1,30 @@
 package io.skyvoli.goodbooks.storage.database.dto;
 
-public class SeriesWithBooks {
-/*
-    @Embedded
-    Series series;
-    @Relation(
-            parentColumn = "seriesId",
-            entityColumn = "seriesId"
-    )
-    private final List<Book> books;
+import java.util.List;
 
-    public SeriesWithBooks(List<Book> books, Series series) {
+public class SeriesWithBooks {
+
+    private Series series;
+    private List<Book> books;
+
+    public SeriesWithBooks(Series series, List<Book> books) {
+        this.series = series;
         this.books = books;
+    }
+
+    public Series getSeries() {
+        return series;
+    }
+
+    public void setSeries(Series series) {
         this.series = series;
     }
 
-    public List<Book> getBook() {
+    public List<Book> getBooks() {
         return books;
     }
 
-    public String getTitle() {
-        return series.getTitle();
-    }*/
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
 }
