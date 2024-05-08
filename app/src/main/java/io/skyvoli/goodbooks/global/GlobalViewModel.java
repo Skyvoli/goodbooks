@@ -57,9 +57,18 @@ public class GlobalViewModel extends ViewModel {
         this.series.addAll(series);
     }
 
+    protected void addSeries(Series series) {
+        this.series.add(series);
+        sortSeries();
+    }
+
     protected void sort() {
         books.sort(Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER)
                 .thenComparing((b1, b2) -> b1.comparePart(b2.getPart())));
+    }
+
+    private void sortSeries() {
+        series.sort(Comparator.comparing(Series::getTitle));
     }
 
     protected void removeBook(Book book) {
