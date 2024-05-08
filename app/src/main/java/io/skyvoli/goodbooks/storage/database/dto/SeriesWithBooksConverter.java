@@ -26,7 +26,7 @@ public class SeriesWithBooksConverter {
     }
 
     public SeriesWithBooks convert(FileStorage fileStorage) {
-        Series series = new Series(seriesEntity.getTitle(),
+        Series series = new Series(seriesEntity.getSeriesId(), seriesEntity.getTitle(),
                 fileStorage.getImage(bookEntities.get(0).getIsbn()), bookEntities.size());
         List<Book> books = bookEntities.stream().map(bookEntity ->
                 new Book(seriesEntity.getTitle(), bookEntity.getSubtitle(),

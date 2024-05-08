@@ -13,7 +13,8 @@ public class Series {
     private Drawable cover;
     private int countedBooks;
 
-    public Series(String title, Drawable cover, int countedBooks) {
+    public Series(long seriesId, String title, Drawable cover, int countedBooks) {
+        this.seriesId = seriesId;
         this.title = title;
         this.cover = cover;
         this.countedBooks = countedBooks;
@@ -29,6 +30,10 @@ public class Series {
 
     public Drawable getCover() {
         return cover;
+    }
+
+    public void setSeriesId(long seriesId) {
+        this.seriesId = seriesId;
     }
 
     public void setTitle(String title) {
