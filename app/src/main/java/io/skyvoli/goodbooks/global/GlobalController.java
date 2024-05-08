@@ -15,6 +15,8 @@ import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.storage.database.dto.Series;
+import io.skyvoli.goodbooks.storage.database.dto.SeriesWithBooks;
+import io.skyvoli.goodbooks.storage.database.dto.SeriesWithBooksConverter;
 import io.skyvoli.goodbooks.storage.database.entities.BookEntity;
 import io.skyvoli.goodbooks.storage.database.entities.SeriesEntity;
 
@@ -32,44 +34,49 @@ public class GlobalController {
     }
 
     public void setupListsWithDataFromDatabase(Context context) {
-        //List<SeriesWithBooks> all = new ArrayList<>();
+
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
-
-        //List<SeriesEntity> seriesEntities = db.seriesDao().getSeriesDto();
-
-        /*seriesEntities.forEach(seriesEntity -> {
+        List<SeriesWithBooks> all = new ArrayList<>();
+        List<SeriesEntity> seriesEntities = db.seriesDao().getSeriesDto();
+        seriesEntities.forEach(seriesEntity -> {
             List<BookEntity> bookEntities = db.bookDao().getBooksFromSeries(seriesEntity.getSeriesId());
-            //all.add(new SeriesWithBooksConverter(seriesEntity, bookEntities).convert(fileStorage));
-        });*/
+            all.add(new SeriesWithBooksConverter(seriesEntity, bookEntities).convert(fileStorage));
+        });
 
-        List<BookEntity> bookEntities = db.bookDao().getAll();
+        List<Series> series = new ArrayList<>();
         List<Book> books = new ArrayList<>();
+
+        all.forEach(seriesWithBooks -> {
+            series.add(seriesWithBooks.getSeries());
+            books.addAll(seriesWithBooks.getBooks());
+        });
+
+        /*List<BookEntity> bookEntities = db.bookDao().getAll();
 
         bookEntities.forEach(bookEntity -> books
                 .add(new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
                         bookEntity.getPart(), bookEntity.getIsbn(),
                         bookEntity.getAuthor(),
                         fileStorage.getImage(bookEntity.getIsbn()),
-                        bookEntity.isResolved())));
+                        bookEntity.isResolved())));*/
         globalViewModel.setBooks(books);
-        globalViewModel.setSeries(fetchSeries(books));
+        globalViewModel.setSeries(series);
     }
 
     private List<Series> fetchSeries(List<Book> books) {
         List<SeriesEntity> seriesEntities = db.seriesDao().getSeriesDto();
         List<Series> seriesList = new ArrayList<>();
 
-        //TODO properly
         seriesEntities.forEach(seriesEntity ->
                 seriesList.add(new Series(
                         seriesEntity.getTitle(),
                         books.stream()
-                                .filter(book -> book.getTitle().equalsIgnoreCase(seriesEntity.getTitle()))
+                                .filter(book -> book.getSeriesId() == seriesEntity.getSeriesId())
                                 .findFirst()
                                 .orElseThrow(() -> new IllegalStateException("Series without any books"))
                                 .getNullableCover(),
+                        //TODO better
                         db.seriesDao().getCountOfSeries(seriesEntity.getTitle()))));
-
         return seriesList;
     }
 

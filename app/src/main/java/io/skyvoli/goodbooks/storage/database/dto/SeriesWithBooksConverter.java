@@ -29,7 +29,7 @@ public class SeriesWithBooksConverter {
         Series series = new Series(seriesEntity.getTitle(),
                 fileStorage.getImage(bookEntities.get(0).getIsbn()), bookEntities.size());
         List<Book> books = bookEntities.stream().map(bookEntity ->
-                new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
+                new Book(seriesEntity.getTitle(), bookEntity.getSubtitle(),
                         bookEntity.getPart(), bookEntity.getIsbn(),
                         bookEntity.getAuthor(),
                         fileStorage.getImage(bookEntity.getIsbn()),
