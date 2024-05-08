@@ -32,9 +32,19 @@ public class GlobalController {
     }
 
     public void setupListsWithDataFromDatabase(Context context) {
+        //List<SeriesWithBooks> all = new ArrayList<>();
+        FileStorage fileStorage = new FileStorage(context.getFilesDir());
+
+        //List<SeriesEntity> seriesEntities = db.seriesDao().getSeriesDto();
+
+        /*seriesEntities.forEach(seriesEntity -> {
+            List<BookEntity> bookEntities = db.bookDao().getBooksFromSeries(seriesEntity.getSeriesId());
+            //all.add(new SeriesWithBooksConverter(seriesEntity, bookEntities).convert(fileStorage));
+        });*/
+
         List<BookEntity> bookEntities = db.bookDao().getAll();
         List<Book> books = new ArrayList<>();
-        FileStorage fileStorage = new FileStorage(context.getFilesDir());
+
         bookEntities.forEach(bookEntity -> books
                 .add(new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
                         bookEntity.getPart(), bookEntity.getIsbn(),

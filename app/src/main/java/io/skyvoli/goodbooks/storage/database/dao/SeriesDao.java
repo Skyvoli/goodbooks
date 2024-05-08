@@ -4,10 +4,12 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Transaction;
 import androidx.room.Update;
 
 import java.util.List;
 
+import io.skyvoli.goodbooks.storage.database.dto.SeriesWithBooksConverter;
 import io.skyvoli.goodbooks.storage.database.entities.SeriesEntity;
 
 @Dao
@@ -16,9 +18,9 @@ public interface SeriesDao {
     @Query("SELECT * FROM series ORDER BY title")
     List<SeriesEntity> getSeriesDto();
 
-    /*@Transaction
-    @Query("SELECT s.*, b.* FROM series s INNER JOIN books b ON s.seriesId = b.seriesId ORDER BY title")
-    List<SeriesWithBooks> getSeriesWithBooks();*/
+    @Transaction
+    @Query("SELECT s.*, b.* FROM series s INNER JOIN books b ON s.seriesId = b.seriesId GROUP BY s.title ORDER BY b.title")
+    List<SeriesWithBooksConverter> getSeriesWithBooks();
 
     @Query("SELECT * FROM series WHERE title LIKE :title")
     List<SeriesEntity> getSeriesDtoByTitle(String title);
