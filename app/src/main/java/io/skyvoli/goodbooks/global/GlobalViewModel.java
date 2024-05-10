@@ -1,12 +1,16 @@
 package io.skyvoli.goodbooks.global;
 
 
+import android.graphics.drawable.Drawable;
+
 import androidx.databinding.ObservableArrayList;
 import androidx.databinding.ObservableList;
 import androidx.lifecycle.ViewModel;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.storage.database.dto.Book;
@@ -16,10 +20,12 @@ public class GlobalViewModel extends ViewModel {
 
     private ObservableList<Book> books;
     private ObservableList<Series> series;
+    private final Map<String, Drawable> drawables;
 
     protected GlobalViewModel() {
         books = new ObservableArrayList<>();
         series = new ObservableArrayList<>();
+        drawables = new HashMap<>();
     }
 
     protected ObservableList<Book> getBooks() {
@@ -32,6 +38,7 @@ public class GlobalViewModel extends ViewModel {
 
     protected void addBook(Book book) {
         books.add(book);
+        drawables.put(book.getIsbn(), book.getNullableCover());
         sort();
     }
 
@@ -45,11 +52,13 @@ public class GlobalViewModel extends ViewModel {
         }
 
         books.set(books.indexOf(found.get()), newBook);
+        drawables.put(newBook.getIsbn(), newBook.getNullableCover());
     }
 
     protected void setBooks(List<Book> books) {
         this.books = new ObservableArrayList<>();
         this.books.addAll(books);
+        books.forEach(book -> drawables.put(book.getIsbn(), book.getNullableCover()));
     }
 
     protected void setSeries(List<Series> series) {
@@ -67,11 +76,19 @@ public class GlobalViewModel extends ViewModel {
                 .thenComparing((b1, b2) -> b1.comparePart(b2.getPart())));
     }
 
+    protected Optional<Drawable> getDrawable(String isbn) {
+        return Optional.ofNullable(drawables.get(isbn));
+    }
+
     private void sortSeries() {
         series.sort(Comparator.comparing(Series::getTitle));
     }
 
     protected void removeBook(Book book) {
         books.remove(book);
+    }
+
+    public void addDrawable(String isbn, Drawable cover) {
+        drawables.put(isbn, cover);
     }
 }
