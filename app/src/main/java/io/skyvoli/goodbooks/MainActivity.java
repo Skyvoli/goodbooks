@@ -10,8 +10,12 @@ import android.widget.EditText;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -19,11 +23,14 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.util.Objects;
+
 import io.skyvoli.goodbooks.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
+    private DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarMain.toolbar);
-        DrawerLayout drawer = binding.drawerLayout;
+        drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -46,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
 
         setDrawerCallback(drawer);
+        setupFragmentLifecycleCallbacksListener();
     }
 
     @Override
@@ -96,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDrawerClosed(@NonNull View drawerView) {
                 drawerCallback.setEnabled(false);
+                notifyDrawerClosed();
             }
 
             @Override
@@ -103,5 +112,27 @@ public class MainActivity extends AppCompatActivity {
                 //ignored
             }
         });
+    }
+
+    private void notifyDrawerClosed() {
+        Fragment currentFragment = Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main)).getChildFragmentManager().getPrimaryNavigationFragment();
+
+        if (currentFragment instanceof StartFragmentListener) {
+            ((StartFragmentListener) currentFragment).configureFragment();
+        }
+    }
+
+    private void setupFragmentLifecycleCallbacksListener() {
+        Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main))
+                .getChildFragmentManager().registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+                    @Override
+                    public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, @Nullable Bundle savedInstanceState) {
+                        super.onFragmentViewCreated(fm, f, v, savedInstanceState);
+
+                        if (!drawer.isDrawerOpen(GravityCompat.START) && (f instanceof StartFragmentListener)) {
+                            ((StartFragmentListener) f).configureFragment();
+                        }
+                    }
+                }, false);
     }
 }
