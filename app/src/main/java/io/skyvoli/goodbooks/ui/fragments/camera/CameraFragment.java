@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
+import io.skyvoli.goodbooks.StartFragmentListener;
 import io.skyvoli.goodbooks.databinding.BookDetailCardBinding;
 import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
@@ -35,11 +36,12 @@ import io.skyvoli.goodbooks.helper.listener.ScanListener;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.web.BookResolver;
 
-public class CameraFragment extends Fragment {
+public class CameraFragment extends Fragment implements StartFragmentListener {
 
     private FragmentCameraBinding binding;
     private CameraViewModel cameraViewModel;
     private GlobalController globalController;
+    private boolean shouldConfigureUi = true;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,20 +50,26 @@ public class CameraFragment extends Fragment {
 
         binding = FragmentCameraBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
         binding.bookPreview.floatingActionButton.setVisibility(View.GONE);
-
         binding.scanBtn.setOnClickListener(new ScanListener(
                 registerForActivityResult(new ScanContract(),
                         this::onScanResult)));
 
-        cameraViewModel.getBook().observe(getViewLifecycleOwner(), book -> setBookView(book, binding.bookPreview));
-        cameraViewModel.getShowBook().observe(getViewLifecycleOwner(), showBook -> showBook(showBook, binding.bookPreview.bookData, binding.progressBar));
-
-        binding.addBookBtn.setOnClickListener(this::addBook);
-        cameraViewModel.getIsNewBook().observe(getViewLifecycleOwner(), isNew -> setInformationText(isNew, binding.information));
-
         return root;
+    }
+
+    @Override
+    public void configureFragment() {
+        if (shouldConfigureUi) {
+            shouldConfigureUi = false;
+
+
+            cameraViewModel.getBook().observe(getViewLifecycleOwner(), book -> setBookView(book, binding.bookPreview));
+            cameraViewModel.getShowBook().observe(getViewLifecycleOwner(), showBook -> showBook(showBook, binding.bookPreview.bookData, binding.progressBar));
+
+            binding.addBookBtn.setOnClickListener(this::addBook);
+            cameraViewModel.getIsNewBook().observe(getViewLifecycleOwner(), isNew -> setInformationText(isNew, binding.information));
+        }
     }
 
     private void onScanResult(ScanIntentResult result) {
@@ -173,6 +181,12 @@ public class CameraFragment extends Fragment {
     private boolean isbnIsBook(String isbn) {
         String prefix = isbn.substring(0, 3);
         return isbn.toCharArray().length == 13 && (prefix.equals("978") || prefix.equals("979"));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        shouldConfigureUi = true;
     }
 
     @Override
