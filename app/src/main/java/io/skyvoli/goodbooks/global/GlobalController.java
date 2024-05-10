@@ -1,6 +1,7 @@
 package io.skyvoli.goodbooks.global;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 
 import androidx.databinding.ObservableList;
 import androidx.fragment.app.FragmentActivity;
@@ -127,11 +128,12 @@ public class GlobalController {
 
     public List<Book> loadBooksFromDb(Context context) {
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
+
         List<Book> books = db.bookDao().getAll()
                 .stream().map(bookEntity -> new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
                         bookEntity.getPart(), bookEntity.getIsbn(),
                         bookEntity.getAuthor(),
-                        fileStorage.getImage(bookEntity.getIsbn()),
+                        loadImage(fileStorage, bookEntity.getIsbn()),
                         bookEntity.isResolved())).collect(Collectors.toList());
         globalViewModel.setBooks(books);
         return books;
@@ -142,7 +144,7 @@ public class GlobalController {
         List<Series> series = db.seriesDao().getSeries();
         series.forEach(series1 -> {
             BookEntity first = db.bookDao().getBooksFromSeries(series1.getSeriesId()).get(0);
-            series1.setCover(fileStorage.getImage(first.getIsbn()));
+            series1.setCover(loadImage(fileStorage, first.getIsbn()));
         });
 
         globalViewModel.setSeries(series);
@@ -155,7 +157,7 @@ public class GlobalController {
                 .stream().map(bookEntity -> new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
                         bookEntity.getPart(), bookEntity.getIsbn(),
                         bookEntity.getAuthor(),
-                        fileStorage.getImage(bookEntity.getIsbn()),
+                        loadImage(fileStorage, bookEntity.getIsbn()),
                         bookEntity.isResolved())).collect(Collectors.toList());
     }
 
@@ -165,7 +167,7 @@ public class GlobalController {
         return new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
                 bookEntity.getPart(), bookEntity.getIsbn(),
                 bookEntity.getAuthor(),
-                fileStorage.getImage(bookEntity.getIsbn()),
+                loadImage(fileStorage, bookEntity.getIsbn()),
                 bookEntity.isResolved());
     }
 
@@ -175,5 +177,14 @@ public class GlobalController {
 
     public void sort() {
         globalViewModel.sort();
+    }
+
+    private Drawable loadImage(FileStorage fileStorage, String isbn) {
+        Optional<Drawable> cached = globalViewModel.getDrawable(isbn);
+        return cached.orElseGet(() -> {
+            Drawable cover = fileStorage.getImage(isbn);
+            globalViewModel.addDrawable(isbn, cover);
+            return cover;
+        });
     }
 }
