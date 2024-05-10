@@ -14,56 +14,63 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.skyvoli.goodbooks.R;
+import io.skyvoli.goodbooks.StartFragmentListener;
 import io.skyvoli.goodbooks.databinding.FragmentSeriesBinding;
 import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
 import io.skyvoli.goodbooks.storage.database.dto.Series;
 import io.skyvoli.goodbooks.ui.recyclerviews.seriescard.SeriesAdapter;
 
-public class SeriesFragment extends Fragment {
+public class SeriesFragment extends Fragment implements StartFragmentListener {
 
     private GlobalController globalController;
     private FragmentSeriesBinding binding;
     private List<Series> series;
+    private boolean shouldConfigureUi = true;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentSeriesBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        return binding.getRoot();
+    }
 
-        globalController = new GlobalController(requireActivity());
+    @Override
+    public void configureFragment() {
+        if (shouldConfigureUi) {
+            shouldConfigureUi = false;
 
-        RecyclerView recyclerView = binding.series;
-        recyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 3));
-        recyclerView.setAdapter(new SeriesAdapter(globalController.getSeries()));
-        recyclerView.setHasFixedSize(true);
+            globalController = new GlobalController(requireActivity());
 
-        ProgressBar progressBar = binding.progressBar;
+            RecyclerView recyclerView = binding.series;
+            recyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 3));
+            recyclerView.setAdapter(new SeriesAdapter(globalController.getSeries()));
+            recyclerView.setHasFixedSize(true);
 
-        SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
-        SwipeColorSchemeConfigurator.setSwipeColorScheme(binding.swipeRefreshLayout, requireContext());
-        swipeRefreshLayout.setOnRefreshListener(() -> onSwipe(swipeRefreshLayout, recyclerView, requireContext()));
+            ProgressBar progressBar = binding.progressBar;
 
-        //TODO pagination
-        //sHOW LOADING
-        if (series == null && globalController.getSeries().isEmpty()) {
-            new Thread(() -> {
-                series = globalController.loadSeriesFromDb(requireContext());
-                if (isAdded()) {
-                    requireActivity().runOnUiThread(() -> loadingCompleted(recyclerView, progressBar));
-                }
-            }).start();
-        } else {
-            //series = globalController.getSeries();
-            loadingCompleted(recyclerView, progressBar);
+            SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
+            SwipeColorSchemeConfigurator.setSwipeColorScheme(binding.swipeRefreshLayout, requireContext());
+            swipeRefreshLayout.setOnRefreshListener(() -> onSwipe(swipeRefreshLayout, recyclerView, requireContext()));
 
+            //TODO pagination
+            if (series == null && globalController.getSeries().isEmpty()) {
+                new Thread(() -> {
+                    series = globalController.loadSeriesFromDb(requireContext());
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(() -> loadingCompleted(recyclerView, progressBar));
+                    }
+                }).start();
+            } else {
+                series = new ArrayList<>(globalController.getSeries());
+                loadingCompleted(recyclerView, progressBar);
+
+            }
         }
-
-        return root;
     }
 
     private void loadingCompleted(RecyclerView recyclerView, ProgressBar progressBar) {
@@ -90,6 +97,12 @@ public class SeriesFragment extends Fragment {
                 });
             }
         }).start();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        shouldConfigureUi = true;
     }
 
     @Override
