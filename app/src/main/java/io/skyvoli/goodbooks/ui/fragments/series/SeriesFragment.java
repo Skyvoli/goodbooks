@@ -13,16 +13,20 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import java.util.List;
+
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.databinding.FragmentSeriesBinding;
 import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
+import io.skyvoli.goodbooks.storage.database.dto.Series;
 import io.skyvoli.goodbooks.ui.recyclerviews.seriescard.SeriesAdapter;
 
 public class SeriesFragment extends Fragment {
 
     private GlobalController globalController;
     private FragmentSeriesBinding binding;
+    private List<Series> series;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -41,8 +45,27 @@ public class SeriesFragment extends Fragment {
         SwipeColorSchemeConfigurator.setSwipeColorScheme(binding.swipeRefreshLayout, requireContext());
         swipeRefreshLayout.setOnRefreshListener(() -> onSwipe(swipeRefreshLayout, recyclerView, requireContext()));
 
+        //TODO pagination
+        //sHOW LOADING
+        if (series == null && globalController.getSeries().isEmpty()) {
+            new Thread(() -> {
+                series = globalController.loadSeriesFromDb(requireContext());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> loadingCompleted(recyclerView));
+                }
+            }).start();
+        } else {
+            series = globalController.getSeries();
+            loadingCompleted(recyclerView);
+
+        }
 
         return root;
+    }
+
+    private void loadingCompleted(RecyclerView recyclerView) {
+        recyclerView.setAdapter(new SeriesAdapter(globalController.getSeries()));
+        recyclerView.setVisibility(View.VISIBLE);
     }
 
     private void onSwipe(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView, Context context) {
@@ -51,7 +74,7 @@ public class SeriesFragment extends Fragment {
             recyclerView.startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out));
             recyclerView.setVisibility(View.INVISIBLE);
 
-            globalController.setupListsWithDataFromDatabase(requireContext());
+            series = globalController.loadSeriesFromDb(requireContext());
 
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {

@@ -20,7 +20,6 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.navigation.NavigationView;
 
 import io.skyvoli.goodbooks.databinding.ActivityMainBinding;
-import io.skyvoli.goodbooks.global.GlobalController;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,10 +46,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
 
         setDrawerCallback(drawer);
-
-        new Thread(() -> new GlobalController(this)
-                .setupListsWithDataFromDatabase(getApplicationContext()))
-                .start();
     }
 
     @Override
