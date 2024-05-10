@@ -18,6 +18,9 @@ public interface BookDao {
     @Query("SELECT * FROM books WHERE seriesId = :seriesId ORDER BY title, part")
     List<BookEntity> getBooksFromSeries(long seriesId);
 
+    @Query("SELECT * FROM books WHERE isbn = :isbn")
+    BookEntity getBookByIsbn(String isbn);
+
     @Insert
     void insert(BookEntity... books);
 

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -41,6 +42,8 @@ public class SeriesFragment extends Fragment {
         recyclerView.setAdapter(new SeriesAdapter(globalController.getSeries()));
         recyclerView.setHasFixedSize(true);
 
+        ProgressBar progressBar = binding.progressBar;
+
         SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
         SwipeColorSchemeConfigurator.setSwipeColorScheme(binding.swipeRefreshLayout, requireContext());
         swipeRefreshLayout.setOnRefreshListener(() -> onSwipe(swipeRefreshLayout, recyclerView, requireContext()));
@@ -51,21 +54,22 @@ public class SeriesFragment extends Fragment {
             new Thread(() -> {
                 series = globalController.loadSeriesFromDb(requireContext());
                 if (isAdded()) {
-                    requireActivity().runOnUiThread(() -> loadingCompleted(recyclerView));
+                    requireActivity().runOnUiThread(() -> loadingCompleted(recyclerView, progressBar));
                 }
             }).start();
         } else {
-            series = globalController.getSeries();
-            loadingCompleted(recyclerView);
+            //series = globalController.getSeries();
+            loadingCompleted(recyclerView, progressBar);
 
         }
 
         return root;
     }
 
-    private void loadingCompleted(RecyclerView recyclerView) {
+    private void loadingCompleted(RecyclerView recyclerView, ProgressBar progressBar) {
         recyclerView.setAdapter(new SeriesAdapter(globalController.getSeries()));
         recyclerView.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
     }
 
     private void onSwipe(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView, Context context) {
