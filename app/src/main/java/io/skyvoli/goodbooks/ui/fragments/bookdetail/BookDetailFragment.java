@@ -107,29 +107,33 @@ public class BookDetailFragment extends Fragment {
         final TextInputEditText editAuthor = binding.editAuthor;
         final FloatingActionButton galleryButton = binding.includeCard.floatingActionButton;
         submit = binding.submitChanges;
-        originalBook = loadBook();
-        copiedBook = originalBook.createClone();
 
-        //Set content & observables
-        title.setText(TitleBuilder.buildTitle(originalBook.getTitle(), originalBook.getSubtitle(), originalBook.getPart()));
+        new Thread(() -> {
+            originalBook = loadBook();
+            copiedBook = originalBook.createClone();
+            if (isAdded()) {
+                requireActivity().runOnUiThread(() -> {
+                    //Set content & observables
+                    title.setText(TitleBuilder.buildTitle(originalBook.getTitle(), originalBook.getSubtitle(), originalBook.getPart()));
 
-        Drawable drawable = originalBook.getCover()
-                .orElseGet(() -> ContextCompat.getDrawable(requireContext(), R.drawable.ruby));
-        setCover(Objects.requireNonNull(drawable));
+                    Drawable drawable = originalBook.getCover()
+                            .orElseGet(() -> ContextCompat.getDrawable(requireContext(), R.drawable.ruby));
+                    setCover(Objects.requireNonNull(drawable));
 
-        isbn.setText(originalBook.getIsbn());
-        author.setText(originalBook.getAuthor());
+                    isbn.setText(originalBook.getIsbn());
+                    author.setText(originalBook.getAuthor());
 
-        //Set editable
-        editTitle.setText(originalBook.getTitle());
+                    //Set editable
+                    editTitle.setText(originalBook.getTitle());
 
-        Optional<String> subtitle = Optional.ofNullable(originalBook.getSubtitle());
-        subtitle.ifPresent(editSubtitle::setText);
+                    Optional.ofNullable(originalBook.getSubtitle()).ifPresent(editSubtitle::setText);
 
-        Optional<Integer> part = Optional.ofNullable(originalBook.getPart());
-        part.ifPresent(integer -> editPart.setText(String.valueOf(integer)));
+                    Optional.ofNullable(originalBook.getPart()).ifPresent(integer -> editPart.setText(String.valueOf(integer)));
 
-        editAuthor.setText(originalBook.getAuthor());
+                    editAuthor.setText(originalBook.getAuthor());
+                });
+            }
+        }).start();
 
         //Set listener
         editTitle.setOnFocusChangeListener(getTitleListener(editTitle, titleLayout));
@@ -202,7 +206,7 @@ public class BookDetailFragment extends Fragment {
         String isbn = Optional.ofNullable(getArguments().getString("isbn"))
                 .orElseThrow(() -> new IllegalStateException("Missing argument isbn"));
 
-        return globalController.getBook(isbn).orElseThrow(() -> new IllegalStateException("Missing book"));
+        return globalController.getBookByIsbn(requireContext(), isbn);
     }
 
     private View.OnFocusChangeListener getTitleListener(TextInputEditText editTitle, TextInputLayout titleLayout) {

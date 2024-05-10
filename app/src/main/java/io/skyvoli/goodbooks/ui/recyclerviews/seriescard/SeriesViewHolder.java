@@ -15,7 +15,7 @@ public class SeriesViewHolder extends RecyclerView.ViewHolder {
     private final ImageView cover;
     private final View line1;
     private final View line2;
-    private String title;
+    private long seriesId;
 
     public SeriesViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -26,7 +26,7 @@ public class SeriesViewHolder extends RecyclerView.ViewHolder {
 
         itemView.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
-            bundle.putString("title", title);
+            bundle.putLong("seriesId", seriesId);
             Navigation.findNavController(v).navigate(R.id.to_series_books, bundle);
         });
     }
@@ -42,7 +42,7 @@ public class SeriesViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setSeriesId(long seriesId) {
+        this.seriesId = seriesId;
     }
 }

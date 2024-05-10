@@ -149,6 +149,26 @@ public class GlobalController {
         return series;
     }
 
+    public List<Book> getBooksFromSeries(Context context, long seriesId) {
+        FileStorage fileStorage = new FileStorage(context.getFilesDir());
+        return db.bookDao().getBooksFromSeries(seriesId)
+                .stream().map(bookEntity -> new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
+                        bookEntity.getPart(), bookEntity.getIsbn(),
+                        bookEntity.getAuthor(),
+                        fileStorage.getImage(bookEntity.getIsbn()),
+                        bookEntity.isResolved())).collect(Collectors.toList());
+    }
+
+    public Book getBookByIsbn(Context context, String isbn) {
+        FileStorage fileStorage = new FileStorage(context.getFilesDir());
+        BookEntity bookEntity = db.bookDao().getBookByIsbn(isbn);
+        return new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
+                bookEntity.getPart(), bookEntity.getIsbn(),
+                bookEntity.getAuthor(),
+                fileStorage.getImage(bookEntity.getIsbn()),
+                bookEntity.isResolved());
+    }
+
     public ObservableList<Series> getSeries() {
         return globalViewModel.getSeries();
     }

@@ -1,9 +1,11 @@
 package io.skyvoli.goodbooks.ui.fragments.seriesbooks;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -12,8 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import io.skyvoli.goodbooks.databinding.FragmentSeriesBooksBinding;
 import io.skyvoli.goodbooks.global.GlobalController;
@@ -23,22 +23,21 @@ import io.skyvoli.goodbooks.ui.recyclerviews.bookcard.BookAdapter;
 
 public class SeriesBooks extends Fragment {
 
-    private String title;
+    private long seriesId;
     private FragmentSeriesBooksBinding binding;
-
-
-    public SeriesBooks() {
-        // Required empty public constructor
-    }
+    private List<Book> books;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() == null) {
-            throw new IllegalStateException("Missing argument title");
+            throw new IllegalStateException("Missing argument seriesId");
         }
-        title = Optional.ofNullable(getArguments().getString("title"))
-                .orElseThrow(() -> new IllegalStateException("Missing argument title"));
+        seriesId = getArguments().getLong("seriesId");
+
+        if (seriesId == 0) {
+            Log.e(getTag(), "Missing argument seriesId");
+        }
     }
 
     @Override
@@ -49,15 +48,25 @@ public class SeriesBooks extends Fragment {
         View root = binding.getRoot();
 
         RecyclerView recyclerView = binding.books;
-        binding.progressBar.setVisibility(View.GONE);
+        ProgressBar progressBar = binding.progressBar;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        List<Book> books = globalController.getBooks()
-                .stream()
-                .filter(book -> book.getTitle().equalsIgnoreCase(title))
-                .collect(Collectors.toList());
+        if (books == null) {
+            new Thread(() -> {
+                books = globalController.getBooksFromSeries(requireContext(), seriesId);
 
-        recyclerView.setAdapter(new BookAdapter(books));
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(() -> {
+                        recyclerView.setAdapter(new BookAdapter(books));
+                        progressBar.setVisibility(View.GONE);
+                    });
+
+                }
+            }).start();
+        } else {
+            recyclerView.setAdapter(new BookAdapter(books));
+            progressBar.setVisibility(View.GONE);
+        }
 
         final SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
 
