@@ -22,10 +22,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import io.skyvoli.goodbooks.R;
+import io.skyvoli.goodbooks.StartFragmentListener;
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.global.GlobalController;
@@ -35,7 +37,7 @@ import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.ui.recyclerviews.bookcard.BookAdapter;
 import io.skyvoli.goodbooks.web.BookResolver;
 
-public class BooksFragment extends Fragment {
+public class BooksFragment extends Fragment implements StartFragmentListener {
 
     private FragmentBooksBinding binding;
     private ProgressBar progressBar;
@@ -43,6 +45,7 @@ public class BooksFragment extends Fragment {
     private RecyclerView recyclerView;
     private List<Book> books;
     private GlobalController globalController;
+    private boolean shouldConfigureUi = true;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,34 +53,40 @@ public class BooksFragment extends Fragment {
 
         binding = FragmentBooksBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        Context context = requireContext();
 
         requireActivity().addMenuProvider(getMenuProvider(), getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
-        recyclerView = binding.books;
-        placeholder = binding.placeholder;
-        progressBar = binding.progressBar;
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-
-        final SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
-
-        SwipeColorSchemeConfigurator.setSwipeColorScheme(swipeRefreshLayout, context);
-        swipeRefreshLayout.setOnRefreshListener(() -> onSwipe(swipeRefreshLayout, context));
-
-        //TODO pagination
-        if (books == null && globalController.getBooks().isEmpty()) {
-            new Thread(() -> {
-                books = globalController.loadBooksFromDb(requireContext());
-                if (isAdded()) {
-                    requireActivity().runOnUiThread(this::loadingCompleted);
-                }
-            }).start();
-        } else {
-            books = globalController.getBooks();
-            loadingCompleted();
-        }
         return root;
+    }
+
+    @Override
+    public void configureFragment() {
+        if (shouldConfigureUi) {
+            shouldConfigureUi = false;
+
+            recyclerView = binding.books;
+            placeholder = binding.placeholder;
+            progressBar = binding.progressBar;
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+            final SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
+
+            SwipeColorSchemeConfigurator.setSwipeColorScheme(swipeRefreshLayout, requireContext());
+            swipeRefreshLayout.setOnRefreshListener(() -> onSwipe(swipeRefreshLayout, requireContext()));
+
+            //TODO pagination?
+            if (books == null && globalController.getBooks().isEmpty()) {
+                new Thread(() -> {
+                    books = new ArrayList<>(globalController.loadBooksFromDb(requireContext()));
+                    if (isAdded()) {
+                        requireActivity().runOnUiThread(this::loadingCompleted);
+                    }
+                }).start();
+            } else {
+                books = new ArrayList<>(globalController.getBooks());
+                loadingCompleted();
+            }
+        }
     }
 
     private void loadingCompleted() {
@@ -168,6 +177,12 @@ public class BooksFragment extends Fragment {
         } else {
             placeholder.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        shouldConfigureUi = true;
     }
 
     @Override
