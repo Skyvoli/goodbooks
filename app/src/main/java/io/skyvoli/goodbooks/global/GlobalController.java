@@ -7,7 +7,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,8 +15,6 @@ import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.storage.database.dto.Series;
-import io.skyvoli.goodbooks.storage.database.dto.SeriesWithBooks;
-import io.skyvoli.goodbooks.storage.database.dto.SeriesWithBooksConverter;
 import io.skyvoli.goodbooks.storage.database.entities.BookEntity;
 import io.skyvoli.goodbooks.storage.database.entities.SeriesEntity;
 
@@ -32,37 +29,6 @@ public class GlobalController {
         globalViewModel = new ViewModelProvider(activity).get(GlobalViewModel.class);
         db = Room.databaseBuilder(activity.getApplicationContext(), AppDatabase.class, DATABASE_NAME)
                 .build();
-    }
-
-    public void setupListsWithDataFromDatabase(Context context) {
-
-        FileStorage fileStorage = new FileStorage(context.getFilesDir());
-        List<SeriesWithBooks> all = new ArrayList<>();
-        List<SeriesEntity> seriesEntities = db.seriesDao().getSeriesDto();
-
-        seriesEntities.forEach(seriesEntity -> {
-            List<BookEntity> bookEntities = db.bookDao().getBooksFromSeries(seriesEntity.getSeriesId());
-            all.add(new SeriesWithBooksConverter(seriesEntity, bookEntities).convert(fileStorage));
-        });
-
-        List<Series> series = new ArrayList<>();
-        List<Book> books = new ArrayList<>();
-
-        all.forEach(seriesWithBooks -> {
-            series.add(seriesWithBooks.getSeries());
-            books.addAll(seriesWithBooks.getBooks());
-        });
-
-        /*List<BookEntity> bookEntities = db.bookDao().getAll();
-
-        bookEntities.forEach(bookEntity -> books
-                .add(new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
-                        bookEntity.getPart(), bookEntity.getIsbn(),
-                        bookEntity.getAuthor(),
-                        fileStorage.getImage(bookEntity.getIsbn()),
-                        bookEntity.isResolved())));*/
-        globalViewModel.setBooks(books);
-        globalViewModel.setSeries(series);
     }
 
     public void addBook(Book book, Context context) {
@@ -156,6 +122,31 @@ public class GlobalController {
 
     public ObservableList<Book> getBooks() {
         return globalViewModel.getBooks();
+    }
+
+
+    public List<Book> loadBooksFromDb(Context context) {
+        FileStorage fileStorage = new FileStorage(context.getFilesDir());
+        List<Book> books = db.bookDao().getAll()
+                .stream().map(bookEntity -> new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
+                        bookEntity.getPart(), bookEntity.getIsbn(),
+                        bookEntity.getAuthor(),
+                        fileStorage.getImage(bookEntity.getIsbn()),
+                        bookEntity.isResolved())).collect(Collectors.toList());
+        globalViewModel.setBooks(books);
+        return books;
+    }
+
+    public List<Series> loadSeriesFromDb(Context context) {
+        FileStorage fileStorage = new FileStorage(context.getFilesDir());
+        List<Series> series = db.seriesDao().getSeries();
+        series.forEach(series1 -> {
+            BookEntity first = db.bookDao().getBooksFromSeries(series1.getSeriesId()).get(0);
+            series1.setCover(fileStorage.getImage(first.getIsbn()));
+        });
+
+        globalViewModel.setSeries(series);
+        return series;
     }
 
     public ObservableList<Series> getSeries() {

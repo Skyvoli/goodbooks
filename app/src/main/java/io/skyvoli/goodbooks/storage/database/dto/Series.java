@@ -13,11 +13,16 @@ public class Series {
     private Drawable cover;
     private int countedBooks;
 
+    @Ignore
     public Series(long seriesId, String title, Drawable cover, int countedBooks) {
         this.seriesId = seriesId;
         this.title = title;
         this.cover = cover;
         this.countedBooks = countedBooks;
+    }
+
+    public Series(long seriesId, String title, int countedBooks) {
+        this(seriesId, title, null, countedBooks);
     }
 
     public long getSeriesId() {

@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,24 +59,29 @@ public class BooksFragment extends Fragment {
         progressBar = binding.progressBar;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        books = new ArrayList<>(globalController.getBooks());
 
         final SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
 
         SwipeColorSchemeConfigurator.setSwipeColorScheme(swipeRefreshLayout, context);
         swipeRefreshLayout.setOnRefreshListener(() -> onSwipe(swipeRefreshLayout, context));
 
-        if (isAdded()) {
-            globalController.getBooks().addOnListChangedCallback(new BookObserver(binding, requireActivity()));
+        //TODO pagination
+        if (books == null && globalController.getBooks().isEmpty()) {
+            new Thread(() -> {
+                books = globalController.loadBooksFromDb(requireContext());
+                if (isAdded()) {
+                    requireActivity().runOnUiThread(this::loadingCompleted);
+                }
+            }).start();
+        } else {
+            books = globalController.getBooks();
+            loadingCompleted();
         }
-
         return root;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
+    private void loadingCompleted() {
+        globalController.getBooks().addOnListChangedCallback(new BookObserver(binding, requireActivity()));
         recyclerView.setAdapter(new BookAdapter(books));
         setPlaceholder();
         progressBar.setVisibility(View.GONE);
@@ -143,11 +147,10 @@ public class BooksFragment extends Fragment {
             recyclerView.startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out));
             recyclerView.setVisibility(View.INVISIBLE);
 
-            globalController.setupListsWithDataFromDatabase(requireContext());
+            books = globalController.loadBooksFromDb(requireContext());
 
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
-                    books = globalController.getBooks();
                     recyclerView.setAdapter(new BookAdapter(books));
                     setPlaceholder();
                     recyclerView.clearAnimation();
