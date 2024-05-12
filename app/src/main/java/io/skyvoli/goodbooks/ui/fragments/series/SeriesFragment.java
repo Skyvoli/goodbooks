@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.skyvoli.goodbooks.R;
@@ -50,6 +49,7 @@ public class SeriesFragment extends Fragment implements StartFragmentListener {
             recyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 3));
             recyclerView.setAdapter(new SeriesAdapter(globalController.getSeries()));
             recyclerView.setHasFixedSize(true);
+            recyclerView.setVisibility(View.INVISIBLE);
 
             ProgressBar progressBar = binding.progressBar;
 
@@ -58,7 +58,7 @@ public class SeriesFragment extends Fragment implements StartFragmentListener {
             swipeRefreshLayout.setOnRefreshListener(() -> onSwipe(swipeRefreshLayout, recyclerView, requireContext()));
 
             //TODO pagination
-            if (series == null && globalController.getSeries().isEmpty()) {
+            if (series == null) {
                 new Thread(() -> {
                     series = globalController.loadSeriesFromDb(requireContext());
                     if (isAdded()) {
@@ -66,17 +66,16 @@ public class SeriesFragment extends Fragment implements StartFragmentListener {
                     }
                 }).start();
             } else {
-                series = new ArrayList<>(globalController.getSeries());
                 loadingCompleted(recyclerView, progressBar);
-
             }
         }
     }
 
     private void loadingCompleted(RecyclerView recyclerView, ProgressBar progressBar) {
-        recyclerView.setAdapter(new SeriesAdapter(globalController.getSeries()));
-        recyclerView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
+        recyclerView.setAdapter(new SeriesAdapter(globalController.getSeries()));
+        recyclerView.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in));
+        recyclerView.setVisibility(View.VISIBLE);
     }
 
     private void onSwipe(SwipeRefreshLayout swipeRefreshLayout, RecyclerView recyclerView, Context context) {
