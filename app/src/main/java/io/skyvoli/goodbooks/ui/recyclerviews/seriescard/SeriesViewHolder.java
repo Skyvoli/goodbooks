@@ -39,6 +39,9 @@ public class SeriesViewHolder extends RecyclerView.ViewHolder {
         if (!multipleBooks) {
             line1.setVisibility(View.GONE);
             line2.setVisibility(View.GONE);
+        } else {
+            line1.setVisibility(View.VISIBLE);
+            line2.setVisibility(View.VISIBLE);
         }
     }
 
