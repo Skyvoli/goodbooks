@@ -67,7 +67,9 @@ public class BooksFragment extends Fragment implements StartFragmentListener {
             recyclerView = binding.books;
             placeholder = binding.placeholder;
             progressBar = binding.progressBar;
+
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            recyclerView.setVisibility(View.INVISIBLE);
 
             final SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
 
@@ -75,7 +77,7 @@ public class BooksFragment extends Fragment implements StartFragmentListener {
             swipeRefreshLayout.setOnRefreshListener(() -> onSwipe(swipeRefreshLayout, requireContext()));
 
             //TODO pagination?
-            if (books == null && globalController.getBooks().isEmpty()) {
+            if (books == null) {
                 new Thread(() -> {
                     books = new ArrayList<>(globalController.loadBooksFromDb(requireContext()));
                     if (isAdded()) {
@@ -83,17 +85,18 @@ public class BooksFragment extends Fragment implements StartFragmentListener {
                     }
                 }).start();
             } else {
-                books = new ArrayList<>(globalController.getBooks());
                 loadingCompleted();
             }
         }
     }
 
     private void loadingCompleted() {
+        progressBar.setVisibility(View.GONE);
         globalController.getBooks().addOnListChangedCallback(new BookObserver(binding, requireActivity()));
         recyclerView.setAdapter(new BookAdapter(books));
+        recyclerView.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in));
+        recyclerView.setVisibility(View.VISIBLE);
         setPlaceholder();
-        progressBar.setVisibility(View.GONE);
     }
 
     private MenuProvider getMenuProvider() {
