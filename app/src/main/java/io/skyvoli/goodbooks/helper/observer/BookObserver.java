@@ -74,7 +74,7 @@ public class BookObserver extends ObservableList.OnListChangedCallback<Observabl
     public void onItemRangeRemoved(ObservableList<Book> sender, int positionStart, int itemCount) {
         BookAdapter adapter = (BookAdapter) binding.books.getAdapter();
         if (adapter == null) {
-            Log.e(getClass().getSimpleName(), ADAPTER_ERROR);
+            Log.e(logTag, ADAPTER_ERROR);
             return;
         }
         int index = positionStart;
