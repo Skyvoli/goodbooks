@@ -51,22 +51,21 @@ public class SeriesBooks extends Fragment {
         ProgressBar progressBar = binding.progressBar;
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        if (books == null) {
-            new Thread(() -> {
-                books = globalController.getBooksFromSeries(requireContext(), seriesId);
+        new Thread(() -> {
+            books = globalController.getBooksFromSeries(requireContext(), seriesId);
 
-                if (isAdded()) {
-                    requireActivity().runOnUiThread(() -> {
-                        recyclerView.setAdapter(new BookAdapter(books));
-                        progressBar.setVisibility(View.GONE);
-                    });
-
-                }
-            }).start();
-        } else {
-            recyclerView.setAdapter(new BookAdapter(books));
-            progressBar.setVisibility(View.GONE);
-        }
+            if (isAdded()) {
+                requireActivity().runOnUiThread(() -> {
+                    //Maybe?
+                    /*if (books.isEmpty()) {
+                        getParentFragmentManager().popBackStack();
+                        return;
+                    }*/
+                    recyclerView.setAdapter(new BookAdapter(books));
+                    progressBar.setVisibility(View.GONE);
+                });
+            }
+        }).start();
 
         final SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
 
