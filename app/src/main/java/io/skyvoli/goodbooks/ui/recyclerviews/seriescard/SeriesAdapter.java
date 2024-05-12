@@ -45,4 +45,8 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesViewHolder> {
     public int getItemCount() {
         return series.size();
     }
+
+    public List<Series> getSeries() {
+        return series;
+    }
 }
