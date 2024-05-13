@@ -30,7 +30,7 @@ public class Book {
         this.resolved = false;
     }
 
-    public Book(String title, String subtitle, Integer part, @NonNull String isbn, String author, Drawable cover, boolean resolved) {
+    public Book(String title, String subtitle, Integer part, @NonNull String isbn, String author, Drawable cover, boolean resolved, long seriesId) {
         this.title = title;
         this.subtitle = subtitle;
         this.part = part;
@@ -38,6 +38,7 @@ public class Book {
         this.author = author;
         this.cover = cover;
         this.resolved = resolved;
+        this.seriesId = seriesId;
     }
 
     public int comparePart(Integer otherPart) {
@@ -52,7 +53,7 @@ public class Book {
     }
 
     public Book createClone() {
-        return new Book(title, subtitle, part, isbn, author, cover, resolved);
+        return new Book(title, subtitle, part, isbn, author, cover, resolved, seriesId);
     }
 
     public String getTitle() {

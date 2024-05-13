@@ -1,7 +1,6 @@
 package io.skyvoli.goodbooks.storage.database.dao;
 
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
@@ -14,17 +13,17 @@ import io.skyvoli.goodbooks.storage.database.entities.SeriesEntity;
 @Dao
 public interface SeriesDao {
 
-    @Query("SELECT * FROM series ORDER BY title")
-    List<SeriesEntity> getSeriesDto();
-
     @Query("SELECT s.*, COUNT(*) as countedBooks FROM series s INNER JOIN books b ON s.seriesId = b.seriesId GROUP BY s.title ORDER BY s.title")
     List<Series> getSeries();
 
-    @Query("SELECT * FROM series WHERE title LIKE :title")
+    @Query("SELECT * FROM series WHERE seriesId = :seriesId")
+    SeriesEntity getSeriesById(long seriesId);
+
+    @Query("SELECT * FROM series WHERE title = :title")
     List<SeriesEntity> getSeriesDtoByTitle(String title);
 
-    @Query("SELECT COUNT(*) as countedBooks FROM books WHERE title LIKE :title")
-    int getCountOfSeries(String title);
+    @Query("SELECT COUNT(*) as countedBooks FROM books WHERE seriesId LIKE :seriesId")
+    int getCountOfSeries(long seriesId);
 
     @Insert
     long insert(SeriesEntity series);
@@ -32,6 +31,6 @@ public interface SeriesDao {
     @Update
     void update(SeriesEntity series);
 
-    @Delete
-    void delete(SeriesEntity series);
+    @Query("DELETE FROM series WHERE seriesId = :seriesId")
+    void delete(long seriesId);
 }

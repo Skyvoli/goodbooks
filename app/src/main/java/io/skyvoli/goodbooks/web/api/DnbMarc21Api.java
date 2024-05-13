@@ -74,7 +74,7 @@ public class DnbMarc21Api implements BookApi {
         Resolved<String> resolvedAuthor = resolveString(bookData, authorFields, "Unbekannt");
         resolvedAuthor.setValue(formatAuthors(resolvedAuthor.getValue()));
 
-        return new Book(resolvedTitle.getValue(), resolvedSubtitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), null, true);
+        return new Book(resolvedTitle.getValue(), resolvedSubtitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), null, true, 0);
     }
 
     public Drawable loadImage(String isbn, int timeout) {
