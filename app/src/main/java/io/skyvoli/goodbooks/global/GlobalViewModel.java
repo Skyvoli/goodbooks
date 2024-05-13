@@ -2,6 +2,7 @@ package io.skyvoli.goodbooks.global;
 
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import androidx.databinding.ObservableArrayList;
 import androidx.databinding.ObservableList;
@@ -21,6 +22,7 @@ public class GlobalViewModel extends ViewModel {
     private ObservableList<Book> books;
     private ObservableList<Series> series;
     private final Map<String, Drawable> drawables;
+    private final String logTag = getClass().getSimpleName();
 
     protected GlobalViewModel() {
         books = new ObservableArrayList<>();
@@ -48,7 +50,9 @@ public class GlobalViewModel extends ViewModel {
                 .findFirst();
 
         if (!found.isPresent()) {
-            throw new IllegalStateException("Existing book not found");
+            //Series probably not filled with data yet
+            Log.w(logTag, "Book not found.");
+            return;
         }
 
         books.set(books.indexOf(found.get()), newBook);

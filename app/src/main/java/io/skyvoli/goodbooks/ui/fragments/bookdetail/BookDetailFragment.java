@@ -35,6 +35,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import org.jsoup.internal.StringUtil;
 
 import java.io.IOException;
+import java.text.Normalizer;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -144,7 +145,7 @@ public class BookDetailFragment extends Fragment {
         submit.setOnClickListener(v -> {
             Book newBook = copiedBook.createClone();
             newBook.setResolved(true);
-            new Thread(() -> globalController.updateBook(newBook, originalBook.getTitle(), requireContext())).start();
+            new Thread(() -> globalController.updateBook(newBook, requireContext())).start();
             globalController.sort();
             originalBook = newBook;
             //Refresh
@@ -291,14 +292,21 @@ public class BookDetailFragment extends Fragment {
 
     private String formatAuthor(String unformatted) {
         //\n shouldn't be completely removed
-        return unformatted.trim()
+        return normalize(unformatted.trim()
                 .replaceAll(" {2,}", " ")
                 .replaceAll("\n{2,}", "\n")
-                .replace("\n ", "\n");
+                .replace("\n ", "\n"));
     }
 
     private String formatString(String unformatted) {
-        return StringUtil.normaliseWhitespace(unformatted).trim();
+        return normalize(StringUtil.normaliseWhitespace(unformatted).trim());
+    }
+
+    private String normalize(String unformatted) {
+        if (Normalizer.isNormalized(unformatted, Normalizer.Form.NFD)) {
+            return unformatted;
+        }
+        return Normalizer.normalize(unformatted, Normalizer.Form.NFD);
     }
 
     private void changed() {

@@ -67,24 +67,25 @@ public class GlobalController {
         return seriesId;
     }
 
-    public void updateBook(Book book, String previousTitle, Context context) {
+    public void updateBook(Book book, Context context) {
+        long oldId = book.getSeriesId();
         updateBookWithCover(book, context);
 
-        if (db.seriesDao().getCountOfSeries(previousTitle) <= 1) {
+        if (db.seriesDao().getCountOfSeries(oldId) <= 1) {
             List<SeriesEntity> found = seriesExists(book.getTitle());
             if (!found.isEmpty()) {
                 //Change reference and delete old
-                //TODO by id
                 book.setSeriesId(found.get(0).getSeriesId());
                 db.bookDao().update(book.getEntity());
-                deleteSeries(previousTitle);
+                deleteSeries(oldId);
             } else {
                 //"Renaming"
-                SeriesEntity series = db.seriesDao().getSeriesDtoByTitle(previousTitle).get(0);
+                SeriesEntity series = db.seriesDao().getSeriesById(oldId);
                 series.setTitle(book.getTitle());
                 db.seriesDao().update(series);
             }
         } else {
+            //TODO update old series (counted)
             long id = getOrCreateSeries(book);
             book.setSeriesId(id);
             db.bookDao().update(book.getEntity());
@@ -105,13 +106,13 @@ public class GlobalController {
         db.bookDao().delete(book.getEntity());
         new FileStorage(context.getFilesDir()).deleteImage(book.getIsbn());
 
-        deleteSeries(book.getTitle());
+        deleteSeries(book.getSeriesId());
     }
 
-    private void deleteSeries(String title) {
-        if (db.seriesDao().getCountOfSeries(title) == 0) {
+    private void deleteSeries(long seriesId) {
+        if (db.seriesDao().getCountOfSeries(seriesId) == 0) {
             //TODO better + in viewModel as well
-            db.seriesDao().delete(db.seriesDao().getSeriesDtoByTitle(title).get(0));
+            db.seriesDao().delete(seriesId);
         }
     }
 
@@ -130,11 +131,7 @@ public class GlobalController {
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
 
         List<Book> books = db.bookDao().getAll()
-                .stream().map(bookEntity -> new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
-                        bookEntity.getPart(), bookEntity.getIsbn(),
-                        bookEntity.getAuthor(),
-                        loadImage(fileStorage, bookEntity.getIsbn()),
-                        bookEntity.isResolved())).collect(Collectors.toList());
+                .stream().map(bookEntity -> getEntityAsBook(bookEntity, fileStorage)).collect(Collectors.toList());
         globalViewModel.setBooks(books);
         return books;
     }
@@ -154,21 +151,13 @@ public class GlobalController {
     public List<Book> getBooksFromSeries(Context context, long seriesId) {
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
         return db.bookDao().getBooksFromSeries(seriesId)
-                .stream().map(bookEntity -> new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
-                        bookEntity.getPart(), bookEntity.getIsbn(),
-                        bookEntity.getAuthor(),
-                        loadImage(fileStorage, bookEntity.getIsbn()),
-                        bookEntity.isResolved())).collect(Collectors.toList());
+                .stream().map(bookEntity -> getEntityAsBook(bookEntity, fileStorage)).collect(Collectors.toList());
     }
 
     public Book getBookByIsbn(Context context, String isbn) {
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
         BookEntity bookEntity = db.bookDao().getBookByIsbn(isbn);
-        return new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
-                bookEntity.getPart(), bookEntity.getIsbn(),
-                bookEntity.getAuthor(),
-                loadImage(fileStorage, bookEntity.getIsbn()),
-                bookEntity.isResolved());
+        return getEntityAsBook(bookEntity, fileStorage);
     }
 
     public ObservableList<Series> getSeries() {
@@ -177,6 +166,15 @@ public class GlobalController {
 
     public void sort() {
         globalViewModel.sort();
+    }
+
+    private Book getEntityAsBook(BookEntity bookEntity, FileStorage fileStorage) {
+        return new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
+                bookEntity.getPart(), bookEntity.getIsbn(),
+                bookEntity.getAuthor(),
+                loadImage(fileStorage, bookEntity.getIsbn()),
+                bookEntity.isResolved(),
+                bookEntity.getSeriesId());
     }
 
     private Drawable loadImage(FileStorage fileStorage, String isbn) {
