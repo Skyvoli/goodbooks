@@ -11,7 +11,7 @@ import io.skyvoli.goodbooks.storage.database.dao.SeriesDao;
 import io.skyvoli.goodbooks.storage.database.entities.BookEntity;
 import io.skyvoli.goodbooks.storage.database.entities.SeriesEntity;
 
-@Database(entities = {BookEntity.class, SeriesEntity.class}, version = 5)
+@Database(entities = {BookEntity.class, SeriesEntity.class}, version = 6)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract BookDao bookDao();
 
@@ -66,6 +66,33 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("INSERT INTO newSeries (seriesId, title) SELECT seriesId, title FROM series");
             database.execSQL("DROP TABLE series");
             database.execSQL("ALTER TABLE newSeries RENAME TO series");
+        }
+    };
+
+    public static final Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS newSeries (seriesId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                    "title TEXT COLLATE NOCASE)");
+            database.execSQL("INSERT INTO newSeries (seriesId, title) SELECT seriesId, title FROM series");
+            database.execSQL("DROP TABLE series");
+            database.execSQL("ALTER TABLE newSeries RENAME TO series");
+
+
+            database.execSQL("CREATE TABLE IF NOT EXISTS newBooks " +
+                    "(isbn TEXT NOT NULL, " +
+                    "title TEXT COLLATE NOCASE, " +
+                    "subtitle TEXT COLLATE NOCASE, " +
+                    "part INTEGER, " +
+                    "author TEXT COLLATE NOCASE, " +
+                    "resolved INTEGER NOT NULL, " +
+                    "seriesId INTEGER NOT NULL, " +
+                    "PRIMARY KEY(isbn), " +
+                    "FOREIGN KEY(seriesId) REFERENCES series(seriesId) ON UPDATE NO ACTION ON DELETE RESTRICT)");
+
+            database.execSQL("INSERT INTO newBooks (isbn, title, subtitle, part, author, resolved, seriesId) SELECT isbn, title, subtitle, part, author, resolved, seriesId FROM books");
+            database.execSQL("DROP TABLE books");
+            database.execSQL("ALTER TABLE newBooks RENAME TO books");
         }
     };
 }
