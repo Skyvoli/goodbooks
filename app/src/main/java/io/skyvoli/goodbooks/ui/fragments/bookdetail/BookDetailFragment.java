@@ -335,7 +335,7 @@ public class BookDetailFragment extends Fragment {
                         Drawable resetImage = baseCover.get();
                         new FileStorage(context.getFilesDir()).saveImage(originalBook.getIsbn(), resetImage);
                         originalBook.setCover(resetImage);
-                        globalController.updateBookWithCover(originalBook, context);
+                        globalController.updateCoverOfBook(originalBook, context);
                         if (isAdded()) {
                             requireActivity().runOnUiThread(() -> setCover(resetImage));
                         }

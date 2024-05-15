@@ -16,8 +16,11 @@ public interface SeriesDao {
     @Query("SELECT s.*, COUNT(*) as countedBooks FROM series s INNER JOIN books b ON s.seriesId = b.seriesId GROUP BY s.title ORDER BY s.title")
     List<Series> getSeries();
 
+    @Query("SELECT s.*, COUNT(*) as countedBooks FROM series s INNER JOIN books b ON s.seriesId = b.seriesId WHERE s.seriesId = :seriesId GROUP BY s.title ORDER BY s.title")
+    Series getSeriesById(long seriesId);
+
     @Query("SELECT * FROM series WHERE seriesId = :seriesId")
-    SeriesEntity getSeriesById(long seriesId);
+    SeriesEntity getSeriesEntityById(long seriesId);
 
     @Query("SELECT * FROM series WHERE title = :title")
     List<SeriesEntity> getSeriesDtoByTitle(String title);

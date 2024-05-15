@@ -21,7 +21,6 @@ import io.skyvoli.goodbooks.StartFragmentListener;
 import io.skyvoli.goodbooks.databinding.FragmentSeriesBinding;
 import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
-import io.skyvoli.goodbooks.helper.observer.SeriesObserver;
 import io.skyvoli.goodbooks.storage.database.dto.Series;
 import io.skyvoli.goodbooks.ui.recyclerviews.seriescard.SeriesAdapter;
 
@@ -74,7 +73,6 @@ public class SeriesFragment extends Fragment implements StartFragmentListener {
 
     private void loadingCompleted(RecyclerView recyclerView, ProgressBar progressBar) {
         progressBar.setVisibility(View.GONE);
-        globalController.getSeries().addOnListChangedCallback(new SeriesObserver(binding, requireActivity()));
         recyclerView.setAdapter(new SeriesAdapter(globalController.getSeries()));
         recyclerView.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in));
         recyclerView.setVisibility(View.VISIBLE);
