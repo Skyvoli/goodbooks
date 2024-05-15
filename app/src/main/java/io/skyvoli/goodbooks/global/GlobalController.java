@@ -82,7 +82,7 @@ public class GlobalController {
                 //Change reference and delete old
                 book.setSeriesId(found.get(0).getSeriesId());
                 db.bookDao().update(book.getEntity());
-                deleteSeries(oldId);
+                removeSeries(oldId);
                 //Update new series
                 updateSeries(book.getSeriesId(), context);
             }
@@ -118,10 +118,10 @@ public class GlobalController {
         db.bookDao().delete(book.getEntity());
         new FileStorage(context.getFilesDir()).deleteImage(book.getIsbn());
 
-        deleteSeries(book.getSeriesId());
+        removeSeries(book.getSeriesId());
     }
 
-    private void deleteSeries(long seriesId) {
+    private void removeSeries(long seriesId) {
         if (db.seriesDao().getCountOfSeries(seriesId) == 0) {
             globalViewModel.removeSeries(seriesId);
             db.seriesDao().delete(seriesId);
