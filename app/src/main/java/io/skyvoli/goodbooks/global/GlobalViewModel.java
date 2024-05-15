@@ -57,6 +57,22 @@ public class GlobalViewModel extends ViewModel {
 
         books.set(books.indexOf(found.get()), newBook);
         drawables.put(newBook.getIsbn(), newBook.getNullableCover());
+
+        sort();
+    }
+
+    public void updateSeries(Series seriesNew) {
+        Optional<Series> found = series.stream()
+                .filter(series1 -> series1.sameIdAs(seriesNew))
+                .findFirst();
+
+        if (!found.isPresent()) {
+            //Series probably not filled with data yet
+            Log.w(logTag, "Book not found.");
+            return;
+        }
+
+        series.set(series.indexOf(found.get()), seriesNew);
     }
 
     protected void setBooks(List<Book> books) {
@@ -90,6 +106,10 @@ public class GlobalViewModel extends ViewModel {
 
     protected void removeBook(Book book) {
         books.remove(book);
+    }
+
+    public void removeSeries(long seriesId) {
+        series.removeIf(series1 -> series1.getSeriesId() == seriesId);
     }
 
     public void addDrawable(String isbn, Drawable cover) {

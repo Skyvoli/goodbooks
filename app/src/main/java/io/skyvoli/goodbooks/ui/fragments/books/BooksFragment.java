@@ -32,7 +32,6 @@ import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
-import io.skyvoli.goodbooks.helper.observer.BookObserver;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.ui.recyclerviews.bookcard.BookAdapter;
 import io.skyvoli.goodbooks.web.BookResolver;
@@ -85,6 +84,7 @@ public class BooksFragment extends Fragment implements StartFragmentListener {
                     }
                 }).start();
             } else {
+                books = globalController.getBooks();
                 loadingCompleted();
             }
         }
@@ -92,7 +92,6 @@ public class BooksFragment extends Fragment implements StartFragmentListener {
 
     private void loadingCompleted() {
         progressBar.setVisibility(View.GONE);
-        globalController.getBooks().addOnListChangedCallback(new BookObserver(binding, requireActivity()));
         recyclerView.setAdapter(new BookAdapter(books));
         recyclerView.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in));
         recyclerView.setVisibility(View.VISIBLE);
@@ -141,7 +140,7 @@ public class BooksFragment extends Fragment implements StartFragmentListener {
                     unresolvedImages.forEach(book -> resolver.loadImage(book.getIsbn(), 15)
                             .ifPresent(drawable -> {
                                 book.setCover(drawable);
-                                globalController.updateBookWithCover(book, context);
+                                globalController.updateCoverOfBook(book, context);
                             }));
 
                     activity.runOnUiThread(() ->

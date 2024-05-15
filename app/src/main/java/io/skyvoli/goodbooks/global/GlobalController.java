@@ -69,34 +69,46 @@ public class GlobalController {
 
     public void updateBook(Book book, Context context) {
         long oldId = book.getSeriesId();
-        updateBookWithCover(book, context);
 
         if (db.seriesDao().getCountOfSeries(oldId) <= 1) {
             List<SeriesEntity> found = seriesExists(book.getTitle());
-            if (!found.isEmpty()) {
+            if (found.isEmpty()) {
+                //Renaming series
+                db.bookDao().update(book.getEntity());
+                SeriesEntity series = db.seriesDao().getSeriesEntityById(oldId);
+                series.setTitle(book.getTitle());
+                db.seriesDao().update(series);
+            } else {
                 //Change reference and delete old
                 book.setSeriesId(found.get(0).getSeriesId());
                 db.bookDao().update(book.getEntity());
                 deleteSeries(oldId);
-            } else {
-                //"Renaming"
-                SeriesEntity series = db.seriesDao().getSeriesById(oldId);
-                series.setTitle(book.getTitle());
-                db.seriesDao().update(series);
+                //Update new series
+                updateSeries(book.getSeriesId(), context);
             }
         } else {
-            //TODO update old series (counted)
-            long id = getOrCreateSeries(book);
-            book.setSeriesId(id);
+            book.setSeriesId(getOrCreateSeries(book));
             db.bookDao().update(book.getEntity());
+            //Update both series
+            updateSeries(oldId, context);
+            updateSeries(book.getSeriesId(), context);
         }
+
+        updateCoverOfBook(book, context);
+    }
+
+    private void updateSeries(long seriesId, Context context) {
+        Series series = db.seriesDao().getSeriesById(seriesId);
+        BookEntity first = db.bookDao().getBooksFromSeries(series.getSeriesId()).get(0);
+        series.setCover(loadImage(new FileStorage(context.getFilesDir()), first.getIsbn()));
+        globalViewModel.updateSeries(series);
     }
 
     private List<SeriesEntity> seriesExists(String title) {
         return db.seriesDao().getSeriesDtoByTitle(title);
     }
 
-    public void updateBookWithCover(Book book, Context context) {
+    public void updateCoverOfBook(Book book, Context context) {
         book.getCover().ifPresent(drawable -> new FileStorage(context.getFilesDir()).saveImage(book.getIsbn(), drawable));
         globalViewModel.updateBook(book);
     }
@@ -111,7 +123,7 @@ public class GlobalController {
 
     private void deleteSeries(long seriesId) {
         if (db.seriesDao().getCountOfSeries(seriesId) == 0) {
-            //TODO better + in viewModel as well
+            globalViewModel.removeSeries(seriesId);
             db.seriesDao().delete(seriesId);
         }
     }

@@ -60,4 +60,8 @@ public class Series {
     public SeriesEntity getEntity() {
         return new SeriesEntity(seriesId, title);
     }
+
+    public boolean sameIdAs(Series series) {
+        return series.getSeriesId() == seriesId;
+    }
 }
