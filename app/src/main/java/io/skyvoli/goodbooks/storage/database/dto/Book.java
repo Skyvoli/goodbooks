@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.room.Ignore;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -16,10 +17,12 @@ public class Book {
     private String subtitle;
     private Integer part;
     private String author;
+    @Ignore
     private Drawable cover;
     private boolean resolved;
     private long seriesId;
 
+    @Ignore
     public Book(@NonNull String isbn) {
         this.title = "Unbekannt";
         this.subtitle = null;
@@ -30,6 +33,7 @@ public class Book {
         this.resolved = false;
     }
 
+    @Ignore
     public Book(String title, String subtitle, Integer part, @NonNull String isbn, String author, Drawable cover, boolean resolved, long seriesId) {
         this.title = title;
         this.subtitle = subtitle;
@@ -37,6 +41,17 @@ public class Book {
         this.isbn = isbn;
         this.author = author;
         this.cover = cover;
+        this.resolved = resolved;
+        this.seriesId = seriesId;
+    }
+
+    public Book(String title, String subtitle, Integer part, @NonNull String isbn, String author, boolean resolved, long seriesId) {
+        this.title = title;
+        this.subtitle = subtitle;
+        this.part = part;
+        this.isbn = isbn;
+        this.author = author;
+        this.cover = null;
         this.resolved = resolved;
         this.seriesId = seriesId;
     }
@@ -139,6 +154,6 @@ public class Book {
     }
 
     public BookEntity getEntity() {
-        return new BookEntity(title, subtitle, part, isbn, author, resolved, seriesId);
+        return new BookEntity(subtitle, part, isbn, author, resolved, seriesId);
     }
 }
