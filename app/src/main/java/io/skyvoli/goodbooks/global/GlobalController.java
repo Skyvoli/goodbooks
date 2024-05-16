@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,7 +17,6 @@ import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.storage.database.dto.Series;
-import io.skyvoli.goodbooks.storage.database.entities.BookEntity;
 import io.skyvoli.goodbooks.storage.database.entities.SeriesEntity;
 
 public class GlobalController {
@@ -47,7 +47,7 @@ public class GlobalController {
                 return found.get(0).getSeriesId();
             }
             //TODO Test
-            List<BookEntity> hits = found.stream()
+            List<Book> hits = found.stream()
                     .map(seriesEntity -> db.bookDao().getBooksFromSeries(seriesEntity.getSeriesId()).get(0))
                     .filter(bookEntity -> bookEntity.getAuthor().equalsIgnoreCase(book.getAuthor()))
                     .collect(Collectors.toList());
@@ -99,7 +99,7 @@ public class GlobalController {
 
     private void updateSeries(long seriesId, Context context) {
         Series series = db.seriesDao().getSeriesById(seriesId);
-        BookEntity first = db.bookDao().getBooksFromSeries(series.getSeriesId()).get(0);
+        Book first = db.bookDao().getBooksFromSeries(series.getSeriesId()).get(0);
         series.setCover(loadImage(new FileStorage(context.getFilesDir()), first.getIsbn()));
         globalViewModel.updateSeries(series);
     }
@@ -142,8 +142,13 @@ public class GlobalController {
     public List<Book> loadBooksFromDb(Context context) {
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
 
-        List<Book> books = db.bookDao().getAll()
-                .stream().map(bookEntity -> getEntityAsBook(bookEntity, fileStorage)).collect(Collectors.toList());
+        List<Book> books = new ArrayList<>();
+
+        db.bookDao().getAll().forEach(book -> {
+            book.setCover(loadImage(fileStorage, book.getIsbn()));
+            books.add(book);
+        });
+
         globalViewModel.setBooks(books);
         return books;
     }
@@ -152,7 +157,7 @@ public class GlobalController {
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
         List<Series> series = db.seriesDao().getSeries();
         series.forEach(series1 -> {
-            BookEntity first = db.bookDao().getBooksFromSeries(series1.getSeriesId()).get(0);
+            Book first = db.bookDao().getBooksFromSeries(series1.getSeriesId()).get(0);
             series1.setCover(loadImage(fileStorage, first.getIsbn()));
         });
 
@@ -162,14 +167,22 @@ public class GlobalController {
 
     public List<Book> getBooksFromSeries(Context context, long seriesId) {
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
-        return db.bookDao().getBooksFromSeries(seriesId)
-                .stream().map(bookEntity -> getEntityAsBook(bookEntity, fileStorage)).collect(Collectors.toList());
+
+        List<Book> books = new ArrayList<>();
+
+        db.bookDao().getBooksFromSeries(seriesId).forEach(book -> {
+            book.setCover(loadImage(fileStorage, book.getIsbn()));
+            books.add(book);
+        });
+
+        return books;
     }
 
     public Book getBookByIsbn(Context context, String isbn) {
         FileStorage fileStorage = new FileStorage(context.getFilesDir());
-        BookEntity bookEntity = db.bookDao().getBookByIsbn(isbn);
-        return getEntityAsBook(bookEntity, fileStorage);
+        Book book = db.bookDao().getBookByIsbn(isbn);
+        book.setCover(loadImage(fileStorage, book.getIsbn()));
+        return book;
     }
 
     public ObservableList<Series> getSeries() {
@@ -178,15 +191,6 @@ public class GlobalController {
 
     public void sort() {
         globalViewModel.sort();
-    }
-
-    private Book getEntityAsBook(BookEntity bookEntity, FileStorage fileStorage) {
-        return new Book(bookEntity.getTitle(), bookEntity.getSubtitle(),
-                bookEntity.getPart(), bookEntity.getIsbn(),
-                bookEntity.getAuthor(),
-                loadImage(fileStorage, bookEntity.getIsbn()),
-                bookEntity.isResolved(),
-                bookEntity.getSeriesId());
     }
 
     private Drawable loadImage(FileStorage fileStorage, String isbn) {

@@ -8,18 +8,19 @@ import androidx.room.Update;
 
 import java.util.List;
 
+import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.storage.database.entities.BookEntity;
 
 @Dao
 public interface BookDao {
-    @Query("SELECT * FROM books ORDER BY title, part")
-    List<BookEntity> getAll();
+    @Query("SELECT s.title, b.* FROM books b INNER JOIN series s ON b.seriesId = s.seriesId ORDER BY title, part")
+    List<Book> getAll();
 
-    @Query("SELECT * FROM books WHERE seriesId = :seriesId ORDER BY title, part")
-    List<BookEntity> getBooksFromSeries(long seriesId);
+    @Query("SELECT s.title, b.* FROM books b INNER JOIN series s ON b.seriesId = s.seriesId WHERE b.seriesId = :seriesId ORDER BY title, part")
+    List<Book> getBooksFromSeries(long seriesId);
 
-    @Query("SELECT * FROM books WHERE isbn = :isbn")
-    BookEntity getBookByIsbn(String isbn);
+    @Query("SELECT s.title, b.* FROM books b INNER JOIN series s ON b.seriesId = s.seriesId WHERE isbn = :isbn")
+    Book getBookByIsbn(String isbn);
 
     @Insert
     void insert(BookEntity... books);

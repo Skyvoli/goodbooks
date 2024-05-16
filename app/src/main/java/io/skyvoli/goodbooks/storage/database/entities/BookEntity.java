@@ -16,8 +16,6 @@ public class BookEntity {
     @NonNull
     @PrimaryKey
     private String isbn;
-    @ColumnInfo(name = "title")
-    private String title;
     @ColumnInfo(name = "subtitle")
     private String subtitle;
     @ColumnInfo(name = "part")
@@ -30,8 +28,7 @@ public class BookEntity {
     private long seriesId;
 
 
-    public BookEntity(String title, String subtitle, Integer part, @NonNull String isbn, String author, boolean resolved, long seriesId) {
-        this.title = title;
+    public BookEntity(String subtitle, Integer part, @NonNull String isbn, String author, boolean resolved, long seriesId) {
         this.subtitle = subtitle;
         this.part = part;
         this.isbn = isbn;
@@ -47,14 +44,6 @@ public class BookEntity {
 
     public void setIsbn(@NonNull String isbn) {
         this.isbn = isbn;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getSubtitle() {
