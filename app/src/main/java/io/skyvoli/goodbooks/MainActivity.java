@@ -26,6 +26,7 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.Objects;
 
 import io.skyvoli.goodbooks.databinding.ActivityMainBinding;
+import io.skyvoli.goodbooks.ui.fragments.StartFragmentListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -115,7 +116,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void notifyDrawerClosed() {
-        Fragment currentFragment = Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main)).getChildFragmentManager().getPrimaryNavigationFragment();
+        Fragment currentFragment = Objects.requireNonNull(getSupportFragmentManager()
+                        .findFragmentById(R.id.nav_host_fragment_content_main))
+                .getChildFragmentManager()
+                .getPrimaryNavigationFragment();
 
         if (currentFragment instanceof StartFragmentListener) {
             ((StartFragmentListener) currentFragment).configureFragment();
@@ -123,8 +127,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupFragmentLifecycleCallbacksListener() {
-        Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main))
-                .getChildFragmentManager().registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+        Objects.requireNonNull(getSupportFragmentManager()
+                        .findFragmentById(R.id.nav_host_fragment_content_main))
+                .getChildFragmentManager()
+                .registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
                     @Override
                     public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, @Nullable Bundle savedInstanceState) {
                         super.onFragmentViewCreated(fm, f, v, savedInstanceState);

@@ -25,15 +25,14 @@ import java.util.Objects;
 import java.util.Optional;
 
 import io.skyvoli.goodbooks.R;
-import io.skyvoli.goodbooks.StartFragmentListener;
 import io.skyvoli.goodbooks.databinding.BookDetailCardBinding;
 import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
+import io.skyvoli.goodbooks.dimensions.Dimension;
 import io.skyvoli.goodbooks.global.GlobalController;
-import io.skyvoli.goodbooks.helper.DimensionCalculator;
-import io.skyvoli.goodbooks.helper.TitleBuilder;
 import io.skyvoli.goodbooks.helper.listener.ScanListener;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
+import io.skyvoli.goodbooks.ui.fragments.StartFragmentListener;
 import io.skyvoli.goodbooks.web.BookResolver;
 
 public class CameraFragment extends Fragment implements StartFragmentListener {
@@ -141,7 +140,7 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
     }
 
     private void setBookView(Book book, BookDetailCardBinding bookPreview) {
-        bookPreview.title.setText(TitleBuilder.buildCompleteTitle(book.getTitle(), book.getSubtitle(), book.getPart()));
+        bookPreview.title.setText(book.buildCompleteTitle());
         bookPreview.isbn.setText(book.getIsbn());
         bookPreview.author.setText(book.getAuthor());
         Optional<Drawable> drawable = book.getCover();
@@ -155,7 +154,7 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
     private void setCover(Drawable drawable, BookDetailCardBinding bookPreview) {
         ImageView cover = bookPreview.cover;
         ((ConstraintLayout.LayoutParams) cover.getLayoutParams()).dimensionRatio
-                = DimensionCalculator.getRatio(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+                = new Dimension(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()).getRatio();
         cover.setImageDrawable(drawable);
     }
 

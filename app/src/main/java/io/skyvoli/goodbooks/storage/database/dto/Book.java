@@ -31,6 +31,7 @@ public class Book {
         this.author = "Unbekannt";
         this.cover = null;
         this.resolved = false;
+        this.seriesId = 0;
     }
 
     @Ignore
@@ -54,6 +55,31 @@ public class Book {
         this.cover = null;
         this.resolved = resolved;
         this.seriesId = seriesId;
+    }
+
+    public String buildTitle() {
+        StringBuilder stringBuilder = new StringBuilder(title);
+        if (subtitle != null) {
+            stringBuilder.append(" - ").append(subtitle);
+        } else if (part != null) {
+            stringBuilder.append(" ").append(part);
+        }
+
+        return stringBuilder.toString();
+
+    }
+
+    public String buildCompleteTitle() {
+        StringBuilder stringBuilder = new StringBuilder(title);
+        if (subtitle != null) {
+            stringBuilder.append(" - ").append(subtitle);
+        }
+        if (part != null) {
+            stringBuilder.append(" (").append(part).append(")");
+        }
+
+        return stringBuilder.toString();
+
     }
 
     public int comparePart(Integer otherPart) {
