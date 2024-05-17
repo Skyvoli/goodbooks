@@ -27,12 +27,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.skyvoli.goodbooks.R;
-import io.skyvoli.goodbooks.StartFragmentListener;
 import io.skyvoli.goodbooks.databinding.FragmentBooksBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
+import io.skyvoli.goodbooks.ui.fragments.StartFragmentListener;
 import io.skyvoli.goodbooks.ui.recyclerviews.bookcard.BookAdapter;
 import io.skyvoli.goodbooks.web.BookResolver;
 

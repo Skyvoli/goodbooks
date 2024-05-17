@@ -9,18 +9,18 @@ import com.journeyapps.barcodescanner.ScanOptions;
 public class ScanListener implements View.OnClickListener {
 
     private final ActivityResultLauncher<ScanOptions> barcodeLauncher;
+    private final ScanOptions scanOptions = new ScanOptions();
 
     public ScanListener(ActivityResultLauncher<ScanOptions> barcodeLauncher) {
         this.barcodeLauncher = barcodeLauncher;
-    }
-
-    @Override
-    public void onClick(View v) {
-        ScanOptions scanOptions = new ScanOptions();
         scanOptions.setPrompt("ISBN einscannen");
         scanOptions.setOrientationLocked(false);
         scanOptions.setDesiredBarcodeFormats(ScanOptions.EAN_13);
         scanOptions.setBeepEnabled(true);
+    }
+
+    @Override
+    public void onClick(View v) {
         barcodeLauncher.launch(scanOptions);
     }
 }

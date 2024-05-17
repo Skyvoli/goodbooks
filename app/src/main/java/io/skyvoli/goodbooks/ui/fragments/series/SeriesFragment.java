@@ -17,11 +17,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import java.util.List;
 
 import io.skyvoli.goodbooks.R;
-import io.skyvoli.goodbooks.StartFragmentListener;
 import io.skyvoli.goodbooks.databinding.FragmentSeriesBinding;
 import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
 import io.skyvoli.goodbooks.storage.database.dto.Series;
+import io.skyvoli.goodbooks.ui.fragments.StartFragmentListener;
 import io.skyvoli.goodbooks.ui.recyclerviews.seriescard.SeriesAdapter;
 
 public class SeriesFragment extends Fragment implements StartFragmentListener {

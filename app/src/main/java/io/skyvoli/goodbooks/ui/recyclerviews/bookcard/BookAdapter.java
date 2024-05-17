@@ -12,7 +12,6 @@ import java.util.List;
 
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.helper.ImageLoader;
-import io.skyvoli.goodbooks.helper.TitleBuilder;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 
 public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
@@ -36,7 +35,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = books.get(position);
-        holder.setTitle(TitleBuilder.buildTitle(book.getTitle(), book.getSubtitle(), book.getPart()));
+        holder.setTitle(book.buildTitle());
         holder.setIsbn(book.getIsbn());
         holder.setAuthor(book.getAuthor());
         ImageLoader.load(context, book.getNullableCover(), holder.getCover());

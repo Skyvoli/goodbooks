@@ -45,9 +45,8 @@ import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dialog.NoticeDialogListener;
 import io.skyvoli.goodbooks.dialog.OnlyPositiveListener;
 import io.skyvoli.goodbooks.dialog.PermissionDialog;
+import io.skyvoli.goodbooks.dimensions.Dimension;
 import io.skyvoli.goodbooks.global.GlobalController;
-import io.skyvoli.goodbooks.helper.DimensionCalculator;
-import io.skyvoli.goodbooks.helper.TitleBuilder;
 import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.web.BookResolver;
@@ -115,7 +114,7 @@ public class BookDetailFragment extends Fragment {
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
                     //Set content & observables
-                    title.setText(TitleBuilder.buildTitle(originalBook.getTitle(), originalBook.getSubtitle(), originalBook.getPart()));
+                    title.setText(originalBook.buildTitle());
 
                     Drawable drawable = originalBook.getCover()
                             .orElseGet(() -> ContextCompat.getDrawable(requireContext(), R.drawable.ruby));
@@ -149,7 +148,7 @@ public class BookDetailFragment extends Fragment {
             globalController.sort();
             originalBook = newBook;
             //Refresh
-            title.setText(TitleBuilder.buildTitle(originalBook.getTitle(), originalBook.getSubtitle(), originalBook.getPart()));
+            title.setText(originalBook.buildTitle());
             author.setText(originalBook.getAuthor());
             editTitle.setText(originalBook.getTitle());
             editAuthor.setText(originalBook.getAuthor());
@@ -166,7 +165,7 @@ public class BookDetailFragment extends Fragment {
 
     private void setCover(Drawable drawable) {
         ((ConstraintLayout.LayoutParams) cover.getLayoutParams()).dimensionRatio
-                = DimensionCalculator.getRatio(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+                = new Dimension(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()).getRatio();
         cover.setImageDrawable(drawable);
     }
 
@@ -182,9 +181,7 @@ public class BookDetailFragment extends Fragment {
                 int selectedItemId = menuItem.getItemId();
                 if (selectedItemId == R.id.delete_item) {
                     new PermissionDialog("Buch löschen",
-                            "Möchten Sie '" + TitleBuilder.buildTitle(originalBook.getTitle(),
-                                    originalBook.getSubtitle(),
-                                    originalBook.getPart()) + "'  wirklich löschen?",
+                            "Möchten Sie '" + originalBook.buildTitle() + "'  wirklich löschen?",
                             true,
                             deleteBookListener()).show(getParentFragmentManager(), "deleteAction");
                     return true;

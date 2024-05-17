@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks;
+package io.skyvoli.goodbooks.ui.fragments;
 
 public interface StartFragmentListener {
 

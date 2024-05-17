@@ -12,8 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import io.skyvoli.goodbooks.StartFragmentListener;
 import io.skyvoli.goodbooks.databinding.FragmentHomeBinding;
+import io.skyvoli.goodbooks.ui.fragments.StartFragmentListener;
 
 public class HomeFragment extends Fragment implements StartFragmentListener {
 
@@ -40,7 +40,6 @@ public class HomeFragment extends Fragment implements StartFragmentListener {
             magicButton.setOnClickListener(v -> {
                 progressCircular.setVisibility(View.VISIBLE);
                 new Thread(() -> {
-                    //Fixme Used for debug etc.
                     if (isAdded()) {
                         requireActivity().runOnUiThread(() -> progressCircular.setVisibility(View.GONE));
                     }
