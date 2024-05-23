@@ -41,7 +41,12 @@ public class GlobalViewModel extends ViewModel {
     protected void addBook(Book book) {
         books.add(book);
         drawables.put(book.getIsbn(), book.getNullableCover());
-        sort();
+        sortBooks();
+    }
+
+    protected void addSeries(Series series) {
+        this.series.add(series);
+        sortSeries();
     }
 
     protected void updateBook(Book newBook) {
@@ -50,7 +55,7 @@ public class GlobalViewModel extends ViewModel {
                 .findFirst();
 
         if (!found.isPresent()) {
-            //Series probably not filled with data yet
+            //Books probably not filled with data yet
             Log.w(logTag, "Book not found.");
             return;
         }
@@ -58,7 +63,7 @@ public class GlobalViewModel extends ViewModel {
         books.set(books.indexOf(found.get()), newBook);
         drawables.put(newBook.getIsbn(), newBook.getNullableCover());
 
-        sort();
+        sortBooks();
     }
 
     public void updateSeries(Series seriesNew) {
@@ -86,18 +91,9 @@ public class GlobalViewModel extends ViewModel {
         this.series.addAll(series);
     }
 
-    protected void addSeries(Series series) {
-        this.series.add(series);
-        sortSeries();
-    }
-
-    protected void sort() {
+    protected void sortBooks() {
         books.sort(Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER)
                 .thenComparing((b1, b2) -> b1.comparePart(b2.getPart())));
-    }
-
-    protected Optional<Drawable> getDrawable(String isbn) {
-        return Optional.ofNullable(drawables.get(isbn));
     }
 
     private void sortSeries() {
@@ -114,5 +110,9 @@ public class GlobalViewModel extends ViewModel {
 
     public void addDrawable(String isbn, Drawable cover) {
         drawables.put(isbn, cover);
+    }
+
+    protected Optional<Drawable> getDrawable(String isbn) {
+        return Optional.ofNullable(drawables.get(isbn));
     }
 }

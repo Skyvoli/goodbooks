@@ -40,13 +40,13 @@ public class GlobalController {
     }
 
     private long getOrCreateSeries(Book book) {
-        List<SeriesEntity> found = seriesExists(book.getTitle());
+        List<SeriesEntity> found = db.seriesDao().getSeriesDtoByTitle(book.getTitle());
         if (!found.isEmpty()) {
-            //Series already exists
+            //Only 1 series exists with that name
             if (found.size() == 1) {
                 return found.get(0).getSeriesId();
             }
-            //TODO Test
+          
             List<Book> hits = found.stream()
                     .map(seriesEntity -> db.bookDao().getBooksFromSeries(seriesEntity.getSeriesId()).get(0))
                     .filter(bookEntity -> bookEntity.getAuthor().equalsIgnoreCase(book.getAuthor()))
@@ -60,6 +60,10 @@ public class GlobalController {
         }
 
         //New series
+        return createNewSeries(book);
+    }
+
+    private long createNewSeries(Book book) {
         Series newSeries = new Series(0, book.getTitle(), book.getNullableCover(), 1);
         long seriesId = db.seriesDao().insert(newSeries.getEntity());
         newSeries.setSeriesId(seriesId);
@@ -71,7 +75,7 @@ public class GlobalController {
         long oldId = book.getSeriesId();
 
         if (db.seriesDao().getCountOfSeries(oldId) <= 1) {
-            List<SeriesEntity> found = seriesExists(book.getTitle());
+            List<SeriesEntity> found = db.seriesDao().getSeriesDtoByTitle(book.getTitle());
             if (found.isEmpty()) {
                 //Renaming series
                 db.bookDao().update(book.getEntity());
@@ -102,10 +106,6 @@ public class GlobalController {
         Book first = db.bookDao().getBooksFromSeries(series.getSeriesId()).get(0);
         series.setCover(loadImage(new FileStorage(context.getFilesDir()), first.getIsbn()));
         globalViewModel.updateSeries(series);
-    }
-
-    private List<SeriesEntity> seriesExists(String title) {
-        return db.seriesDao().getSeriesDtoByTitle(title);
     }
 
     public void updateCoverOfBook(Book book, Context context) {
@@ -190,7 +190,7 @@ public class GlobalController {
     }
 
     public void sort() {
-        globalViewModel.sort();
+        globalViewModel.sortBooks();
     }
 
     private Drawable loadImage(FileStorage fileStorage, String isbn) {
