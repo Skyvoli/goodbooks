@@ -85,27 +85,28 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
             return;
         }
 
-        Optional<Book> found = globalController.getBook(isbn);
-
-        if (found.isPresent()) {
-            cameraViewModel.setBook(found.get());
-            cameraViewModel.setIsNewBook(false);
-            return;
-        }
-
-        cameraViewModel.setShowBook(false);
-
         new Thread(() -> {
-            Book scanedBook = new BookResolver().resolveBook(isbn, 10);
+            Optional<Book> found = globalController.getBook(requireContext(), isbn);
 
-            if (!isAdded()) {
+            if (found.isPresent()) {
+                requireActivity().runOnUiThread(() -> {
+                    cameraViewModel.setBook(found.get());
+                    cameraViewModel.setIsNewBook(false);
+                });
                 return;
             }
-            requireActivity().runOnUiThread(() -> {
-                cameraViewModel.setIsNewBook(true);
-                cameraViewModel.setBook(scanedBook);
-                cameraViewModel.setShowBook(true);
-            });
+
+            requireActivity().runOnUiThread(() -> cameraViewModel.setShowBook(false));
+
+            Book scanedBook = new BookResolver().resolveBook(isbn, 10);
+
+            if (isAdded()) {
+                requireActivity().runOnUiThread(() -> {
+                    cameraViewModel.setIsNewBook(true);
+                    cameraViewModel.setBook(scanedBook);
+                    cameraViewModel.setShowBook(true);
+                });
+            }
         }).start();
 
     }
@@ -161,6 +162,10 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
     private void addBook(View v) {
         cameraViewModel.setIsNewBook(false);
         Book bookToAdd = cameraViewModel.getBook().getValue();
+
+        if (bookToAdd == null) {
+            throw new IllegalStateException("Method call is not allowed");
+        }
 
         new Thread(() -> globalController.addBook(bookToAdd, requireContext())).start();
 
