@@ -46,7 +46,7 @@ public class GlobalController {
             if (found.size() == 1) {
                 return found.get(0).getSeriesId();
             }
-          
+
             List<Book> hits = found.stream()
                     .map(seriesEntity -> db.bookDao().getBooksFromSeries(seriesEntity.getSeriesId()).get(0))
                     .filter(bookEntity -> bookEntity.getAuthor().equalsIgnoreCase(book.getAuthor()))
@@ -128,10 +128,10 @@ public class GlobalController {
         }
     }
 
-    public Optional<Book> getBook(String isbn) {
-        return globalViewModel.getBooks().stream()
-                .filter(el -> el.sameIsbn(isbn))
-                .findAny();
+    public Optional<Book> getBook(Context context, String isbn) {
+        Optional<Book> found = Optional.ofNullable(db.bookDao().getBookByIsbn(isbn));
+        found.ifPresent(book -> book.setCover(loadImage(new FileStorage(context.getFilesDir()), isbn)));
+        return found;
     }
 
     public ObservableList<Book> getBooks() {
@@ -193,7 +193,7 @@ public class GlobalController {
         globalViewModel.sortBooks();
     }
 
-    private Drawable loadImage(FileStorage fileStorage, String isbn) {
+    public Drawable loadImage(FileStorage fileStorage, String isbn) {
         Optional<Drawable> cached = globalViewModel.getDrawable(isbn);
         return cached.orElseGet(() -> {
             Drawable cover = fileStorage.getImage(isbn);
