@@ -34,17 +34,20 @@ public class FileStorage {
     }
 
     public Drawable getImage(String isbn) {
-        String path = directory.getPath() + File.separator + isbn + IMAGE_PATH_END;
         //If not found returns null
-        return Drawable.createFromPath(path);
+        return Drawable.createFromPath(getStringPath(isbn));
     }
 
     public void deleteImage(String isbn) {
         try {
-            Files.delete(Paths.get(directory.getPath() + File.separator + isbn + IMAGE_PATH_END));
+            Files.delete(Paths.get(getStringPath(isbn)));
         } catch (IOException e) {
             Log.d(logTag, "Couldn't delete image");
         }
+    }
+
+    private String getStringPath(String isbn) {
+        return directory.getPath() + File.separator + isbn + IMAGE_PATH_END;
     }
 
     private byte[] convertToByteArray(Drawable drawable) {

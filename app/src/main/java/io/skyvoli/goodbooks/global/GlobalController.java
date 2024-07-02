@@ -33,13 +33,14 @@ public class GlobalController {
     }
 
     public void addBook(Book book, Context context) {
-        book.setSeriesId(getOrCreateSeries(book));
+        book.setSeriesId(getSeriesOf(book));
+        //Save book
         globalViewModel.addBook(book);
         db.bookDao().insert(book.getEntity());
         book.getCover().ifPresent(cover -> new FileStorage(context.getFilesDir()).saveImage(book.getIsbn(), cover));
     }
 
-    private long getOrCreateSeries(Book book) {
+    private long getSeriesOf(Book book) {
         List<SeriesEntity> found = db.seriesDao().getSeriesDtoByTitle(book.getTitle());
         if (!found.isEmpty()) {
             //Only 1 series exists with that name
@@ -59,11 +60,11 @@ public class GlobalController {
             return hits.get(0).getSeriesId();
         }
 
-        //New series
-        return createNewSeries(book);
+        //No series exists --> New series
+        return createNewSeriesFor(book);
     }
 
-    private long createNewSeries(Book book) {
+    private long createNewSeriesFor(Book book) {
         Series newSeries = new Series(0, book.getTitle(), book.getNullableCover(), 1);
         long seriesId = db.seriesDao().insert(newSeries.getEntity());
         newSeries.setSeriesId(seriesId);
@@ -91,7 +92,7 @@ public class GlobalController {
                 updateSeries(book.getSeriesId(), context);
             }
         } else {
-            book.setSeriesId(getOrCreateSeries(book));
+            book.setSeriesId(getSeriesOf(book));
             db.bookDao().update(book.getEntity());
             //Update both series
             updateSeries(oldId, context);
