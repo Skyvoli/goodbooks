@@ -31,7 +31,9 @@ public class SeriesBooks extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() == null) {
-            throw new IllegalStateException("Missing argument seriesId");
+            Log.e(getTag(), "Missing arguments");
+            seriesId = 0;
+            return;
         }
         seriesId = getArguments().getLong("seriesId");
 
@@ -56,11 +58,6 @@ public class SeriesBooks extends Fragment {
 
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
-                    //Maybe?
-                    /*if (books.isEmpty()) {
-                        getParentFragmentManager().popBackStack();
-                        return;
-                    }*/
                     recyclerView.setAdapter(new BookAdapter(books));
                     progressBar.setVisibility(View.GONE);
                 });
