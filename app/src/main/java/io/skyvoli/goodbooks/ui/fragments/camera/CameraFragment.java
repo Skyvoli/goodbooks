@@ -44,6 +44,7 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        //TODO Swipe for refresh
         cameraViewModel = new ViewModelProvider(this).get(CameraViewModel.class);
         globalController = new GlobalController(requireActivity());
 
