@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "squid:S1192"})
 public class Migrations {
 
     private Migrations() {

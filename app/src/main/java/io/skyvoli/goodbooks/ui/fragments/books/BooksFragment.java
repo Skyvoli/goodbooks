@@ -24,6 +24,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import io.skyvoli.goodbooks.R;
@@ -107,49 +108,60 @@ public class BooksFragment extends Fragment implements StartFragmentListener {
 
             @Override
             public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() != R.id.reset_item) {
-                    return false;
-                }
-
-                Activity activity = requireActivity();
-                Context context = requireContext();
-
-                List<String> unresolvedIsbn = books.stream()
-                        .filter((book -> !book.isResolved())).
-                        map(Book::getIsbn)
-                        .collect(Collectors.toList());
-
-                List<Book> unresolvedImages = books.stream()
-                        .filter((book -> !book.getCover().isPresent() && book.isResolved()))
-                        .collect(Collectors.toList());
-
-                if (unresolvedImages.isEmpty() && unresolvedIsbn.isEmpty()) {
-                    new InformationDialog("Bücher vollständig", "Alle Bücher sind vollständig geladen").show(getParentFragmentManager(), "completed");
+                if (menuItem.getItemId() == R.id.reset_item) {
+                    resolveBooks();
                     return true;
                 }
-
-
-                new Thread(() -> {
-                    BookResolver resolver = new BookResolver();
-
-                    unresolvedIsbn.forEach(isbn -> {
-                        Book resolved = resolver.resolveBook(isbn, 10);
-                        globalController.updateBook(resolved, requireContext());
-                    });
-
-                    unresolvedImages.forEach(book -> resolver.loadImage(book.getIsbn(), 15)
-                            .ifPresent(drawable -> {
-                                book.setCover(drawable);
-                                globalController.updateCoverOfBook(book, context);
-                            }));
-
-                    activity.runOnUiThread(() ->
-                            Toast.makeText(context, "Reloaded", Toast.LENGTH_SHORT).show());
-                }).start();
-
-                return true;
+                return false;
             }
         };
+    }
+
+    private void resolveBooks() {
+        Activity activity = requireActivity();
+        Context context = requireContext();
+
+        List<String> unresolvedIsbn = books.stream()
+                .filter((book -> !book.isResolved()))
+                .map(Book::getIsbn)
+                .collect(Collectors.toList());
+
+        List<Book> unresolvedImages = books.stream()
+                .filter((book -> !book.getCover().isPresent() && book.isResolved()))
+                .collect(Collectors.toList());
+
+        if (unresolvedImages.isEmpty() && unresolvedIsbn.isEmpty()) {
+            new InformationDialog("Bücher vollständig", "Alle Bücher sind vollständig geladen").show(getParentFragmentManager(), "completed");
+            return;
+        }
+
+        new Thread(() -> {
+            BookResolver resolver = new BookResolver();
+
+            if (!unresolvedIsbn.isEmpty()) {
+                long seriesIdUnknown = books.stream()
+                        .filter((book -> !book.isResolved()))
+                        .findFirst()
+                        .orElseThrow(NoSuchElementException::new)
+                        .getSeriesId();
+
+                unresolvedIsbn.forEach(isbn -> {
+                    Book resolved = resolver.resolveBook(isbn, 10);
+                    resolved.setSeriesId(seriesIdUnknown);
+                    globalController.updateBook(resolved, requireContext());
+                });
+            }
+
+            unresolvedImages.forEach(book -> resolver.loadImage(book.getIsbn(), 15)
+                    .ifPresent(drawable -> {
+                        book.setCover(drawable);
+                        globalController.updateCoverOfBook(book, context);
+                    }));
+
+            activity.runOnUiThread(() ->
+                    Toast.makeText(context, "Reloaded", Toast.LENGTH_SHORT).show());
+        }).start();
+
     }
 
     private void onSwipe(SwipeRefreshLayout swipeRefreshLayout, Context context) {
