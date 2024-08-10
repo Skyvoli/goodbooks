@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,7 +17,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.zxing.client.android.Intents;
@@ -48,6 +53,8 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
         cameraViewModel = new ViewModelProvider(this).get(CameraViewModel.class);
         globalController = new GlobalController(requireActivity());
 
+        requireActivity().addMenuProvider(getMenuProvider(), getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+
         binding = FragmentCameraBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         binding.bookPreview.floatingActionButton.setVisibility(View.GONE);
@@ -63,7 +70,6 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
         if (shouldConfigureUi) {
             shouldConfigureUi = false;
 
-
             cameraViewModel.getBook().observe(getViewLifecycleOwner(), book -> setBookView(book, binding.bookPreview));
             cameraViewModel.getShowBook().observe(getViewLifecycleOwner(), showBook -> showBook(showBook, binding.bookPreview.bookData, binding.progressBar));
 
@@ -72,14 +78,36 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
         }
     }
 
+    private MenuProvider getMenuProvider() {
+        return new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.books_menu, menu);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                int selectedItemId = menuItem.getItemId();
+                if (selectedItemId == R.id.reset_item) {
+                    new InformationDialog("Reload", "wip")
+                            .show(getParentFragmentManager(), "reload");
+                    return true;
+                }
+                return false;
+            }
+        };
+    }
+
     private void onScanResult(ScanIntentResult result) {
         if (result.getContents() == null) {
             handleCanceledScan(result);
             return;
         }
 
-        String isbn = result.getContents();
+        handleIsbn(result.getContents());
+    }
 
+    private void handleIsbn(String isbn) {
         if (!isbnIsBook(isbn)) {
             new InformationDialog("418", "Ich bin kein Buch.")
                     .show(getParentFragmentManager(), "418");
@@ -109,11 +137,9 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
                 });
             }
         }).start();
-
     }
 
     private void setInformationText(Boolean isNew, TextView information) {
-
         if (isNew == null) {
             information.setText(R.string.no_scanned_placeholder);
             binding.addBookBtn.setEnabled(false);
