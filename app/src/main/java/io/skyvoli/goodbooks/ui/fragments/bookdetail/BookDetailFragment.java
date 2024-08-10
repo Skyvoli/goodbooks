@@ -72,6 +72,7 @@ public class BookDetailFragment extends Fragment {
             requireContext().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
             ImageDecoder.Source source = ImageDecoder.createSource(requireContext().getContentResolver(), uri);
             Drawable newCover;
+            //TODO Image to large catch
             try {
                 newCover = ImageDecoder.decodeDrawable(source);
             } catch (IOException e) {
