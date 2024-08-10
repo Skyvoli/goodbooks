@@ -1,6 +1,6 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: "Bug report"
+about: "If something isn't working as expected \U0001F914."
 title: "[BUG]: "
 labels: bug
 assignees: ''
@@ -28,9 +28,3 @@ assignees: ''
 <!--- Providing context helps us come up with a solution that is most useful in the real world -->
 
 <!--- Provide a general summary of the issue in the Title above -->
-
-## Detailed Description
-<!--- Provide a detailed description of the change or addition you are proposing -->
-
-## Possible Implementation
-<!--- Not obligatory, but suggest an idea for implementing addition or change -->
