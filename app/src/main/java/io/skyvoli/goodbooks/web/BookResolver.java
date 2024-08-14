@@ -9,13 +9,16 @@ import java.util.Optional;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.web.api.BookApi;
 import io.skyvoli.goodbooks.web.api.DnbMarc21Api;
+import io.skyvoli.goodbooks.web.api.GoogleBooksApi;
 
 public class BookResolver {
 
     private final BookApi dnbApi = new DnbMarc21Api();
+    private final BookApi dnbApi2 = new GoogleBooksApi();
 
     public Book resolveBook(String isbn, int timeout) {
         Optional<Document> document = new RequestHandler().getDocument(dnbApi.buildUrl(isbn), timeout);
+        Optional<Document> document2 = new RequestHandler().getDocument(dnbApi2.buildUrl(isbn), timeout);
         if (!document.isPresent()) {
             return new Book(isbn);
         }
