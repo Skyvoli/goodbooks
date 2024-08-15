@@ -8,6 +8,7 @@ import org.jsoup.nodes.Element;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,17 +24,23 @@ public class DnbMarc21Api implements BookApi {
     private static final String RECORD_SCHEMA = "&recordSchema=MARC21-xml";
     private static final String IMAGE_URL = "https://portal.dnb.de/opac/mvb/cover?isbn=";
 
-    public String buildUrl(String isbn) {
-        return BASE_URL + OPERATION + QUERY + isbn + MAXIMUM_RECORDS + 1 + RECORD_SCHEMA;
-    }
 
     @Override
-    public Book serializeDocument(Document document, String isbn, int timeout) {
+    public Optional<Book> getBook(String isbn, int timeout) {
+        String url = BASE_URL + OPERATION + QUERY + isbn + MAXIMUM_RECORDS + 1 + RECORD_SCHEMA;
+        Optional<Document> doc = new RequestHandler().getDocument(url, timeout);
+
+        if (!doc.isPresent()) {
+            return Optional.of(new Book(isbn));
+        }
+
+        Document document = doc.get();
+
         Element bookData;
         try {
             bookData = document.getElementsByAttributeValueContaining("type", "Bibliographic").get(0);
         } catch (IndexOutOfBoundsException e) {
-            return new Book(isbn);
+            return Optional.of(new Book(isbn));
         }
 
         List<XmlField> titleFields = new ArrayList<>();
@@ -74,7 +81,9 @@ public class DnbMarc21Api implements BookApi {
         Resolved<String> resolvedAuthor = resolveString(bookData, authorFields, "Unbekannt");
         resolvedAuthor.setValue(formatAuthors(resolvedAuthor.getValue()));
 
-        return new Book(resolvedTitle.getValue(), resolvedSubtitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), null, true, 0);
+        Drawable cover = this.loadImage(isbn, timeout);
+
+        return Optional.of(new Book(resolvedTitle.getValue(), resolvedSubtitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), cover, true, 0));
     }
 
     public Drawable loadImage(String isbn, int timeout) {
