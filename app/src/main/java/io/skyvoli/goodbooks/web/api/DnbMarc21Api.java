@@ -31,7 +31,7 @@ public class DnbMarc21Api implements BookApi {
         Optional<Document> doc = new RequestHandler().getDocument(url, timeout);
 
         if (!doc.isPresent()) {
-            return Optional.of(new Book(isbn));
+            return Optional.empty();
         }
 
         Document document = doc.get();
@@ -40,7 +40,7 @@ public class DnbMarc21Api implements BookApi {
         try {
             bookData = document.getElementsByAttributeValueContaining("type", "Bibliographic").get(0);
         } catch (IndexOutOfBoundsException e) {
-            return Optional.of(new Book(isbn));
+            return Optional.empty();
         }
 
         List<XmlField> titleFields = new ArrayList<>();
@@ -87,7 +87,12 @@ public class DnbMarc21Api implements BookApi {
     }
 
     public Drawable loadImage(String isbn, int timeout) {
-        return new RequestHandler().getImage(IMAGE_URL + isbn, timeout);
+        RequestHandler requestHandler = new RequestHandler();
+        Drawable cover = requestHandler.getImage(IMAGE_URL + isbn, timeout);
+        if (cover == null) {
+            cover = requestHandler.getFallbackImage(isbn, timeout);
+        }
+        return cover;
     }
 
     private Resolved<String> resolveString(Element bookData, List<XmlField> titleFields, String defaultValue) {
