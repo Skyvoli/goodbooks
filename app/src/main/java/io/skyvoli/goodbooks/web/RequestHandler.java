@@ -72,7 +72,7 @@ public class RequestHandler {
         } catch (IOException e) {
             return Optional.empty();
         }
-        return Optional.ofNullable(doc);
+        return Optional.of(doc);
     }
 
     private Optional<JsonNode> fetchJson(URL url) {
@@ -85,7 +85,6 @@ public class RequestHandler {
         }
         return Optional.of(node);
     }
-
 
     public Drawable getImage(String url, int timeout) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -101,6 +100,13 @@ public class RequestHandler {
             return null;
         }
         return cover;
+    }
+
+    public Drawable getFallbackImage(String isbn, int timeout) {
+        Optional<JsonNode> imageLink = getJsonDocument("https://bookcover.longitood.com/bookcover/" + isbn, timeout);
+        return imageLink.map(jsonNode ->
+                        getImage(jsonNode.findValue("url").asText(), timeout))
+                .orElse(null);
     }
 
     private Drawable fetchImage(String url) {

@@ -17,7 +17,7 @@ public class BookResolver {
     public Book resolveBook(String isbn, int timeout) {
         Optional<Book> result = dnbApi.getBook(isbn, timeout);
         Optional<Book> result2 = dnbApi2.getBook(isbn, timeout);
-        return result.orElseGet(() -> new Book(isbn));
+        return result.orElseGet(() -> result2.orElseGet(() -> new Book(isbn)));
     }
 
     public Optional<Drawable> loadImage(String isbn, int timeout) {
