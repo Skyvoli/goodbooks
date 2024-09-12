@@ -76,6 +76,10 @@ android {
         }
     }
 
+    lint {
+        lintConfig = file("$rootDir/glideLintDisable.xml")
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
