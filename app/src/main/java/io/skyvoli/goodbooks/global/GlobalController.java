@@ -73,7 +73,7 @@ public class GlobalController {
     }
 
     public void updateBook(Book book, Context context) {
-        long oldId = book.getSeriesId();
+        long oldId = getSeriesOf(book);
 
         if (db.seriesDao().getCountOfSeries(oldId) <= 1) {
             List<SeriesEntity> found = db.seriesDao().getSeriesDtoByTitle(book.getTitle());

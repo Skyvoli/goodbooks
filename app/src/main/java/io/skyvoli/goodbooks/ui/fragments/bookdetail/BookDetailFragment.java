@@ -328,7 +328,7 @@ public class BookDetailFragment extends Fragment {
             public void onDialogPositiveClick() {
                 Context context = requireContext();
                 new Thread(() -> {
-                    Optional<Drawable> baseCover = new BookResolver().loadImage(originalBook.getIsbn(), 15);
+                    Optional<Drawable> baseCover = new BookResolver(requireContext()).loadImage(originalBook.getIsbn(), 15);
                     if (baseCover.isPresent()) {
                         Drawable resetImage = baseCover.get();
                         new FileStorage(context.getFilesDir()).saveImage(originalBook.getIsbn(), resetImage);

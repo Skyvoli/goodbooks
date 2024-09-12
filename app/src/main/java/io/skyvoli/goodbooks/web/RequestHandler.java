@@ -36,6 +36,8 @@ public class RequestHandler {
             return Optional.empty();
         } catch (ExecutionException | TimeoutException e) {
             return Optional.empty();
+        } finally {
+            shutdownPool(executorService);
         }
         return document;
     }
@@ -59,6 +61,8 @@ public class RequestHandler {
             return Optional.empty();
         } catch (ExecutionException | TimeoutException e) {
             return Optional.empty();
+        } finally {
+            shutdownPool(executorService);
         }
         return node;
     }
@@ -86,37 +90,55 @@ public class RequestHandler {
         return Optional.of(node);
     }
 
-    public Drawable getImage(String url, int timeout) {
+    public Optional<Drawable> getImage(String url, int timeout) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<Drawable> future = executorService.submit(() -> fetchImage(url));
+        Future<Optional<Drawable>> future = executorService.submit(() -> fetchImage(url));
 
-        Drawable cover;
+        Optional<Drawable> cover;
         try {
             cover = future.get(timeout, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return null;
+            return Optional.empty();
         } catch (ExecutionException | TimeoutException e) {
-            return null;
+            return Optional.empty();
+        } finally {
+            shutdownPool(executorService);
         }
         return cover;
     }
 
-    public Drawable getFallbackImage(String isbn, int timeout) {
+    public Optional<Drawable> getFallbackImage(String isbn, int timeout) {
         Optional<JsonNode> imageLink = getJsonDocument("https://bookcover.longitood.com/bookcover/" + isbn, timeout);
-        return imageLink.map(jsonNode ->
-                        getImage(jsonNode.findValue("url").asText(), timeout))
-                .orElse(null);
+
+        if (!imageLink.isPresent()) {
+            return Optional.empty();
+        }
+
+        return getImage(imageLink.get().findValue("url").asText(), timeout);
     }
 
-    private Drawable fetchImage(String url) {
-        try {
-            InputStream is = (InputStream) new URL(url).getContent();
-            return Drawable.createFromStream(is, "cover");
+    private Optional<Drawable> fetchImage(String url) {
+        try (InputStream is = new URL(url).openConnection().getInputStream()) {
+            return Optional.ofNullable(Drawable.createFromStream(is, "cover"));
         } catch (IOException e) {
             Log.e(logTag, "Couldn't fetch image");
             e.printStackTrace();
-            return null;
+            return Optional.empty();
+        }
+
+    }
+
+    private void shutdownPool(ExecutorService pool) {
+        pool.shutdown();
+
+        try {
+            if (!pool.awaitTermination(10, TimeUnit.SECONDS)) {
+                pool.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            pool.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 

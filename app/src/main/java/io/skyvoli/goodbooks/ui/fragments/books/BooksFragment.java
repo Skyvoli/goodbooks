@@ -136,7 +136,7 @@ public class BooksFragment extends Fragment implements StartFragmentListener {
         }
 
         new Thread(() -> {
-            BookResolver resolver = new BookResolver();
+            BookResolver resolver = new BookResolver(requireContext());
 
             if (!unresolvedIsbn.isEmpty()) {
                 long seriesIdUnknown = books.stream()
