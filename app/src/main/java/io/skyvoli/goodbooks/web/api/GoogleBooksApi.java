@@ -8,10 +8,14 @@ import androidx.annotation.Nullable;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.web.RequestHandler;
@@ -48,22 +52,34 @@ public class GoogleBooksApi implements BookApi {
         String part = title;
         String subtitle = getString(map.get("subtitle"), null);
 
-        String[] partTest = title.split(",\\sVol\\.\\s");
-        if (partTest.length >= 2) {
+        String[] partTest = title.split(",?\\sVol\\.\\s");
+        if (partTest.length == 2) {
             title = partTest[0];
             part = partTest[1];
+        } else {
+            List<String> titleParts = Arrays.stream(title.split("\\s")).collect(Collectors.toList());
+            ListIterator<String> iterator = titleParts.listIterator(titleParts.size());
+
+            while (iterator.hasPrevious()) {
+                try {
+                    String nextString = iterator.previous();
+                    Integer.parseInt(nextString);
+                    part = nextString;
+                    title = title.split("\\s" + part)[0];
+                    break;
+                } catch (NumberFormatException ignore) {
+                    //ignored
+                }
+            }
         }
 
-        Drawable cover = loadImage(isbn, timeout);
-        String authors = getString(map.get("authors"), "");
+        String authors = getFromStringList(map.get("authors"), "");
 
-        Book book = new Book(title, subtitle, parseToInt(part), isbn, authors, cover, true, 0);
-
-        return Optional.of(book);
+        return Optional.of(new Book(title, subtitle, parseToInt(part), isbn, authors, null, true, 0));
     }
 
     @Override
-    public Drawable loadImage(String isbn, int timeout) {
+    public Optional<Drawable> loadImage(String isbn, int timeout) {
         return new RequestHandler().getFallbackImage(isbn, timeout);
     }
 
@@ -83,6 +99,35 @@ public class GoogleBooksApi implements BookApi {
         }
         return defaultValue;
 
+    }
+
+    private String getFromStringList(@Nullable JsonNode node, String defaultValue) {
+        if (node == null) {
+            return defaultValue;
+        }
+
+        if (node.isArray()) {
+            StringBuilder builder = new StringBuilder();
+
+            Iterator<JsonNode> iterator = node.iterator();
+
+            if (iterator.hasNext()) {
+                builder.append(iterator.next().textValue());
+            } else {
+                return defaultValue;
+            }
+
+            while (iterator.hasNext()) {
+                builder.append(System.lineSeparator()).append(iterator.next().textValue());
+            }
+            return builder.toString();
+        }
+
+        if (node.isTextual()) {
+            return node.textValue();
+        }
+
+        return defaultValue;
     }
 
     private Integer parseToInt(String part) {

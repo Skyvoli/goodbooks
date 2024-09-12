@@ -127,7 +127,7 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
 
             requireActivity().runOnUiThread(() -> cameraViewModel.setShowBook(false));
 
-            Book scanedBook = new BookResolver().resolveBook(isbn, 10);
+            Book scanedBook = new BookResolver(requireContext()).resolveBook(isbn, 10);
 
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {

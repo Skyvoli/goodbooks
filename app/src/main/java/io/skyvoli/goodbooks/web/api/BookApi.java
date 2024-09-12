@@ -10,5 +10,5 @@ public interface BookApi {
 
     Optional<Book> getBook(String isbn, int timeout);
 
-    Drawable loadImage(String isbn, int timeout);
+    Optional<Drawable> loadImage(String isbn, int timeout);
 }

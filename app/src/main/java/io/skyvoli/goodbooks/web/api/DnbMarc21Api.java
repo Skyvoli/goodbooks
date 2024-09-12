@@ -23,12 +23,13 @@ public class DnbMarc21Api implements BookApi {
     private static final String MAXIMUM_RECORDS = "&maximumRecords=";
     private static final String RECORD_SCHEMA = "&recordSchema=MARC21-xml";
     private static final String IMAGE_URL = "https://portal.dnb.de/opac/mvb/cover?isbn=";
+    RequestHandler requestHandler = new RequestHandler();
 
 
     @Override
     public Optional<Book> getBook(String isbn, int timeout) {
         String url = BASE_URL + OPERATION + QUERY + isbn + MAXIMUM_RECORDS + 1 + RECORD_SCHEMA;
-        Optional<Document> doc = new RequestHandler().getDocument(url, timeout);
+        Optional<Document> doc = requestHandler.getDocument(url, timeout);
 
         if (!doc.isPresent()) {
             return Optional.empty();
@@ -81,18 +82,12 @@ public class DnbMarc21Api implements BookApi {
         Resolved<String> resolvedAuthor = resolveString(bookData, authorFields, "Unbekannt");
         resolvedAuthor.setValue(formatAuthors(resolvedAuthor.getValue()));
 
-        Drawable cover = this.loadImage(isbn, timeout);
-
-        return Optional.of(new Book(resolvedTitle.getValue(), resolvedSubtitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), cover, true, 0));
+        return Optional.of(new Book(resolvedTitle.getValue(), resolvedSubtitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), null, true, 0));
     }
 
-    public Drawable loadImage(String isbn, int timeout) {
-        RequestHandler requestHandler = new RequestHandler();
-        Drawable cover = requestHandler.getImage(IMAGE_URL + isbn, timeout);
-        if (cover == null) {
-            cover = requestHandler.getFallbackImage(isbn, timeout);
-        }
-        return cover;
+    public Optional<Drawable> loadImage(String isbn, int timeout) {
+        return requestHandler.getImage(IMAGE_URL + isbn, timeout);
+
     }
 
     private Resolved<String> resolveString(Element bookData, List<XmlField> titleFields, String defaultValue) {
