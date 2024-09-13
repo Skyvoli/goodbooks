@@ -27,7 +27,7 @@ public class BookResolver {
         Optional<Book> result = dnbApi.getBook(isbn, timeout);
         Optional<Drawable> cover = dnbApi.loadImage(isbn, timeout);
 
-        Book book = result.orElseGet(() -> dnbApi2.getBook(isbn, timeout).orElseGet(() -> new Book(isbn)));
+        Book book = result.orElseGet(() -> dnbApi2.getBook(isbn, timeout).orElseGet(() -> Book.createUnknown(isbn)));
         book.setCover(cover.orElseGet(() -> dnbApi2.loadImage(isbn, timeout).orElse(fallbackImage)));
         return book;
     }
