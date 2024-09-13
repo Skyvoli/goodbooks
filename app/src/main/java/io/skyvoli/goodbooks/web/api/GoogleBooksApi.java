@@ -70,10 +70,15 @@ public class GoogleBooksApi implements BookApi {
                 }
             }
         }
+        title = removeUnwantedSequencesFromTitle(title);
 
         String authors = getFromStringList(map.get("authors"));
 
         return Optional.of(new Book(title, subtitle, parseToInt(part), isbn, authors, true, 0));
+    }
+
+    private String removeUnwantedSequencesFromTitle(String title) {
+        return title.replaceAll("\\s-\\sBand", "");
     }
 
     @Override
