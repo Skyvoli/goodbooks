@@ -4,9 +4,6 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,10 +14,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.zxing.client.android.Intents;
 import com.journeyapps.barcodescanner.ScanContract;
@@ -35,6 +31,7 @@ import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dimensions.Dimension;
 import io.skyvoli.goodbooks.global.GlobalController;
+import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
 import io.skyvoli.goodbooks.helper.listener.ScanListener;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.ui.fragments.StartFragmentListener;
@@ -49,20 +46,30 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //TODO Swipe for refresh
         cameraViewModel = new ViewModelProvider(this).get(CameraViewModel.class);
         globalController = new GlobalController(requireActivity());
 
-        requireActivity().addMenuProvider(getMenuProvider(), getViewLifecycleOwner(), Lifecycle.State.RESUMED);
-
         binding = FragmentCameraBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
+        SwipeColorSchemeConfigurator.setSwipeColorScheme(binding.swipeRefreshLayout, requireContext());
+        swipeRefreshLayout.setOnRefreshListener(this::onSwipe);
+
         binding.bookPreview.floatingActionButton.setVisibility(View.GONE);
         binding.scanBtn.setOnClickListener(new ScanListener(
                 registerForActivityResult(new ScanContract(),
                         this::onScanResult)));
 
         return root;
+    }
+
+    private void onSwipe() {
+        binding.swipeRefreshLayout.setRefreshing(true);
+        String isbn = Objects.requireNonNull(cameraViewModel.getBook().getValue()).getIsbn();
+        binding.addBookBtn.setEnabled(false);
+        handleIsbn(isbn);
+        binding.swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -76,26 +83,6 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
             binding.addBookBtn.setOnClickListener(this::addBook);
             cameraViewModel.getIsNewBook().observe(getViewLifecycleOwner(), isNew -> setInformationText(isNew, binding.information));
         }
-    }
-
-    private MenuProvider getMenuProvider() {
-        return new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                menuInflater.inflate(R.menu.books_menu, menu);
-            }
-
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                int selectedItemId = menuItem.getItemId();
-                if (selectedItemId == R.id.reset_item) {
-                    new InformationDialog("Reload", "wip")
-                            .show(getParentFragmentManager(), "reload");
-                    return true;
-                }
-                return false;
-            }
-        };
     }
 
     private void onScanResult(ScanIntentResult result) {
