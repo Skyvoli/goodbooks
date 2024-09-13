@@ -23,13 +23,11 @@ import io.skyvoli.goodbooks.web.RequestHandler;
 public class GoogleBooksApi implements BookApi {
 
     private static final String BASE_URL = "https://www.googleapis.com/books/v1/volumes?q=isbn:";
-
+    private final RequestHandler requestHandler = new RequestHandler();
 
     @Override
     public Optional<Book> getBook(String isbn, int timeout) {
-        String url = BASE_URL + isbn;
-        RequestHandler requestHandler = new RequestHandler();
-        Optional<JsonNode> requestNode = requestHandler.getJsonDocument(url, timeout);
+        Optional<JsonNode> requestNode = requestHandler.getJsonDocument(BASE_URL + isbn, timeout);
         if (!requestNode.isPresent()) {
             return Optional.empty();
         }
@@ -73,14 +71,14 @@ public class GoogleBooksApi implements BookApi {
             }
         }
 
-        String authors = getFromStringList(map.get("authors"), "");
+        String authors = getFromStringList(map.get("authors"));
 
-        return Optional.of(new Book(title, subtitle, parseToInt(part), isbn, authors, null, true, 0));
+        return Optional.of(new Book(title, subtitle, parseToInt(part), isbn, authors, true, 0));
     }
 
     @Override
     public Optional<Drawable> loadImage(String isbn, int timeout) {
-        return new RequestHandler().getFallbackImage(isbn, timeout);
+        return requestHandler.getFallbackImage(isbn, timeout);
     }
 
     private String getString(@Nullable JsonNode node, String defaultValue) {
@@ -101,9 +99,9 @@ public class GoogleBooksApi implements BookApi {
 
     }
 
-    private String getFromStringList(@Nullable JsonNode node, String defaultValue) {
+    private String getFromStringList(@Nullable JsonNode node) {
         if (node == null) {
-            return defaultValue;
+            return "";
         }
 
         if (node.isArray()) {
@@ -114,7 +112,7 @@ public class GoogleBooksApi implements BookApi {
             if (iterator.hasNext()) {
                 builder.append(iterator.next().textValue());
             } else {
-                return defaultValue;
+                return "";
             }
 
             while (iterator.hasNext()) {
@@ -127,9 +125,10 @@ public class GoogleBooksApi implements BookApi {
             return node.textValue();
         }
 
-        return defaultValue;
+        return "";
     }
 
+    @Nullable
     private Integer parseToInt(String part) {
         try {
             return Integer.parseInt(part);

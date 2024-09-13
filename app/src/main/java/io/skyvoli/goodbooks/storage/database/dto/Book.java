@@ -22,16 +22,8 @@ public class Book {
     private boolean resolved;
     private long seriesId;
 
-    @Ignore
-    public Book(@NonNull String isbn) {
-        this.title = "Unbekannt";
-        this.subtitle = null;
-        this.part = null;
-        this.isbn = isbn;
-        this.author = "Unbekannt";
-        this.cover = null;
-        this.resolved = false;
-        this.seriesId = 0;
+    public static Book createUnknown(@NonNull String isbn) {
+        return new Book("Unbekannt", null, null, isbn, "Unbekannt", null, false, 0);
     }
 
     @Ignore

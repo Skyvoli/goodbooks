@@ -23,7 +23,7 @@ public class DnbMarc21Api implements BookApi {
     private static final String MAXIMUM_RECORDS = "&maximumRecords=";
     private static final String RECORD_SCHEMA = "&recordSchema=MARC21-xml";
     private static final String IMAGE_URL = "https://portal.dnb.de/opac/mvb/cover?isbn=";
-    RequestHandler requestHandler = new RequestHandler();
+    private final RequestHandler requestHandler = new RequestHandler();
 
 
     @Override
@@ -49,7 +49,7 @@ public class DnbMarc21Api implements BookApi {
         List<XmlField> partFields = new ArrayList<>();
         List<XmlField> authorFields = new ArrayList<>();
 
-        //Titel: tag 245 code a + n
+        //Title: tag 245 code a + n
         titleFields.add(new XmlField("830", "a"));
         titleFields.add(new XmlField("800", "t"));
         titleFields.add(new XmlField("245", "a"));
@@ -82,7 +82,7 @@ public class DnbMarc21Api implements BookApi {
         Resolved<String> resolvedAuthor = resolveString(bookData, authorFields, "Unbekannt");
         resolvedAuthor.setValue(formatAuthors(resolvedAuthor.getValue()));
 
-        return Optional.of(new Book(resolvedTitle.getValue(), resolvedSubtitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), null, true, 0));
+        return Optional.of(new Book(resolvedTitle.getValue(), resolvedSubtitle.getValue(), resolvedPart.getValue(), isbn, resolvedAuthor.getValue(), true, 0));
     }
 
     public Optional<Drawable> loadImage(String isbn, int timeout) {
@@ -105,18 +105,18 @@ public class DnbMarc21Api implements BookApi {
         for (XmlField field : titleFields) {
             String resultAsString = getContent(getElement(bookData, field.tag), field.code);
             if (resultAsString != null) {
-                Integer result = parseToInt(resultAsString);
-                if (result != null) {
-                    return new Resolved<>(result, field);
+                Optional<Integer> result = parseToInt(resultAsString);
+                if (result.isPresent()) {
+                    return new Resolved<>(result.get(), field);
                 }
             }
         }
         return new Resolved<>(null, null);
     }
 
-    private Integer parseToInt(String part) {
+    private Optional<Integer> parseToInt(String part) {
         try {
-            return Integer.parseInt(part);
+            return Optional.of(Integer.parseInt(part));
         } catch (NumberFormatException e) {
             Log.e(getClass().getSimpleName(), "Not a integer");
 
@@ -129,9 +129,9 @@ public class DnbMarc21Api implements BookApi {
             }
 
             if (digits.length() == 0) {
-                return null;
+                return Optional.empty();
             }
-            return Integer.valueOf(digits.toString());
+            return Optional.of(Integer.valueOf(digits.toString()));
         }
     }
 
