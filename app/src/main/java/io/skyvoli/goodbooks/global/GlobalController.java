@@ -9,9 +9,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
@@ -32,15 +34,42 @@ public class GlobalController {
                 .build();
     }
 
+    public List<Integer> getPotentialMissingBooks(Book book) {
+        if (book.getPart() == null) {
+            return new ArrayList<>();
+        }
+
+        List<Book> books = db.bookDao().getBooksFromSeries(getSeriesOf(book, false));
+        List<Integer> existing = books.stream().map(Book::getPart).collect(Collectors.toList());
+
+        int max = book.getPart();
+
+        BitSet allBitSet = new BitSet(max);
+        BitSet presentBitSet = new BitSet(max);
+
+        IntStream.rangeClosed(1, max)
+                .forEach(allBitSet::set);
+        
+        existing.forEach(presentBitSet::set);
+
+        allBitSet.and(presentBitSet);
+
+        return IntStream.rangeClosed(1, max - 1)
+                .filter(i -> !allBitSet.get(i))
+                .boxed()
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
     public void addBook(Book book, Context context) {
-        book.setSeriesId(getSeriesOf(book));
+        book.setSeriesId(getSeriesOf(book, true));
         //Save book
         globalViewModel.addBook(book);
         db.bookDao().insert(book.getEntity());
         book.getCover().ifPresent(cover -> new FileStorage(context.getFilesDir()).saveImage(book.getIsbn(), cover));
     }
 
-    private long getSeriesOf(Book book) {
+    private long getSeriesOf(Book book, boolean allowNewCreation) {
         List<SeriesEntity> found = db.seriesDao().getSeriesDtoByTitle(book.getTitle());
         if (!found.isEmpty()) {
             //Only 1 series exists with that name
@@ -59,7 +88,10 @@ public class GlobalController {
 
             return hits.get(0).getSeriesId();
         }
-
+        if (!allowNewCreation) {
+            //TODO wrapper for seriesId
+            return -1;
+        }
         //No series exists --> New series
         return createNewSeriesFor(book);
     }
@@ -73,7 +105,7 @@ public class GlobalController {
     }
 
     public void updateBook(Book book, Context context) {
-        long oldId = getSeriesOf(book);
+        long oldId = getSeriesOf(book, true);
 
         if (db.seriesDao().getCountOfSeries(oldId) <= 1) {
             List<SeriesEntity> found = db.seriesDao().getSeriesDtoByTitle(book.getTitle());
@@ -92,7 +124,7 @@ public class GlobalController {
                 updateSeries(book.getSeriesId(), context);
             }
         } else {
-            book.setSeriesId(getSeriesOf(book));
+            book.setSeriesId(getSeriesOf(book, true));
             db.bookDao().update(book.getEntity());
             //Update both series
             updateSeries(oldId, context);

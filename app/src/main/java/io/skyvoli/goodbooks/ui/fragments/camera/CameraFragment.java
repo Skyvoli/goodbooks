@@ -22,6 +22,7 @@ import com.google.zxing.client.android.Intents;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanIntentResult;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -115,6 +116,7 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
             requireActivity().runOnUiThread(() -> cameraViewModel.setShowBook(false));
 
             Book scanedBook = new BookResolver(requireContext()).resolveBook(isbn, 10);
+            List<Integer> missing = globalController.getPotentialMissingBooks(scanedBook);
 
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
