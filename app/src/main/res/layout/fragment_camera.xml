@@ -15,7 +15,7 @@
             android:paddingStart="@dimen/parent_spacing"
             android:paddingEnd="@dimen/parent_spacing"
             android:paddingBottom="@dimen/parent_spacing">
-        
+
         <include
                 layout="@layout/book_detail_card"
                 android:id="@+id/book_preview"
@@ -58,7 +58,7 @@
                 android:layout_marginEnd="@dimen/parent_spacing"
 
                 app:layout_constraintEnd_toStartOf="@+id/addBookBtn"
-                app:layout_constraintTop_toBottomOf="@+id/information" />
+                app:layout_constraintTop_toBottomOf="@+id/missing_books" />
 
         <Button
                 android:text="@string/add_book"
@@ -68,7 +68,7 @@
                 android:enabled="false"
                 android:layout_marginTop="@dimen/parent_spacing"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/information" />
+                app:layout_constraintTop_toBottomOf="@+id/missing_books" />
 
         <TextView
                 android:text="@string/no_scanned_placeholder"
@@ -78,6 +78,15 @@
                 android:textSize="20sp"
                 android:layout_marginTop="@dimen/parent_spacing"
                 app:layout_constraintTop_toBottomOf="@+id/border2"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/missing_books"
+                android:textSize="20sp"
+                android:layout_marginTop="@dimen/parent_spacing"
+                app:layout_constraintTop_toBottomOf="@+id/information"
                 app:layout_constraintEnd_toEndOf="parent" />
 
 
