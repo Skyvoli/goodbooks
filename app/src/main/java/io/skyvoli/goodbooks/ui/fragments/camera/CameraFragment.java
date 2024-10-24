@@ -7,8 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,6 +20,7 @@ import com.google.zxing.client.android.Intents;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanIntentResult;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,6 +43,7 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
     private CameraViewModel cameraViewModel;
     private GlobalController globalController;
     private boolean shouldConfigureUi = true;
+    private static final int BORDER = 6;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,11 +78,11 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
         if (shouldConfigureUi) {
             shouldConfigureUi = false;
 
-            cameraViewModel.getBook().observe(getViewLifecycleOwner(), book -> setBookView(book, binding.bookPreview));
-            cameraViewModel.getShowBook().observe(getViewLifecycleOwner(), showBook -> showBook(showBook, binding.bookPreview.bookData, binding.progressBar));
-
+            cameraViewModel.getBook().observe(getViewLifecycleOwner(), this::setBookView);
+            cameraViewModel.getShowBook().observe(getViewLifecycleOwner(), this::showBook);
             binding.addBookBtn.setOnClickListener(this::addBook);
-            cameraViewModel.getIsNewBook().observe(getViewLifecycleOwner(), isNew -> setInformationText(isNew, binding.information));
+            cameraViewModel.getIsNewBook().observe(getViewLifecycleOwner(), this::setInformationText);
+            cameraViewModel.getMissing().observe(getViewLifecycleOwner(), this::setMissingBooksText);
         }
     }
 
@@ -121,6 +121,7 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
                     cameraViewModel.setIsNewBook(true);
+                    cameraViewModel.setMissingBooks(missing);
                     cameraViewModel.setBook(scanedBook);
                     cameraViewModel.setShowBook(true);
                 });
@@ -128,35 +129,66 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
         }).start();
     }
 
-    private void setInformationText(Boolean isNew, TextView information) {
+    private void setInformationText(Boolean isNew) {
         if (isNew == null) {
-            information.setText(R.string.no_scanned_placeholder);
+            binding.information.setText(R.string.no_scanned_placeholder);
             binding.addBookBtn.setEnabled(false);
             return;
         }
 
         binding.addBookBtn.setEnabled(isNew);
         if (isNew) {
-            information.setText(R.string.new_book);
+            binding.information.setText(R.string.new_book);
         } else {
-            information.setText(R.string.book_already_in_list);
+            binding.information.setText(R.string.book_already_in_list);
         }
     }
 
-    private void showBook(Boolean showBook, ConstraintLayout constraintLayout, ProgressBar progressBar) {
+    private void setMissingBooksText(List<Integer> missing) {
+        if (missing.isEmpty()) {
+            binding.missingBooks.setText("Es fehlen keine Bücher");
+            return;
+        } else if (missing.size() == 1) {
+            binding.missingBooks.setText(new StringBuilder("Buch ").append(missing.get(0)).append(" fehlt"));
+            return;
+        }
+
+        StringBuilder builder = new StringBuilder("Bücher ");
+        Iterator<Integer> iterator = missing.iterator();
+
+        if (missing.size() > BORDER) {
+            builder.append(missing.get(0));
+            for (int index = 1; index < BORDER; index++) {
+                builder.append(", ").append(missing.get(index));
+            }
+            builder.setLength(builder.length() - 1);
+            builder.append("& ").append(missing.size() - (BORDER - 1)).append(" weitere Bücher");
+        } else {
+            builder.append(iterator.next());
+            while (iterator.hasNext()) {
+                builder.append(", ").append(iterator.next());
+            }
+        }
+
+        builder.append(" fehlen");
+        binding.missingBooks.setText(builder);
+    }
+
+    private void showBook(Boolean showBook) {
         if (showBook == null) {
             throw new NullPointerException();
         }
         if (showBook) {
-            constraintLayout.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
+            binding.bookPreview.bookData.setVisibility(View.VISIBLE);
+            binding.progressBar.setVisibility(View.GONE);
         } else {
-            constraintLayout.setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
+            binding.bookPreview.bookData.setVisibility(View.INVISIBLE);
+            binding.progressBar.setVisibility(View.VISIBLE);
         }
     }
 
-    private void setBookView(Book book, BookDetailCardBinding bookPreview) {
+    private void setBookView(Book book) {
+        BookDetailCardBinding bookPreview = binding.bookPreview;
         bookPreview.title.setText(book.buildCompleteTitle());
         bookPreview.isbn.setText(book.getIsbn());
         bookPreview.author.setText(book.getAuthor());
