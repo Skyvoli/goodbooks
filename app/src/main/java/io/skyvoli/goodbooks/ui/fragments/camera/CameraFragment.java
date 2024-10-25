@@ -67,9 +67,18 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
 
     private void onSwipe() {
         binding.swipeRefreshLayout.setRefreshing(true);
-        String isbn = Objects.requireNonNull(cameraViewModel.getBook().getValue()).getIsbn();
-        binding.addBookBtn.setEnabled(false);
-        handleIsbn(isbn);
+        Optional<Book> maybeBook = Optional.ofNullable(cameraViewModel.getBook().getValue());
+
+        if (maybeBook.isPresent()) {
+            String isbn = maybeBook.get().getIsbn();
+            binding.addBookBtn.setEnabled(false);
+            handleIsbn(isbn);
+        } else {
+            //Ignore
+            new InformationDialog("Kein Buch", "Kein Buch vorhanden zum Neuladen").show(getParentFragmentManager(), "");
+        }
+
+
         binding.swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -103,24 +112,24 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
         }
 
         new Thread(() -> {
+            Book scanedBook;
+            boolean isNew;
             Optional<Book> found = globalController.getBook(requireContext(), isbn);
 
             if (found.isPresent()) {
-                requireActivity().runOnUiThread(() -> {
-                    cameraViewModel.setBook(found.get());
-                    cameraViewModel.setIsNewBook(false);
-                });
-                return;
+                isNew = false;
+                scanedBook = found.get();
+            } else {
+                isNew = true;
+                requireActivity().runOnUiThread(() -> cameraViewModel.setShowBook(false));
+                scanedBook = new BookResolver(requireContext()).resolveBook(isbn, 10);
             }
 
-            requireActivity().runOnUiThread(() -> cameraViewModel.setShowBook(false));
-
-            Book scanedBook = new BookResolver(requireContext()).resolveBook(isbn, 10);
             List<Integer> missing = globalController.getPotentialMissingBooks(scanedBook);
 
             if (isAdded()) {
                 requireActivity().runOnUiThread(() -> {
-                    cameraViewModel.setIsNewBook(true);
+                    cameraViewModel.setIsNewBook(isNew);
                     cameraViewModel.setMissingBooks(missing);
                     cameraViewModel.setBook(scanedBook);
                     cameraViewModel.setShowBook(true);
