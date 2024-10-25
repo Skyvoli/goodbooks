@@ -19,6 +19,9 @@ public interface BookDao {
     @Query("SELECT s.title, b.* FROM books b INNER JOIN series s ON b.seriesId = s.seriesId WHERE b.seriesId = :seriesId ORDER BY title, part")
     List<Book> getBooksFromSeries(long seriesId);
 
+    @Query("SELECT b.part FROM books b INNER JOIN series s ON b.seriesId = s.seriesId WHERE b.seriesId = :seriesId AND part < :maxVolume ORDER BY part")
+    List<Integer> getVolumeNumbers(long seriesId, int maxVolume);
+
     @Query("SELECT s.title, b.* FROM books b INNER JOIN series s ON b.seriesId = s.seriesId WHERE isbn = :isbn")
     Book getBookByIsbn(String isbn);
 

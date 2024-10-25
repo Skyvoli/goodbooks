@@ -39,17 +39,22 @@ public class GlobalController {
             return new ArrayList<>();
         }
 
-        List<Book> books = db.bookDao().getBooksFromSeries(getSeriesOf(book, false));
-        List<Integer> existing = books.stream().map(Book::getPart).collect(Collectors.toList());
-
         int max = book.getPart();
+        long seriesId = book.getSeriesId();
+
+        if (seriesId == 0) {
+            seriesId = getSeriesOf(book, false);
+        }
+
+        List<Integer> existing = db.bookDao().getVolumeNumbers(seriesId, max);
+
 
         BitSet allBitSet = new BitSet(max);
         BitSet presentBitSet = new BitSet(max);
 
         IntStream.rangeClosed(1, max)
                 .forEach(allBitSet::set);
-        
+
         existing.forEach(presentBitSet::set);
 
         allBitSet.and(presentBitSet);
