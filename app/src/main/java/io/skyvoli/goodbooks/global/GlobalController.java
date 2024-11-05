@@ -25,6 +25,7 @@ public class GlobalController {
 
     private final GlobalViewModel globalViewModel;
     private static final String DATABASE_NAME = "books";
+    private static final long NO_SERIES = -1;
 
     private final AppDatabase db;
 
@@ -43,7 +44,7 @@ public class GlobalController {
         long seriesId = book.getSeriesId();
 
         if (seriesId == 0) {
-            seriesId = getSeriesOf(book, false);
+            seriesId = getSeriesId(book);
         }
 
         List<Integer> existing = db.bookDao().getVolumeNumbers(seriesId, max);
@@ -67,14 +68,14 @@ public class GlobalController {
     }
 
     public void addBook(Book book, Context context) {
-        book.setSeriesId(getSeriesOf(book, true));
+        book.setSeriesId(getSeriesIdOfNew(book));
         //Save book
         globalViewModel.addBook(book);
         db.bookDao().insert(book.getEntity());
         book.getCover().ifPresent(cover -> new FileStorage(context.getFilesDir()).saveImage(book.getIsbn(), cover));
     }
 
-    private long getSeriesOf(Book book, boolean allowNewCreation) {
+    private long getSeriesId(Book book) {
         List<SeriesEntity> found = db.seriesDao().getSeriesDtoByTitle(book.getTitle());
         if (!found.isEmpty()) {
             //Only 1 series exists with that name
@@ -93,12 +94,17 @@ public class GlobalController {
 
             return hits.get(0).getSeriesId();
         }
-        if (!allowNewCreation) {
-            //TODO wrapper for seriesId
-            return -1;
+
+        return NO_SERIES;
+
+    }
+
+    private long getSeriesIdOfNew(Book book) {
+        long id = getSeriesId(book);
+        if (id == NO_SERIES) {
+            return createNewSeriesFor(book);
         }
-        //No series exists --> New series
-        return createNewSeriesFor(book);
+        return id;
     }
 
     private long createNewSeriesFor(Book book) {
@@ -109,9 +115,7 @@ public class GlobalController {
         return seriesId;
     }
 
-    public void updateBook(Book book, Context context) {
-        long oldId = getSeriesOf(book, true);
-
+    public Book updateBook(long oldId, Book book, Context context) {
         if (db.seriesDao().getCountOfSeries(oldId) <= 1) {
             List<SeriesEntity> found = db.seriesDao().getSeriesDtoByTitle(book.getTitle());
             if (found.isEmpty()) {
@@ -129,7 +133,7 @@ public class GlobalController {
                 updateSeries(book.getSeriesId(), context);
             }
         } else {
-            book.setSeriesId(getSeriesOf(book, true));
+            book.setSeriesId(getSeriesIdOfNew(book));
             db.bookDao().update(book.getEntity());
             //Update both series
             updateSeries(oldId, context);
@@ -137,6 +141,7 @@ public class GlobalController {
         }
 
         updateCoverOfBook(book, context);
+        return book;
     }
 
     private void updateSeries(long seriesId, Context context) {
