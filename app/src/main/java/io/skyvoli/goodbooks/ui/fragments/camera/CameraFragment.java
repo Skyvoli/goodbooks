@@ -71,7 +71,6 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
 
         if (maybeBook.isPresent()) {
             String isbn = maybeBook.get().getIsbn();
-            binding.addBookBtn.setEnabled(false);
             handleIsbn(isbn);
         } else {
             //Ignore

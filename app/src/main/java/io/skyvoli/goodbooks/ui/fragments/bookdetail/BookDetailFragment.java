@@ -145,15 +145,20 @@ public class BookDetailFragment extends Fragment {
         submit.setOnClickListener(v -> {
             Book newBook = copiedBook.createClone();
             newBook.setResolved(true);
-            new Thread(() -> globalController.updateBook(newBook, requireContext())).start();
-            globalController.sort();
-            originalBook = newBook;
-            //Refresh
-            title.setText(originalBook.buildTitle());
-            author.setText(originalBook.getAuthor());
-            editTitle.setText(originalBook.getTitle());
-            editAuthor.setText(originalBook.getAuthor());
-            submit.setEnabled(false);
+            new Thread(() -> {
+                originalBook = globalController.updateBook(originalBook.getSeriesId(), newBook, requireContext());
+                copiedBook = originalBook.createClone();
+                globalController.sort();
+                requireActivity().runOnUiThread(() -> {
+                    //Refresh
+                    title.setText(originalBook.buildTitle());
+                    author.setText(originalBook.getAuthor());
+                    editTitle.setText(originalBook.getTitle());
+                    editAuthor.setText(originalBook.getAuthor());
+                    submit.setEnabled(false);
+                });
+            }).start();
+
 
             new InformationDialog("Gespeichert", "Die Daten wurden übernommen.")
                     .show(getParentFragmentManager(), "saved");

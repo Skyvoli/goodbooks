@@ -147,8 +147,7 @@ public class BooksFragment extends Fragment implements StartFragmentListener {
 
                 unresolvedIsbn.forEach(isbn -> {
                     Book resolved = resolver.resolveBook(isbn, 10);
-                    resolved.setSeriesId(seriesIdUnknown);
-                    globalController.updateBook(resolved, requireContext());
+                    globalController.updateBook(seriesIdUnknown, resolved, requireContext());
                 });
             }
 
