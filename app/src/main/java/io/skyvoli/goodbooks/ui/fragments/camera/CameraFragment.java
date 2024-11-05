@@ -14,7 +14,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.zxing.client.android.Intents;
 import com.journeyapps.barcodescanner.ScanContract;
@@ -53,14 +52,12 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
         binding = FragmentCameraBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshLayout;
         SwipeColorSchemeConfigurator.setSwipeColorScheme(binding.swipeRefreshLayout, requireContext());
-        swipeRefreshLayout.setOnRefreshListener(this::onSwipe);
+        binding.swipeRefreshLayout.setOnRefreshListener(this::onSwipe);
 
         binding.bookPreview.floatingActionButton.setVisibility(View.GONE);
         binding.scanBtn.setOnClickListener(new ScanListener(
-                registerForActivityResult(new ScanContract(),
-                        this::onScanResult)));
+                registerForActivityResult(new ScanContract(), this::onScanResult)));
 
         return root;
     }
@@ -70,13 +67,10 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
         Optional<Book> maybeBook = Optional.ofNullable(cameraViewModel.getBook().getValue());
 
         if (maybeBook.isPresent()) {
-            String isbn = maybeBook.get().getIsbn();
-            handleIsbn(isbn);
+            handleIsbn(maybeBook.get().getIsbn());
         } else {
-            //Ignore
             new InformationDialog("Kein Buch", "Kein Buch vorhanden zum Neuladen").show(getParentFragmentManager(), "");
         }
-
 
         binding.swipeRefreshLayout.setRefreshing(false);
     }
@@ -97,10 +91,9 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
     private void onScanResult(ScanIntentResult result) {
         if (result.getContents() == null) {
             handleCanceledScan(result);
-            return;
+        } else {
+            handleIsbn(result.getContents());
         }
-
-        handleIsbn(result.getContents());
     }
 
     private void handleIsbn(String isbn) {
@@ -154,7 +147,7 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
 
     private void setMissingBooksText(List<Integer> missing) {
         if (missing.isEmpty()) {
-            binding.missingBooks.setText("Es fehlen keine Bücher");
+            binding.missingBooks.setText(R.string.no_missing_books);
             return;
         } else if (missing.size() == 1) {
             binding.missingBooks.setText(new StringBuilder("Buch ").append(missing.get(0)).append(" fehlt"));

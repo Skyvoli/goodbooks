@@ -96,7 +96,6 @@ public class GlobalController {
         }
 
         return NO_SERIES;
-
     }
 
     private long getSeriesIdOfNew(Book book) {
@@ -115,7 +114,8 @@ public class GlobalController {
         return seriesId;
     }
 
-    public Book updateBook(long oldId, Book book, Context context) {
+    public Book updateBook(Book book, Context context) {
+        long oldId = book.getSeriesId();
         if (db.seriesDao().getCountOfSeries(oldId) <= 1) {
             List<SeriesEntity> found = db.seriesDao().getSeriesDtoByTitle(book.getTitle());
             if (found.isEmpty()) {
@@ -128,7 +128,7 @@ public class GlobalController {
                 //Change reference and delete old
                 book.setSeriesId(found.get(0).getSeriesId());
                 db.bookDao().update(book.getEntity());
-                removeSeries(oldId);
+                tryRemoveSeries(oldId);
                 //Update new series
                 updateSeries(book.getSeriesId(), context);
             }
@@ -160,11 +160,10 @@ public class GlobalController {
         globalViewModel.removeBook(book);
         db.bookDao().delete(book.getEntity());
         new FileStorage(context.getFilesDir()).deleteImage(book.getIsbn());
-
-        removeSeries(book.getSeriesId());
+        tryRemoveSeries(book.getSeriesId());
     }
 
-    private void removeSeries(long seriesId) {
+    private void tryRemoveSeries(long seriesId) {
         if (db.seriesDao().getCountOfSeries(seriesId) == 0) {
             globalViewModel.removeSeries(seriesId);
             db.seriesDao().delete(seriesId);
