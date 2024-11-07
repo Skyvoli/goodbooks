@@ -4,9 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -33,18 +30,7 @@ public class HomeFragment extends Fragment implements StartFragmentListener {
     public void configureFragment() {
         if (shouldConfigureUi) {
             shouldConfigureUi = false;
-            final TextView textView = binding.textHome;
-            homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-            final Button magicButton = binding.button;
-            final ProgressBar progressCircular = binding.progressCircular;
-            magicButton.setOnClickListener(v -> {
-                progressCircular.setVisibility(View.VISIBLE);
-                new Thread(() -> {
-                    if (isAdded()) {
-                        requireActivity().runOnUiThread(() -> progressCircular.setVisibility(View.GONE));
-                    }
-                }).start();
-            });
+            homeViewModel.getText().observe(getViewLifecycleOwner(), binding.textHome::setText);
         }
     }
 
