@@ -19,7 +19,6 @@ import com.google.zxing.client.android.Intents;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanIntentResult;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,6 +29,8 @@ import io.skyvoli.goodbooks.databinding.FragmentCameraBinding;
 import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.dimensions.Dimension;
 import io.skyvoli.goodbooks.global.GlobalController;
+import io.skyvoli.goodbooks.helper.DataFormatter;
+import io.skyvoli.goodbooks.helper.ISBNChecker;
 import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
 import io.skyvoli.goodbooks.helper.listener.ScanListener;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
@@ -42,7 +43,6 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
     private CameraViewModel cameraViewModel;
     private GlobalController globalController;
     private boolean shouldConfigureUi = true;
-    private static final int BORDER = 6;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -84,7 +84,8 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
             cameraViewModel.getShowBook().observe(getViewLifecycleOwner(), this::showBook);
             binding.addBookBtn.setOnClickListener(this::addBook);
             cameraViewModel.getIsNewBook().observe(getViewLifecycleOwner(), this::setInformationText);
-            cameraViewModel.getMissing().observe(getViewLifecycleOwner(), this::setMissingBooksText);
+            cameraViewModel.getMissing().observe(getViewLifecycleOwner(), missing ->
+                    binding.missingBooks.setText(DataFormatter.getMissingBooksString(requireContext(), missing)));
         }
     }
 
@@ -96,12 +97,23 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
         }
     }
 
+    private void handleCanceledScan(ScanIntentResult result) {
+        Intent originalIntent = result.getOriginalIntent();
+        if (originalIntent == null) {
+            Toast.makeText(getActivity(), "Scan abgebrochen", Toast.LENGTH_LONG).show();
+        } else if (originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
+            Toast.makeText(getActivity(), "Erlaubnis zur Nutzung der Kamera nicht gegeben", Toast.LENGTH_LONG).show();
+        }
+    }
+
     private void handleIsbn(String isbn) {
-        if (!isbnIsBook(isbn)) {
+        if (ISBNChecker.isbnIsNotBook(isbn)) {
             new InformationDialog("418", "Ich bin kein Buch.")
                     .show(getParentFragmentManager(), "418");
             return;
         }
+
+        cameraViewModel.setShowBook(false);
 
         new Thread(() -> {
             Book scanedBook;
@@ -113,21 +125,22 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
                 scanedBook = found.get();
             } else {
                 isNew = true;
-                requireActivity().runOnUiThread(() -> cameraViewModel.setShowBook(false));
                 scanedBook = new BookResolver(requireContext()).resolveBook(isbn, 10);
             }
 
             List<Integer> missing = globalController.getPotentialMissingBooks(scanedBook);
 
             if (isAdded()) {
-                requireActivity().runOnUiThread(() -> {
-                    cameraViewModel.setIsNewBook(isNew);
-                    cameraViewModel.setMissingBooks(missing);
-                    cameraViewModel.setBook(scanedBook);
-                    cameraViewModel.setShowBook(true);
-                });
+                requireActivity().runOnUiThread(() -> setModel(scanedBook, missing, isNew));
             }
         }).start();
+    }
+
+    private void setModel(Book book, List<Integer> missing, boolean isNew) {
+        cameraViewModel.setIsNewBook(isNew);
+        cameraViewModel.setMissingBooks(missing);
+        cameraViewModel.setBook(book);
+        cameraViewModel.setShowBook(true);
     }
 
     private void setInformationText(Boolean isNew) {
@@ -143,36 +156,6 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
         } else {
             binding.information.setText(R.string.book_already_in_list);
         }
-    }
-
-    private void setMissingBooksText(List<Integer> missing) {
-        if (missing.isEmpty()) {
-            binding.missingBooks.setText(R.string.no_missing_books);
-            return;
-        } else if (missing.size() == 1) {
-            binding.missingBooks.setText(new StringBuilder("Buch ").append(missing.get(0)).append(" fehlt"));
-            return;
-        }
-
-        StringBuilder builder = new StringBuilder("Bücher ");
-        Iterator<Integer> iterator = missing.iterator();
-
-        if (missing.size() > BORDER) {
-            builder.append(missing.get(0));
-            for (int index = 1; index < BORDER; index++) {
-                builder.append(", ").append(missing.get(index));
-            }
-            builder.setLength(builder.length() - 1);
-            builder.append("& ").append(missing.size() - (BORDER - 1)).append(" weitere Bücher");
-        } else {
-            builder.append(iterator.next());
-            while (iterator.hasNext()) {
-                builder.append(", ").append(iterator.next());
-            }
-        }
-
-        builder.append(" fehlen");
-        binding.missingBooks.setText(builder);
     }
 
     private void showBook(Boolean showBook) {
@@ -195,14 +178,14 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
         bookPreview.author.setText(book.getAuthor());
         Optional<Drawable> drawable = book.getCover();
         if (drawable.isPresent()) {
-            setCover(drawable.get(), bookPreview);
+            setCover(drawable.get());
         } else {
-            setCover(Objects.requireNonNull(ContextCompat.getDrawable(requireContext(), R.drawable.ruby)), bookPreview);
+            setCover(Objects.requireNonNull(ContextCompat.getDrawable(requireContext(), R.drawable.ruby)));
         }
     }
 
-    private void setCover(Drawable drawable, BookDetailCardBinding bookPreview) {
-        ImageView cover = bookPreview.cover;
+    private void setCover(Drawable drawable) {
+        ImageView cover = binding.bookPreview.cover;
         ((ConstraintLayout.LayoutParams) cover.getLayoutParams()).dimensionRatio
                 = new Dimension(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight()).getRatio();
         cover.setImageDrawable(drawable);
@@ -220,20 +203,6 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
 
         new InformationDialog("Hinzugefügt", "Das Buch wurde zur Liste hinzugefügt")
                 .show(getParentFragmentManager(), "added");
-    }
-
-    private void handleCanceledScan(ScanIntentResult result) {
-        Intent originalIntent = result.getOriginalIntent();
-        if (originalIntent == null) {
-            Toast.makeText(getActivity(), "Scan abgebrochen", Toast.LENGTH_LONG).show();
-        } else if (originalIntent.hasExtra(Intents.Scan.MISSING_CAMERA_PERMISSION)) {
-            Toast.makeText(getActivity(), "Erlaubnis zur Nutzung der Kamera nicht gegeben", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private boolean isbnIsBook(String isbn) {
-        String prefix = isbn.substring(0, 3);
-        return isbn.toCharArray().length == 13 && (prefix.equals("978") || prefix.equals("979"));
     }
 
     @Override
