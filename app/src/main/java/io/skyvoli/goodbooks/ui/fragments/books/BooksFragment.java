@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.MenuProvider;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Lifecycle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,11 +32,11 @@ import io.skyvoli.goodbooks.dialog.InformationDialog;
 import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
-import io.skyvoli.goodbooks.ui.fragments.StartFragmentListener;
+import io.skyvoli.goodbooks.ui.fragments.StartFragment;
 import io.skyvoli.goodbooks.ui.recyclerviews.bookcard.BookAdapter;
 import io.skyvoli.goodbooks.web.BookResolver;
 
-public class BooksFragment extends Fragment implements StartFragmentListener {
+public class BooksFragment extends StartFragment {
 
     private FragmentBooksBinding binding;
     private ProgressBar progressBar;
@@ -45,7 +44,6 @@ public class BooksFragment extends Fragment implements StartFragmentListener {
     private RecyclerView recyclerView;
     private List<Book> books;
     private GlobalController globalController;
-    private boolean shouldConfigureUi = true;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -191,12 +189,6 @@ public class BooksFragment extends Fragment implements StartFragmentListener {
         } else {
             placeholder.setVisibility(View.VISIBLE);
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        shouldConfigureUi = true;
     }
 
     @Override

@@ -12,7 +12,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.zxing.client.android.Intents;
@@ -34,15 +33,14 @@ import io.skyvoli.goodbooks.helper.ISBNChecker;
 import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
 import io.skyvoli.goodbooks.helper.listener.ScanListener;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
-import io.skyvoli.goodbooks.ui.fragments.StartFragmentListener;
+import io.skyvoli.goodbooks.ui.fragments.StartFragment;
 import io.skyvoli.goodbooks.web.BookResolver;
 
-public class CameraFragment extends Fragment implements StartFragmentListener {
+public class CameraFragment extends StartFragment {
 
     private FragmentCameraBinding binding;
     private CameraViewModel cameraViewModel;
     private GlobalController globalController;
-    private boolean shouldConfigureUi = true;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -203,12 +201,6 @@ public class CameraFragment extends Fragment implements StartFragmentListener {
 
         new InformationDialog("Hinzugefügt", "Das Buch wurde zur Liste hinzugefügt")
                 .show(getParentFragmentManager(), "added");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        shouldConfigureUi = true;
     }
 
     @Override
