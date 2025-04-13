@@ -10,8 +10,8 @@ import java.util.Optional;
 import io.skyvoli.goodbooks.R;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.web.api.BookApi;
-import io.skyvoli.goodbooks.web.api.DnbMarc21Api;
-import io.skyvoli.goodbooks.web.api.GoogleBooksApi;
+import io.skyvoli.goodbooks.web.api.dnb.DnbMarc21Api;
+import io.skyvoli.goodbooks.web.api.google.GoogleBooksApi;
 
 public class BookResolver {
 
