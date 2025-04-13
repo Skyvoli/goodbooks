@@ -24,6 +24,7 @@ public class GoogleBooksApi implements BookApi {
 
     private static final String BASE_URL = "https://www.googleapis.com/books/v1/volumes?q=isbn:";
     private final RequestHandler requestHandler = new RequestHandler();
+    private final String logTag = getClass().getSimpleName();
 
     @Override
     public Optional<Book> getBook(String isbn, int timeout) {
@@ -32,9 +33,14 @@ public class GoogleBooksApi implements BookApi {
             return Optional.empty();
         }
 
-        Optional<JsonNode> finalNode = requestHandler.getJsonDocument(
-                requestNode.get().findValue("selfLink").textValue(), timeout);
+        Optional<JsonNode> selfLink = Optional.ofNullable(requestNode.get().findValue("selfLink"));
 
+        if (!selfLink.isPresent()) {
+            Log.i(logTag, "ISBN not found: " + isbn);
+            return Optional.empty();
+        }
+
+        Optional<JsonNode> finalNode = requestHandler.getJsonDocument(selfLink.get().textValue(), timeout);
         if (!finalNode.isPresent()) {
             return Optional.empty();
         }
