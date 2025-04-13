@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.web.api;
+package io.skyvoli.goodbooks.web.api.dnb;
 
 import java.util.Objects;
 

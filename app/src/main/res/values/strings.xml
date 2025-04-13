@@ -36,4 +36,5 @@
     <string name="new_book">Neues Buch</string>
     <string name="add_book">Hinzufügen</string>
     <string name="menu_series">Serien</string>
+    <string name="no_missing_books">Es fehlen keine Bücher</string>
 </resources>

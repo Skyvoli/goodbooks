@@ -1,4 +1,5 @@
-package io.skyvoli.goodbooks.web.api;
+package io.skyvoli.goodbooks.web.api.dnb;
+
 
 public class Resolved<T> {
 

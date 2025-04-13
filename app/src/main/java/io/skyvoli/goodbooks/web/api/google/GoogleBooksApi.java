@@ -1,4 +1,4 @@
-package io.skyvoli.goodbooks.web.api;
+package io.skyvoli.goodbooks.web.api.google;
 
 import android.graphics.drawable.Drawable;
 import android.util.Log;
@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import io.skyvoli.goodbooks.storage.database.dto.Book;
 import io.skyvoli.goodbooks.web.RequestHandler;
+import io.skyvoli.goodbooks.web.api.BookApi;
 
 public class GoogleBooksApi implements BookApi {
 

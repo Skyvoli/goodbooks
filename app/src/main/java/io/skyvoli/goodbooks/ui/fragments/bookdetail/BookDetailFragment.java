@@ -146,7 +146,7 @@ public class BookDetailFragment extends Fragment {
             Book newBook = copiedBook.createClone();
             newBook.setResolved(true);
             new Thread(() -> {
-                originalBook = globalController.updateBook(originalBook.getSeriesId(), newBook, requireContext());
+                originalBook = globalController.updateBook(newBook, requireContext());
                 copiedBook = originalBook.createClone();
                 globalController.sort();
                 requireActivity().runOnUiThread(() -> {
