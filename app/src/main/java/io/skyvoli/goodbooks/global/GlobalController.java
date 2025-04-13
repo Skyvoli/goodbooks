@@ -9,12 +9,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
+import io.skyvoli.goodbooks.helper.MissingNumberDetector;
 import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
@@ -36,35 +35,22 @@ public class GlobalController {
     }
 
     public List<Integer> getPotentialMissingBooks(Book book) {
-        if (book.getPart() == null) {
+
+        Integer bookPart = book.getPart();
+
+        if (bookPart == null) {
             return new ArrayList<>();
         }
 
-        int max = book.getPart();
         long seriesId = book.getSeriesId();
 
         if (seriesId == 0) {
             seriesId = getSeriesId(book);
         }
 
-        List<Integer> existing = db.bookDao().getVolumeNumbers(seriesId, max);
+        List<Integer> existing = db.bookDao().getVolumeNumbers(seriesId, bookPart);
 
-
-        BitSet allBitSet = new BitSet(max);
-        BitSet presentBitSet = new BitSet(max);
-
-        IntStream.rangeClosed(1, max)
-                .forEach(allBitSet::set);
-
-        existing.forEach(presentBitSet::set);
-
-        allBitSet.and(presentBitSet);
-
-        return IntStream.rangeClosed(1, max - 1)
-                .filter(i -> !allBitSet.get(i))
-                .boxed()
-                .sorted()
-                .collect(Collectors.toList());
+        return MissingNumberDetector.findMissingNumbers(existing, bookPart);
     }
 
     public void addBook(Book book, Context context) {
