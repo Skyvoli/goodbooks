@@ -9,12 +9,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
+import io.skyvoli.goodbooks.helper.MissingNumberDetector;
 import io.skyvoli.goodbooks.storage.FileStorage;
 import io.skyvoli.goodbooks.storage.database.AppDatabase;
 import io.skyvoli.goodbooks.storage.database.dto.Book;
@@ -36,35 +35,22 @@ public class GlobalController {
     }
 
     public List<Integer> getPotentialMissingBooks(Book book) {
-        if (book.getPart() == null) {
+
+        Integer bookPart = book.getPart();
+
+        if (bookPart == null) {
             return new ArrayList<>();
         }
 
-        int max = book.getPart();
         long seriesId = book.getSeriesId();
 
         if (seriesId == 0) {
             seriesId = getSeriesId(book);
         }
 
-        List<Integer> existing = db.bookDao().getVolumeNumbers(seriesId, max);
+        List<Integer> existing = db.bookDao().getVolumeNumbers(seriesId, bookPart);
 
-
-        BitSet allBitSet = new BitSet(max);
-        BitSet presentBitSet = new BitSet(max);
-
-        IntStream.rangeClosed(1, max)
-                .forEach(allBitSet::set);
-
-        existing.forEach(presentBitSet::set);
-
-        allBitSet.and(presentBitSet);
-
-        return IntStream.rangeClosed(1, max - 1)
-                .filter(i -> !allBitSet.get(i))
-                .boxed()
-                .sorted()
-                .collect(Collectors.toList());
+        return MissingNumberDetector.findMissingNumbers(existing, bookPart);
     }
 
     public void addBook(Book book, Context context) {
@@ -96,7 +82,6 @@ public class GlobalController {
         }
 
         return NO_SERIES;
-
     }
 
     private long getSeriesIdOfNew(Book book) {
@@ -115,7 +100,8 @@ public class GlobalController {
         return seriesId;
     }
 
-    public Book updateBook(long oldId, Book book, Context context) {
+    public Book updateBook(Book book, Context context) {
+        long oldId = book.getSeriesId();
         if (db.seriesDao().getCountOfSeries(oldId) <= 1) {
             List<SeriesEntity> found = db.seriesDao().getSeriesDtoByTitle(book.getTitle());
             if (found.isEmpty()) {
@@ -128,7 +114,7 @@ public class GlobalController {
                 //Change reference and delete old
                 book.setSeriesId(found.get(0).getSeriesId());
                 db.bookDao().update(book.getEntity());
-                removeSeries(oldId);
+                tryRemoveSeries(oldId);
                 //Update new series
                 updateSeries(book.getSeriesId(), context);
             }
@@ -160,11 +146,10 @@ public class GlobalController {
         globalViewModel.removeBook(book);
         db.bookDao().delete(book.getEntity());
         new FileStorage(context.getFilesDir()).deleteImage(book.getIsbn());
-
-        removeSeries(book.getSeriesId());
+        tryRemoveSeries(book.getSeriesId());
     }
 
-    private void removeSeries(long seriesId) {
+    private void tryRemoveSeries(long seriesId) {
         if (db.seriesDao().getCountOfSeries(seriesId) == 0) {
             globalViewModel.removeSeries(seriesId);
             db.seriesDao().delete(seriesId);

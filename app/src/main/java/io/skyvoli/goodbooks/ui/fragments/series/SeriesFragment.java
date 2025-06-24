@@ -9,7 +9,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -21,15 +20,14 @@ import io.skyvoli.goodbooks.databinding.FragmentSeriesBinding;
 import io.skyvoli.goodbooks.global.GlobalController;
 import io.skyvoli.goodbooks.helper.SwipeColorSchemeConfigurator;
 import io.skyvoli.goodbooks.storage.database.dto.Series;
-import io.skyvoli.goodbooks.ui.fragments.StartFragmentListener;
+import io.skyvoli.goodbooks.ui.fragments.StartFragment;
 import io.skyvoli.goodbooks.ui.recyclerviews.seriescard.SeriesAdapter;
 
-public class SeriesFragment extends Fragment implements StartFragmentListener {
+public class SeriesFragment extends StartFragment {
 
     private GlobalController globalController;
     private FragmentSeriesBinding binding;
     private List<Series> series;
-    private boolean shouldConfigureUi = true;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -96,12 +94,6 @@ public class SeriesFragment extends Fragment implements StartFragmentListener {
                 });
             }
         }).start();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        shouldConfigureUi = true;
     }
 
     @Override

@@ -26,7 +26,7 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.Objects;
 
 import io.skyvoli.goodbooks.databinding.ActivityMainBinding;
-import io.skyvoli.goodbooks.ui.fragments.StartFragmentListener;
+import io.skyvoli.goodbooks.ui.fragments.StartFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -121,8 +121,8 @@ public class MainActivity extends AppCompatActivity {
                 .getChildFragmentManager()
                 .getPrimaryNavigationFragment();
 
-        if (currentFragment instanceof StartFragmentListener) {
-            ((StartFragmentListener) currentFragment).configureFragment();
+        if (currentFragment instanceof StartFragment) {
+            ((StartFragment) currentFragment).configureFragment();
         }
     }
 
@@ -135,8 +135,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, @Nullable Bundle savedInstanceState) {
                         super.onFragmentViewCreated(fm, f, v, savedInstanceState);
 
-                        if (!drawer.isDrawerOpen(GravityCompat.START) && (f instanceof StartFragmentListener)) {
-                            ((StartFragmentListener) f).configureFragment();
+                        if (!drawer.isDrawerOpen(GravityCompat.START) && (f instanceof StartFragment)) {
+                            ((StartFragment) f).configureFragment();
                         }
                     }
                 }, false);
